@@ -14,16 +14,16 @@ const config = {
 			colors: {
 				// flowbite-svelte
 				primary: {
-					50: '#ecfdf5',
-					100: '#d1fae5',
-					200: '#a7f3d0',
-					300: '#6ee7b7',
-					400: '#34d399',
-					500: '#10b981',
-					600: '#059669',
-					700: '#3cf4a2',
-					800: '#065f46',
-					900: '#0C2464'
+					50: '#f9fafb',   // Super light, barely-there grey
+					100: '#f3f4f6',  // Like, paper-white but with attitude
+					200: '#e5e7eb',  // Getting a bit more serious
+					300: '#d1d5db',  // Nice middle-light tone
+					400: '#9ca3af',  // Perfect for secondary text
+					500: '#6b7280',  // Your go-to middle grey
+					600: '#4b5563',  // Getting into the moody territory
+					700: '#374151',  // Dark but not too dark
+					800: '#1f2937',  // Almost-but-not-quite black
+					900: '#111827'   // The deep end
 				},
 				gray: {
 					800: '#0C2464',
