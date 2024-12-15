@@ -10,38 +10,46 @@
 	const { supabase } = data;
 
 	async function handleSignIn() {
+		if (!supabase) return;
 		try {
 			loading = true;
-			const { error } = await supabase?.auth.signInWithPassword({
+			const {
+				data: { user },
+				error
+			} = await supabase.auth.signInWithPassword({
 				email,
 				password
 			});
 			if (error) throw error;
 			goto('/dashboard');
 		} catch (error) {
-			alert(error.message);
+			if (error instanceof Error) {
+				alert(error.message);
+			}
 		} finally {
 			loading = false;
 		}
 	}
 
 	async function handleSignUp() {
+		if (!supabase) return;
 		try {
 			loading = true;
-			const { error } = await data.supabase.auth.signUp({
+			const { error } = await supabase.auth.signUp({
 				email,
 				password
 			});
 			if (error) throw error;
 			alert('Check your email for the confirmation link!');
-		} catch (error) {
-			alert(error.message);
+		} catch (error: any) {
+			alert(error.message ?? 'an error occured');
 		} finally {
 			loading = false;
 		}
 	}
 
 	async function handleGoogleSignIn() {
+		if (!data.supabase) return;
 		const { error } = await data.supabase.auth.signInWithOAuth({
 			provider: 'google'
 		});
