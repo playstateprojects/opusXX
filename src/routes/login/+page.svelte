@@ -23,7 +23,7 @@
 		try {
 			const userCredential = await signInWithEmailAndPassword(auth, email, password);
 			console.log('User logged in:', userCredential.user);
-			goto('/beehomes');
+			goto('/');
 		} catch (error) {
 			console.error('Error logging in:', error);
 			setError('Failed to log in. Please check your email and password.');
@@ -54,7 +54,7 @@
 			const provider = new GoogleAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			console.log('User logged in with Google:', result.user);
-			goto('/beehomes');
+			goto('/');
 		} catch (error) {
 			console.error('Error logging in with Google:', error);
 			setError('Failed to log in with Google. Please try again.');
@@ -69,7 +69,7 @@
 			const provider = new FacebookAuthProvider();
 			const result = await signInWithPopup(auth, provider);
 			console.log('User logged in with Facebook:', result.user);
-			goto('/beehomes');
+			goto('/');
 		} catch (error) {
 			console.error('Error logging in with Facebook:', error);
 			setError('Failed to log in with Facebook. Please try again.');
@@ -81,21 +81,14 @@
 	<div>
 		<h2 class="mb-6 text-center text-2xl font-bold">Login</h2>
 		<p>
-			Login or <a href="/waitlist" class="text-blue-600">signup</a> to join the waitlist.
+			Login or <a href="/signup" class="text-blue-600">signup</a> to join the waitlist.
 		</p>
 		<form on:submit|preventDefault={handleEmailPasswordLogin} class="mt-4 space-y-4">
-			<Label for="large-input" class="mb-2 block">Email</Label>
+			<Label for="email" class="mb-2 block">Email</Label>
+			<Input id="email" size="lg" type="email" placeholder="Email" bind:value={email} required />
+			<Label for="password" class="mb-2 block">Password</Label>
 			<Input
-				id="large-input"
-				size="lg"
-				type="email"
-				placeholder="Email"
-				bind:value={email}
-				required
-			/>
-			<Label for="large-input" class="mb-2 block">Password</Label>
-			<Input
-				id="large-input"
+				id="password"
 				size="lg"
 				type="password"
 				placeholder="Password"
@@ -122,9 +115,7 @@
 			<a href="/passwordreset" class="mt-2 block text-sm text-blue-600 hover:underline"
 				>Reset or change your password</a
 			>
-			<Button type="submit" variant="raised" color="primary" class="w-full rounded-full"
-				>Login</Button
-			>
+			<Button type="submit" class="w-full">Login</Button>
 		</form>
 
 		<!-- <div class="my-4">
@@ -150,9 +141,3 @@
 {:else}
 	<EmailLinkSent {email} />
 {/if}
-
-<style lang="postcss">
-	:global(.mdc-tab__text-label) {
-		@apply text-sm;
-	}
-</style>

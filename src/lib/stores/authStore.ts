@@ -6,7 +6,8 @@ import {
 	signOut,
 	updateProfile,
 	browserLocalPersistence,
-	setPersistence
+	setPersistence,
+	sendSignInLinkToEmail
 } from 'firebase/auth';
 import { type FirebaseApp } from 'firebase/app';
 import { browser } from '$app/environment';
@@ -69,6 +70,24 @@ if (browser) {
 } else {
 	console.log('Non-browser environment detected, skipping Firebase initialization');
 }
+const handleSignup = async (email: string) => {
+	const actionCodeSettings = {
+		url: `${window.location.origin}/loginverify`,
+		handleCodeInApp: true
+	};
+
+	// Store password temporarily in session storage
+
+	// Send sign-in link to email
+	await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+
+	// Optionally store email for retrieval later
+	localStorage.setItem('emailForSignIn', email);
+
+	// Send sign-in link to email
+	await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+
+}
 
 const logout = async () => {
 	try {
@@ -119,4 +138,4 @@ function waitForUser(): Promise<User | null> {
 	});
 }
 
-export { auth, logout, user, idToken, updateDisplayName, updatePhotoURL, waitForUser };
+export { auth, logout, user, idToken, updateDisplayName, updatePhotoURL, waitForUser, handleSignup };
