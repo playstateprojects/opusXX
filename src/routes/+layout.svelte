@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import type { LayoutData } from './$types';
 	import '../app.css';
+	import XXHeader from '$lib/components/XXHeader.svelte';
 
 	export let data: LayoutData;
 
@@ -23,5 +24,8 @@
 </script>
 
 <div class="flex h-full w-full flex-col items-center justify-center overflow-hidden">
-	<slot></slot>
+	<XXHeader></XXHeader>
+	<div class="h-full w-full overflow-hidden">
+		<slot></slot>
+	</div>
 </div>

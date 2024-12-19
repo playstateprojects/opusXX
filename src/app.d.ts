@@ -12,6 +12,12 @@ declare global {
 		// interface Error {}
 		// interface Platform {}
 	}
+	namespace NodeJS {
+		interface ProcessEnv {
+			CF_ACCOUNT_ID: string;
+			CF_AI_TOKEN: string;
+		}
+	}
 }
 
 export { };
