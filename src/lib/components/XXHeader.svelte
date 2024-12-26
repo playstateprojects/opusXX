@@ -4,12 +4,12 @@
 		NavBrand,
 		NavLi,
 		NavUl,
-		NavHamburger,
 		Avatar,
 		Dropdown,
 		DropdownItem,
 		DropdownHeader,
-		DropdownDivider
+		DropdownDivider,
+		Button
 	} from 'flowbite-svelte';
 	import { user } from '$lib/stores/userStore';
 	import { get } from 'svelte/store';
@@ -43,21 +43,22 @@
 		<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">OpusXX</span>
 	</NavBrand>
 	<div class="flex items-center md:order-2">
-		<Avatar id="avatar-menu" src="/images/xxgenerator.webp" />
-		<NavHamburger class="w-full md:order-1 md:flex md:w-auto" />
-	</div>
-	<Dropdown placement="bottom" triggeredBy="#avatar-menu">
 		{#if $user}
+			<Avatar id="avatar-menu" src="/images/xxgenerator.webp" />
+		{:else}
+			<Button href="/login">Login</Button>
+		{/if}
+	</div>
+	{#if $user}
+		<Dropdown placement="bottom" triggeredBy="#avatar-menu">
 			<DropdownHeader>
 				<span class="block text-sm">{$user?.email}</span>
 			</DropdownHeader>
 			<DropdownItem>Settings</DropdownItem>
 			<DropdownDivider />
 			<DropdownItem on:click={handleSignOut}>Sign out</DropdownItem>
-		{:else}
-			<DropdownItem href="login">Sign in</DropdownItem>
-		{/if}
-	</Dropdown>
+		</Dropdown>
+	{/if}
 	<NavUl>
 		<NavLi href="/about">About</NavLi>
 		<NavLi href="/contact">Contact</NavLi>

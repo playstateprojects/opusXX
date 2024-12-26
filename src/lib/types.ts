@@ -10,3 +10,10 @@ export interface AiMessage {
     content: string,
     time?: Date
 }
+
+export interface VectorInfo {
+    sourceUrl: string;
+    vector: number[];
+    meta: string;
+    namespace: string
+}
