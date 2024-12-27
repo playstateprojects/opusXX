@@ -9,6 +9,15 @@ declare global {
 		interface PageData {
 			session: Session | null
 		}
+		interface Platform {
+			env: {
+				VECTORIZE: {
+					insert: (data: any) => Promise<any>;
+					query: (data: any, options: any) => Promise<any>;
+					// Add other methods if VECTORIZE supports more
+				};
+			};
+		}
 		// interface Error {}
 		// interface Platform {}
 	}

@@ -20,7 +20,7 @@
 	let supabaseUnsubscribe: () => void;
 
 	unsubscribe = user.subscribe((currentUser) => {
-		console.log('Current user:', currentUser);
+		// console.log('Current user:', currentUser);
 	});
 
 	async function handleSignOut() {
