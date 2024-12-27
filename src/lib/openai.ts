@@ -1,18 +1,14 @@
+import { OPENAI_API_KEY } from '$env/static/private';
+import OpenAI from 'openai';
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
 const getEmbedding = async (text: string) => {
-    const response = await fetch.post(
-        `${OPENAI_API_URL}/v1/engines/davinci/completions`,
-        {
-            prompt: text,
-            max_tokens: 1,
-            n: 1,
-            stop: ["\n"],
-        },
-        {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${OPENAI_API_KEY}`,
-            },
-        }
-    );
-    return response.data.choices[0].logprobs.tokens;
+    const embedding = await openai.embeddings.create({
+        model: "text-embedding-3-small",
+        input: "Your text string goes here",
+        encoding_format: "float",
+    });
+    return embedding
 }
+
+export { getEmbedding }

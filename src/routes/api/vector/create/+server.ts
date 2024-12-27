@@ -1,15 +1,9 @@
-import OpenAI from "openai";
-import { OPENAI_API_KEY } from '$env/static/private';
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+import { getEmbedding } from '$lib/openai.js';
 
 
 export async function POST({ request }) {
     const body = await request.json();
-    const embedding = await openai.embeddings.create({
-        model: "text-embedding-3-small",
-        input: "Your text string goes here",
-        encoding_format: "float",
-    });
+    const embedding = await getEmbedding(body.text);
     console.log(embedding);
     return new Response(JSON.stringify({ error: 'Not implemented', body, embedding }));
 }
