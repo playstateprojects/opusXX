@@ -16,6 +16,7 @@ declare global {
 		interface ProcessEnv {
 			CF_ACCOUNT_ID: string;
 			CF_AI_TOKEN: string;
+			OPENAI_API_KEY: string;
 		}
 	}
 }
