@@ -3,6 +3,7 @@
 	import { Button, Card, Input, Label } from 'flowbite-svelte';
 	let scraperUrl = 'https://en.wikipedia.org/wiki/Hildegard_of_Bingen';
 	import { load } from 'cheerio';
+	import { extractJson } from '$lib/scrapingUtils';
 	let composerInfo: { name: string; works: string[]; birth: string };
 	const composerJson = {
 		name: '',
@@ -88,7 +89,8 @@
 			method: 'POST',
 			body: JSON.stringify({ messages: messages })
 		});
-		composerInfo = await response.json();
+		const composerJson = await response.json();
+		composerInfo = extractJson(composerJson) as { name: string; works: string[]; birth: string };
 	};
 </script>
 
