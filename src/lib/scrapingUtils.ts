@@ -1,4 +1,5 @@
 function extractJson(input: string): unknown {
+    console.log(input)
     const start = input.indexOf('{');
     const end = input.lastIndexOf('}');
 

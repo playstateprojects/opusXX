@@ -1,30 +1,9 @@
 <script lang="ts">
-	import { AiRole, type AiMessage } from '$lib/types';
 	import { Button, Card, Input, Label } from 'flowbite-svelte';
 	let scraperUrl = 'https://en.wikipedia.org/wiki/Hildegard_of_Bingen';
 	import { load } from 'cheerio';
-	import { extractJson } from '$lib/scrapingUtils';
-	let composerInfo: { name: string; works: string[]; birth: string };
-	const composerJson = {
-		name: '',
-		birth: '',
-		death: '',
-		era: '',
-		period: '',
-		instruments: [],
-		works: [],
-		awards: [],
-		education: [],
-		website: '',
-		about: ''
-	};
-	let messages: AiMessage[] = [
-		{
-			role: AiRole.System,
-			content:
-				'You are a classical music expert. Your speciality is recommending works by female composers. Your primary audience are programme directors of major classical music companies.'
-		}
-	];
+	import type { Composer } from '$lib/zodDefinitions';
+	let composerInfo: Composer;
 
 	const getRawHtml = async (url: string) => {
 		try {
@@ -69,38 +48,37 @@
 			body: JSON.stringify({ text: scraperUrl })
 		});
 		const data = await response.json();
-		console.log(data);
+		console.log('datata', data);
 	};
 	const submitUrl = async () => {
+		const existing = await fetch(
+			`/api/base/composers?name=${encodeURIComponent('Aleotti, Vittoria')}`,
+			{
+				method: 'GET'
+			}
+		);
+		return;
 		const rawData = await scrapeData(scraperUrl);
-		console.log('rawData', rawData);
-		const prompt = `from the following html please extract information about the composer in order to complete the following json. 
-		return only the populated json object. do not explain your process or include any additional text. respond only with valid json. No additional formating should be included.
-		<JSON_EXAMPLE>
-		${JSON.stringify(composerJson)}
-		</JSON_EXAMPLE>
-
-		<HTML>
-		${rawData}
-		</HTML>
-		`;
-		messages.push({ role: AiRole.User, content: prompt });
-		const response = await fetch('/api/chat', {
+		const response = await fetch('/api/scrape/data', {
 			method: 'POST',
-			body: JSON.stringify({ messages: messages })
+			body: JSON.stringify({ text: rawData })
 		});
-		const composerJson = await response.json();
-		composerInfo = extractJson(composerJson) as { name: string; works: string[]; birth: string };
+		const composerRaw = await response.json();
+		composerInfo = composerRaw.data;
+		console.log('ci', composerInfo);
 	};
 </script>
 
 <div class="flex min-h-screen items-center justify-center">
 	<Card class="w-full max-w-md space-y-6 p-6">
 		{#if composerInfo}
-			{composerInfo.name}
-			{composerInfo.birth}
+			<h1>{composerInfo.name}</h1>
+			<h3>born: {composerInfo.birthDate}</h3>
+			<h3>Description</h3>
+			<p>{composerInfo.description}</p>
 			{#each composerInfo.works as work}
-				<p>{work}</p>
+				<h2>{work.title}</h2>
+				<p>{work.description}</p>
 			{/each}
 		{/if}
 		<h3 class="text-center text-xl font-medium text-gray-900 dark:text-white">

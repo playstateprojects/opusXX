@@ -9,10 +9,10 @@ export async function POST({ request }) {
     try {
 
         const data = await chat(body.messages)
-        console.log("data", data)
+        console.log(data)
 
 
-        return json({ data: data.content });
+        return json(data);
     } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
