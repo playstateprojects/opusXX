@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import type { AiMessage } from './types';
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 import { zodResponseFormat } from "openai/helpers/zod";
-import { Composer } from './zodDefinitions';
+import { Composer, ComposerList } from './zodDefinitions';
 
 const getEmbedding = async (text: string) => {
     const embedding = await openai.embeddings.create({
@@ -25,7 +25,7 @@ const chat = async (messages: AiMessage[]) => {
     }
 }
 
-const extract = async (text: string) => {
+const extractComposer = async (text: string) => {
     const response = await openai.beta.chat.completions.parse({
         model: "gpt-4o-2024-08-06",
         messages: [
@@ -35,7 +35,25 @@ const extract = async (text: string) => {
         response_format: zodResponseFormat(Composer, "composer")
 
     })
-    console.log("rrrrrrr", response)
+    console.log("composer res....", response)
+    if (response && response.choices[0].message && response.choices[0].message.parsed) {
+        return response.choices[0].message.parsed
+    } else {
+        return { error: true }
+    }
+}
+const extractComposerList = async (text: string) => {
+    console.log("getting from openApi")
+    const response = await openai.beta.chat.completions.parse({
+        model: "gpt-4o-2024-08-06",
+        messages: [
+            { role: "system", content: "You will be provided a content from a page that lists links to entries of people. Analyse the data proided and extract links and names from the provided text. Do not add any additional names to the list." },
+            { role: "user", content: text }
+        ],
+        response_format: zodResponseFormat(ComposerList, "composerList")
+    })
+    console.log("listresponse", response)
+    console.log("listresponse", response.choices[0].message)
     if (response && response.choices[0].message && response.choices[0].message.parsed) {
         return response.choices[0].message.parsed
     } else {
@@ -43,4 +61,4 @@ const extract = async (text: string) => {
     }
 }
 
-export { getEmbedding, chat, extract }
+export { getEmbedding, chat, extractComposer, extractComposerList }

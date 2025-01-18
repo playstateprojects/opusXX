@@ -35,11 +35,19 @@ const Composer = z.object({
     works: z.array(Work),
     gender: z.enum(['male', 'female', 'other'])
 })
+const ComposerList = z.object({
+    links: z.array(
+        z.object(
+            { name: z.string(), url: z.string() }
+        )
+    )
+})
 
 type Composer = z.infer<typeof Composer>
 type Work = z.infer<typeof Work>
 type Reference = z.infer<typeof Reference>
+type ComposerList = z.infer<typeof ComposerList>
 
 
 
-export { Reference, Work, Composer }
+export { Reference, Work, Composer, ComposerList }
