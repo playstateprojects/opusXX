@@ -6,9 +6,6 @@ export async function POST({ request }) {
     try {
 
         const data = await extract(body.text)
-        console.log("data", data)
-
-
         return json({ data: data });
     } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), {

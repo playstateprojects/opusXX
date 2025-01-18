@@ -34,7 +34,7 @@
 			throw error;
 		}
 	};
-
+	// returns raw HTML from a web page
 	const scrapeData = async (url: string): Promise<string> => {
 		const rawData = await getRawHtml(url);
 		return rawData;
