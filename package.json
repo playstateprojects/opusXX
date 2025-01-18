@@ -43,6 +43,7 @@
 		"@cloudflare/workers-types": "^4.20241218.0",
 		"@supabase/auth-helpers-sveltekit": "^0.13.0",
 		"@supabase/supabase-js": "^2.47.7",
+		"airtable": "^0.12.2",
 		"cheerio": "^1.0.0",
 		"openai": "^4.77.0",
 		"wrangler": "^3.95.0",

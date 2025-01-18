@@ -33,7 +33,6 @@
 
 	onDestroy(() => {
 		unsubscribe?.();
-		supabaseUnsubscribe?.();
 	});
 </script>
 

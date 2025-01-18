@@ -51,13 +51,21 @@
 		console.log('datata', data);
 	};
 	const submitUrl = async () => {
-		const existing = await fetch(
-			`/api/base/composers?name=${encodeURIComponent('Aleotti, Vittoria')}`,
-			{
-				method: 'GET'
-			}
-		);
-		return;
+		// const existing = await fetch(
+		// 	`/api/base/composers?name=${encodeURIComponent('Aleotti, Vittoria')}`,
+		// 	{
+		// 		method: 'GET'
+		// 	}
+		// );
+		// const created = await await fetch(`/api/base/composers`, {
+		// 	method: 'POST',
+		// 	headers: {
+		// 		'Content-Type': 'application/json'
+		// 	},
+		// 	body: JSON.stringify({ name: 'Aleotti, demo' })
+		// });
+		// console.log('created', created.json());
+		// return;
 		const rawData = await scrapeData(scraperUrl);
 		const response = await fetch('/api/scrape/data', {
 			method: 'POST',
