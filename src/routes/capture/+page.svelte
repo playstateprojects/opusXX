@@ -1,12 +1,26 @@
 <script lang="ts">
 	import { Button, Card, Input, Label } from 'flowbite-svelte';
-	let scraperUrl = 'https://en.wikipedia.org/wiki/List_of_women_composers_by_birth_date';
+	import TurndownService from 'turndown';
+	import { gfm } from 'turndown-plugin-gfm';
+	let scraperUrl = 'https://en.wikipedia.org/wiki/Alba_Trissina';
 	import { load } from 'cheerio';
 	import type { Composer, ComposerList } from '$lib/zodDefinitions';
 	let composerInfo: Composer;
 	let composerList: ComposerList;
+	const emptyComposer = {
+		name: '',
+		birthDate: '',
+		birthLocation: '',
+		longDescription: '',
+		shortDescription: '',
+		tags: [],
+		refrences: [],
+		works: [],
+		links: []
+	};
 
 	const getOnlyLinks = async (url: string): Promise<string> => {
+		console.log('get obly links');
 		try {
 			// Input validation
 			if (!url || typeof url !== 'string') {
@@ -103,17 +117,7 @@
 			throw error;
 		}
 	};
-	// returns raw HTML from a web page
-	const scrapeData = async (url: string): Promise<string> => {
-		const rawData = await getRawHtml(url);
 
-		return rawData;
-	};
-	const scrapeLinksList = async (url: string): Promise<string> => {
-		const rawData = await getRawHtml(url);
-
-		return rawData;
-	};
 	const saveVector = async () => {
 		const response = await fetch('/api/vector/create', {
 			method: 'POST',
@@ -125,23 +129,7 @@
 		const data = await response.json();
 		console.log('datata', data);
 	};
-	const submitUrl = async () => {
-		// const existing = await fetch(
-		// 	`/api/base/composers?name=${encodeURIComponent('Aleotti, Vittoria')}`,
-		// 	{
-		// 		method: 'GET'
-		// 	}
-		// );
-		// const created = await await fetch(`/api/base/composers`, {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify({ name: 'Aleotti, demo' })
-		// });
-		// console.log('created', created.json());
-		// return;
-		// const rawData = await scrapeData(scraperUrl);
+	const scrapeComposerList = async () => {
 		const rawData = await getOnlyLinks(scraperUrl);
 		console.log(rawData);
 		const response = await fetch('/api/scrape/composerList', {
@@ -149,11 +137,7 @@
 			body: JSON.stringify({ text: rawData })
 		});
 		const composerRaw = await response.json();
-		try {
-			composerInfo = composerRaw.data;
-		} catch {
-			console.log('not a composer');
-		}
+
 		try {
 			composerList = composerRaw.data;
 			console.log(composerList.links.length);
@@ -162,41 +146,67 @@
 			console.log('not a list');
 		}
 	};
-	const submitComposerUrl = async (url: string) => {
-		// const existing = await fetch(
-		// 	`/api/base/composers?name=${encodeURIComponent('Aleotti, Vittoria')}`,
-		// 	{
-		// 		method: 'GET'
-		// 	}
-		// );
-		// const created = await await fetch(`/api/base/composers`, {
-		// 	method: 'POST',
-		// 	headers: {
-		// 		'Content-Type': 'application/json'
-		// 	},
-		// 	body: JSON.stringify({ name: 'Aleotti, demo' })
-		// });
-		// console.log('created', created.json());
-		// return;
-		// const rawData = await scrapeData(scraperUrl);
-		const rawData = await getOnlyLinks(url);
-		console.log(rawData);
-		return;
-		const response = await fetch('/api/scrape/composerList', {
+	const getMarkdown = async (url: string): Promise<string> => {
+		try {
+			// Input validation
+			if (!url || typeof url !== 'string') {
+				throw new Error('Invalid URL provided');
+			}
+
+			const response = await fetch(`/api/scrape/html/?url=${encodeURIComponent(url)}`);
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const html = await response.text();
+			const x = load(html);
+
+			// Remove unnecessary elements
+			x('script, style, noscript, iframe, form, .ads, .sidebar, .popup').remove();
+
+			// Extract the main content (adjust based on the website)
+			let mainContent = x('article, main, .content, #content').first();
+			if (!mainContent.length) {
+				mainContent = x('body'); // Fallback to entire body
+			}
+
+			// Convert cleaned HTML to a string
+			const cleanedHtml = mainContent.html();
+			if (!cleanedHtml) return '';
+
+			// Initialize Turndown with GitHub-Flavored Markdown (GFM)
+			const turndownService = new TurndownService({ headingStyle: 'atx' });
+			turndownService.use(gfm);
+
+			// Preserve code blocks
+			turndownService.addRule('preformatted', {
+				filter: ['pre'],
+				replacement: (content: any) => `\n\`\`\`\n${content}\n\`\`\`\n`
+			});
+
+			// Convert HTML to Markdown
+			const markdown = turndownService.turndown(cleanedHtml);
+
+			console.log('md', markdown);
+			return markdown;
+			// Extract elements and their properties
+		} catch (error) {
+			console.log(error);
+		}
+		return '';
+	};
+	const scrapeComposer = async (url: string) => {
+		const rawData = await getMarkdown(url);
+		const response = await fetch('/api/scrape/composer', {
 			method: 'POST',
 			body: JSON.stringify({ text: rawData })
 		});
 		const composerRaw = await response.json();
 		try {
 			composerInfo = composerRaw.data;
+			console.log('ci', composerInfo);
 		} catch {
 			console.log('not a composer');
-		}
-		try {
-			composerList = composerRaw.data;
-			console.log(composerList.links.length);
-		} catch {
-			console.log('not a list');
 		}
 	};
 </script>
@@ -204,6 +214,7 @@
 <div class="flex min-h-screen items-center justify-center">
 	<Card class="mb-4 max-h-full w-full max-w-md space-y-6 overflow-scroll p-6">
 		{#if composerList}
+			-------cl------
 			{#each composerList.links as composer}
 				<div class="flex">
 					<p>
@@ -224,7 +235,7 @@
 			<h1>{composerInfo.name}</h1>
 			<h3>born: {composerInfo.birthDate}</h3>
 			<h3>Description</h3>
-			<p>{composerInfo.description}</p>
+			<p>{composerInfo.shortDescription}</p>
 			{#each composerInfo.works as work}
 				<h2>{work.title}</h2>
 				<p>{work.description}</p>
@@ -235,12 +246,16 @@
 		</h3>
 		<p>for example: https://en.wikipedia.org/wiki/Hildegard_of_Bingen</p>
 		<p>or https://en.wikipedia.org/wiki/List_of_women_composers_by_birth_date</p>
-		<form on:submit|preventDefault={submitUrl} class="space-y-4">
-			<div>
-				<Label for="scraperUrl" class="mb-2">scraperUrl</Label>
-				<Input id="scraperUrl" placeholder="name@company.com" bind:value={scraperUrl} required />
-			</div>
-			<Button type="submit" color="primary">Submit</Button>
-		</form>
+		<div>
+			<Label for="scraperUrl" class="mb-2">scraperUrl</Label>
+			<Input id="scraperUrl" placeholder="name@company.com" bind:value={scraperUrl} required />
+		</div>
+		<Button on:click={scrapeComposerList} color="primary">Composer List</Button>
+		<Button
+			on:click={() => {
+				scrapeComposer(scraperUrl);
+			}}
+			color="primary">Composer</Button
+		>
 	</Card>
 </div>

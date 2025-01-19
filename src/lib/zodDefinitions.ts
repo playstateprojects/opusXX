@@ -20,6 +20,15 @@ const Work = z.object({
     refrences: z.array(Reference),
 })
 
+const Media = z.object({
+    url: z.string().optional(),
+    type: z.enum(["image", "video", "audio", "document"]),
+    info: z.string(),
+    tags: z.array(z.string()).optional()
+})
+const Source = z.object({
+
+})
 
 const Composer = z.object({
     name: z.string(),
@@ -27,13 +36,15 @@ const Composer = z.object({
     deathDate: z.string().optional(),
     birthLocation: z.string(),
     deathLocation: z.string().optional(),
-    description: z.string(),
-    media: z.array(z.string()).optional(),
+    longDescription: z.string(),
+    shortDescription: z.string(),
+    media: z.array(Media).optional(),
     links: z.array(z.string()).optional(),
     tags: z.array(z.string()),
     refrences: z.array(Reference),
     works: z.array(Work),
-    gender: z.enum(['male', 'female', 'other'])
+    gender: z.enum(['male', 'female', 'other']),
+    allRelevantTextContent: z.array(z.string())
 })
 const ComposerList = z.object({
     links: z.array(
