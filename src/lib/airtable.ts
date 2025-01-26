@@ -27,11 +27,21 @@ const getGenres = async () => {
     const data = await response.json();
     return data.records.map((record: any) => { return { id: record.id, name: record.fields.Name } }) ?? [];
 }
+const getSubGenres = async () => {
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/Sub-Genre`;
+
+    const response = await fetch(url, {
+        headers: {
+            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+        },
+    })
+    const data = await response.json();
+    return data.records.map((record: any) => { return { id: record.id, name: record.fields.Name } }) ?? [];
+}
 const createSource = async (source: Source): Promise<string> => {
     console.log("html len", source.RawHTML?.length)
     const html = source.RawHTML ? encodeURIComponent(source.RawHTML) : ''
     const md = source.Content ? encodeURIComponent(source.Content) : ''
-    console.log(md)
     return new Promise((resolve, reject) => {
         base('sources').create([
             {
@@ -121,6 +131,6 @@ const createComposer = async (composer: Composer) => {
 }
 
 
-export { composerByName, createComposer, createSource, createWork, getGenres };
+export { composerByName, createComposer, createSource, createWork, getGenres, getSubGenres };
 
 

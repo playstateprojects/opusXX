@@ -1,10 +1,10 @@
-import { getGenres } from '$lib/airtable';
+import { getGenres, getSubGenres } from '$lib/airtable';
 import type { Genres } from '$lib/zodDefinitions';
 import type { PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async () => {
+export const load = (async () => {
     console.log('hello')
     let genres: Genres = await getGenres();
-    console.log('genres', genres)
-    return { genres };
-}
+    let subGenres: Genres = await getSubGenres();
+    return { genres, subGenres };
+}) satisfies PageServerLoad;

@@ -112,7 +112,7 @@
 		}
 		return '';
 	};
-	const scrapeComposer = async (url: string, composerIndex: number) => {
+	const scrapeComposer = async (url: string, composerIndex: number = -1) => {
 		const cleanedHtml = await getHTML(url);
 		const rawData = await getMarkdown(cleanedHtml);
 		loadingComposers[composerIndex] = true;
