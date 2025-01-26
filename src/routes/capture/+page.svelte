@@ -2,11 +2,14 @@
 	import { Button, Card, Input, Label } from 'flowbite-svelte';
 	import TurndownService from 'turndown';
 	import { gfm } from 'turndown-plugin-gfm';
-	let scraperUrl = 'https://en.wikipedia.org/wiki/Alba_Trissina';
+	let scraperUrl = 'https://en.wikipedia.org/wiki/List_of_women_composers_by_birth_date';
 	import { load } from 'cheerio';
-	import type { Composer, ComposerList } from '$lib/zodDefinitions';
+	import type { Composer, ComposerList, Source } from '$lib/zodDefinitions';
+	import composers from '$lib/composerList.json';
+	const loadingComposers: boolean[] = composers.map(() => false);
 	let composerInfo: Composer;
 	let composerList: ComposerList;
+
 	const emptyComposer = {
 		name: '',
 		birthDate: '',
@@ -17,105 +20,6 @@
 		refrences: [],
 		works: [],
 		links: []
-	};
-
-	const getOnlyLinks = async (url: string): Promise<string> => {
-		console.log('get obly links');
-		try {
-			// Input validation
-			if (!url || typeof url !== 'string') {
-				throw new Error('Invalid URL provided');
-			}
-
-			const response = await fetch(`/api/scrape/html/?url=${encodeURIComponent(url)}`);
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const html = await response.text();
-			const x = load(html);
-			const rootUrl = new URL(url).origin;
-			const extractedElements: string[] = [];
-			// Extract elements and their properties
-			x('body *').each((_, el) => {
-				const $el = x(el);
-				const tag = el.tagName.toLowerCase();
-				const text = $el.text().trim();
-
-				if (!text) return; // Skip empty elements
-
-				if (tag === 'a') {
-					let href = $el.attr('href');
-
-					if (!href || href === '#') return; // Skip invalid links
-
-					// Convert relative URLs to absolute
-					if (href.startsWith('/')) {
-						href = new URL(href, rootUrl).href;
-					}
-
-					extractedElements.push(`${text} (${href})`);
-				} else if (['h1', 'h2', 'h3', 'h4', 'h5'].includes(tag)) {
-					extractedElements.push(`${tag.toUpperCase()}: ${text}`);
-				}
-			});
-
-			return extractedElements.join('\n');
-		} catch (error) {
-			console.error('Error scraping content:', error);
-			if (error instanceof Error) {
-				throw new Error(`Scraping failed: ${error.message}`);
-			} else {
-				throw new Error('Scraping failed with an unknown error');
-			}
-		}
-	};
-
-	const getPageText = async (url: string) => {
-		try {
-			const response = await fetch(`/api/scrape/html/?url=${encodeURIComponent(url)}`);
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const html = await response.text();
-			const $ = load(html);
-
-			// Clean the HTML first
-			$('script').remove();
-			$('style').remove();
-			$('noscript').remove();
-			$('head').remove();
-
-			// Get all text content
-			const textContent = $('body')
-				.text()
-				.replace(/[\r\n\t]+/g, ' ') // Replace newlines and tabs with space
-				.replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
-				.trim();
-
-			const textWithLinks = $('body')
-				.find('*')
-				.map((_, el) => {
-					if ($(el).is('a')) {
-						const href = $(el).attr('href') || '#';
-						const text = $(el).text().trim();
-						return text ? `${text} (${href})` : href; // Format: "Link Text (URL)"
-					}
-					return $(el).text().trim();
-				})
-				.get()
-				.join(' ') // Join all extracted text with space
-				.replace(/[\r\n\t]+/g, ' ') // Replace newlines and tabs with space
-				.replace(/\s{2,}/g, ' ') // Replace multiple spaces with single space
-				.trim();
-			// console.log(textContent);
-
-			return textWithLinks;
-		} catch (error) {
-			console.error('Error scraping content:', error);
-			throw error;
-		}
 	};
 
 	const saveVector = async () => {
@@ -130,8 +34,7 @@
 		console.log('datata', data);
 	};
 	const scrapeComposerList = async () => {
-		const rawData = await getOnlyLinks(scraperUrl);
-		console.log(rawData);
+		const rawData = await getMarkdown(scraperUrl);
 		const response = await fetch('/api/scrape/composerList', {
 			method: 'POST',
 			body: JSON.stringify({ text: rawData })
@@ -140,13 +43,11 @@
 
 		try {
 			composerList = composerRaw.data;
-			console.log(composerList.links.length);
-			console.log(composerList);
 		} catch {
 			console.log('not a list');
 		}
 	};
-	const getMarkdown = async (url: string): Promise<string> => {
+	const getHTML = async (url: string): Promise<string> => {
 		try {
 			// Input validation
 			if (!url || typeof url !== 'string') {
@@ -175,6 +76,20 @@
 			if (!cleanedHtml) return '';
 
 			// Initialize Turndown with GitHub-Flavored Markdown (GFM)
+
+			return cleanedHtml;
+			// Extract elements and their properties
+		} catch (error) {
+			console.log(error);
+		}
+		return '';
+	};
+	const getMarkdown = async (cleanedHtml: string): Promise<string> => {
+		try {
+			// Input validation
+			if (!cleanedHtml) return '';
+
+			// Initialize Turndown with GitHub-Flavored Markdown (GFM)
 			const turndownService = new TurndownService({ headingStyle: 'atx' });
 			turndownService.use(gfm);
 
@@ -195,11 +110,18 @@
 		}
 		return '';
 	};
-	const scrapeComposer = async (url: string) => {
-		const rawData = await getMarkdown(url);
+	const scrapeComposer = async (url: string, composerIndex: number) => {
+		const cleanedHtml = await getHTML(url);
+		const rawData = await getMarkdown(cleanedHtml);
+		loadingComposers[composerIndex] = true;
+		const source: Source = {
+			URL: url,
+			Content: rawData,
+			RawHTML: cleanedHtml
+		};
 		const response = await fetch('/api/scrape/composer', {
 			method: 'POST',
-			body: JSON.stringify({ text: rawData })
+			body: JSON.stringify({ text: rawData, source: source })
 		});
 		const composerRaw = await response.json();
 		try {
@@ -207,40 +129,47 @@
 			console.log('ci', composerInfo);
 		} catch {
 			console.log('not a composer');
+		} finally {
+			loadingComposers[composerIndex] = false;
 		}
 	};
 </script>
 
 <div class="flex min-h-screen items-center justify-center">
 	<Card class="mb-4 max-h-full w-full max-w-md space-y-6 overflow-scroll p-6">
-		{#if composerList}
-			-------cl------
-			{#each composerList.links as composer}
-				<div class="flex">
-					<p>
-						{composer.name}
-						<a href={composer.url}>{composer.url}</a>
-					</p>
-					<Button
-						size="xs"
-						on:click={() => {
-							console.log('sending', composer.url);
-						}}
-					>
-						scrape</Button
-					>
-				</div>
-			{/each}
-		{:else if composerInfo}
-			<h1>{composerInfo.name}</h1>
-			<h3>born: {composerInfo.birthDate}</h3>
-			<h3>Description</h3>
-			<p>{composerInfo.shortDescription}</p>
-			{#each composerInfo.works as work}
-				<h2>{work.title}</h2>
-				<p>{work.description}</p>
-			{/each}
-		{/if}
+		<div class="flex max-h-[600px] flex-col space-y-4 overflow-scroll">
+			{#if composers}
+				Composers found: {composers.length}
+				{#each composers as composer, idx}
+					<div class="flex border-b-2 border-b-slate-100 pb-2">
+						<p>
+							{composer.composer}
+							<a href={composer.link} target="_blank">{composer.link}</a>
+						</p>
+						{idx}
+						<Button
+							size="xs"
+							on:click={() => {
+								console.log('sending', composer.link);
+								scrapeComposer(composer.link, idx);
+							}}
+							disabled={loadingComposers[idx]}
+						>
+							scrape</Button
+						>
+					</div>
+				{/each}
+			{:else if composerInfo}
+				<h1>{composerInfo.name}</h1>
+				<h3>born: {composerInfo.birthDate}</h3>
+				<h3>Description</h3>
+				<p>{composerInfo.shortDescription}</p>
+				{#each composerInfo.works as work}
+					<h2>{work.title}</h2>
+					<p>{work.shortDescription}</p>
+				{/each}
+			{/if}
+		</div>
 		<h3 class="text-center text-xl font-medium text-gray-900 dark:text-white">
 			Submit a URL to scrape for data
 		</h3>

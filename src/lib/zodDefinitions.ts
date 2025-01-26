@@ -1,18 +1,30 @@
 import { z } from "zod";
 
+export const AirtableCollaboratorSchema = z.object({
+    id: z.string(),
+    email: z.string(),
+    name: z.string(),
+})
+
 const Reference = z.object({
     content: z.string(),
     source: z.string(),
     tags: z.array(z.string())
 })
+const ComposerSex = z.enum([
+    'Female',
+    'Male',
+    'Other',
+])
 
 const Work = z.object({
     title: z.string(),
     composer: z.string(),
     location: z.string(),
-    date: z.string().optional(),
+    publicationYear: z.string().optional(),
     duration: z.string().optional(),
-    description: z.string(),
+    shortDescription: z.string(),
+    longDescription: z.string(),
     publisher: z.string().optional(),
     media: z.array(z.string()).optional(),
     links: z.array(z.string()).optional(),
@@ -27,8 +39,13 @@ const Media = z.object({
     tags: z.array(z.string()).optional()
 })
 const Source = z.object({
-
+    'URL': z.string().optional(),
+    'Content': z.string().optional(),
+    'Composer': z.array(z.string()).optional(),
+    RawHTML: z.string().optional(),
+    Work: z.array(z.string()).optional(),
 })
+type Source = z.infer<typeof Source>
 
 const Composer = z.object({
     name: z.string(),
@@ -38,14 +55,23 @@ const Composer = z.object({
     deathLocation: z.string().optional(),
     longDescription: z.string(),
     shortDescription: z.string(),
+    imageURL: z.string(),
     media: z.array(Media).optional(),
     links: z.array(z.string()).optional(),
     tags: z.array(z.string()),
     refrences: z.array(Reference),
     works: z.array(Work),
     gender: z.enum(['male', 'female', 'other']),
-    allRelevantTextContent: z.array(z.string())
+    sources: z.array(z.string()).optional(),
+    'Notes': z.string().optional(),
+    'Sex': z.array(ComposerSex).optional(),
+    'Active Locations': z.string().optional(),
+    'Work': z.array(z.string()).optional(),
+    'Alernate Names': z.array(z.string()).optional(),
+    loading: z.boolean().optional(),
+
 })
+
 const ComposerList = z.object({
     links: z.array(
         z.object(
@@ -61,4 +87,4 @@ type ComposerList = z.infer<typeof ComposerList>
 
 
 
-export { Reference, Work, Composer, ComposerList }
+export { Reference, Work, Composer, ComposerList, Source }

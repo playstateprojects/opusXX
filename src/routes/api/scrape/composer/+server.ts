@@ -1,4 +1,4 @@
-import { createComposer } from "$lib/airtable.js";
+import { createComposer, createSource } from "$lib/airtable.js";
 import { extractComposer } from "$lib/openai";
 import type { Composer } from "$lib/zodDefinitions.js";
 import { json } from "@sveltejs/kit";
@@ -6,10 +6,17 @@ import { json } from "@sveltejs/kit";
 export async function POST({ request }) {
     const body = await request.json();
     try {
+        const source = await createSource(body.source)
+        console.log('srcsrcsrc', source)
+        if (!source || source == '') {
+            return json({ error: 'no source' })
+        }
+        const { data } = await extractComposer(body.text)
+        if (data) {
+            const composer: Composer = data as Composer
 
-        const data = await extractComposer(body.text)
-        if (!data.error) {
-            const res = await createComposer(data as Composer)
+            composer.sources = [source]
+            const res = await createComposer(composer)
             console.log("created c", res)
         }
 
