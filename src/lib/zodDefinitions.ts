@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GenreSchema } from "./zodAirtableTypes";
 
 export const AirtableCollaboratorSchema = z.object({
     id: z.string(),
@@ -80,11 +81,19 @@ const ComposerList = z.object({
     )
 })
 
+
+
+const Genres = z.array(z.object({
+    name: z.string(),
+    id: z.string().optional()
+}))
+
 type Composer = z.infer<typeof Composer>
 type Work = z.infer<typeof Work>
 type Reference = z.infer<typeof Reference>
 type ComposerList = z.infer<typeof ComposerList>
+type Genres = z.infer<typeof Genres>
 
 
 
-export { Reference, Work, Composer, ComposerList, Source }
+export { Reference, Work, Composer, ComposerList, Source, Genres }

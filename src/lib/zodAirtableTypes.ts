@@ -118,9 +118,6 @@ export const GenreStatus = z.enum([
 
 export const GenreSchema = z.object({
   'Name': z.string().optional(),
-  'Notes': z.string().optional(),
-  'Assignee': AirtableCollaboratorSchema.optional(),
-  'Status': GenreStatus.optional(),
   'Work': z.array(z.string()).optional(),
 })
 export type Genre = z.infer<typeof GenreSchema>

@@ -16,7 +16,7 @@ const composerByName = async (fieldValue: string) => {
     const data = await response.json();
     return data.records ?? [];
 }
-const getGenres = async (fieldValue: string) => {
+const getGenres = async () => {
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/Genre`;
 
     const response = await fetch(url, {
@@ -25,7 +25,7 @@ const getGenres = async (fieldValue: string) => {
         },
     })
     const data = await response.json();
-    return data.records ?? [];
+    return data.records.map((record: any) => { return { id: record.id, name: record.fields.Name } }) ?? [];
 }
 const createSource = async (source: Source): Promise<string> => {
     console.log("html len", source.RawHTML?.length)

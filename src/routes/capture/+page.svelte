@@ -9,6 +9,8 @@
 	const loadingComposers: boolean[] = composers.map(() => false);
 	let composerInfo: Composer;
 	let composerList: ComposerList;
+	let { data } = $props();
+	let { genres } = $derived(data);
 
 	const emptyComposer = {
 		name: '',
