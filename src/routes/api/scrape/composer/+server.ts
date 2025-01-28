@@ -7,7 +7,6 @@ export async function POST({ request }) {
     const body = await request.json();
     try {
         const source = await createSource(body.source)
-        console.log('srcsrcsrc', source)
         if (!source || source == '') {
             return json({ error: 'no source' })
         }

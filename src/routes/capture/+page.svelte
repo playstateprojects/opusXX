@@ -115,7 +115,8 @@
 	const scrapeComposer = async (url: string, composerIndex: number = -1) => {
 		const cleanedHtml = await getHTML(url);
 		const rawData = await getMarkdown(cleanedHtml);
-		loadingComposers[composerIndex] = true;
+		console.log('compIdx', composerIndex);
+		if (composerIndex > -1) loadingComposers[composerIndex] = true;
 		const source: Source = {
 			URL: url,
 			Content: rawData,
@@ -132,7 +133,7 @@
 		} catch {
 			console.log('not a composer');
 		} finally {
-			loadingComposers[composerIndex] = false;
+			if (composerIndex > -1) loadingComposers[composerIndex] = false;
 		}
 	};
 </script>
@@ -152,13 +153,17 @@
 						<Button
 							size="xs"
 							on:click={() => {
-								console.log('sending', composer.link);
+								loadingComposers[idx] = true;
 								scrapeComposer(composer.link, idx);
 							}}
 							disabled={loadingComposers[idx]}
 						>
-							scrape</Button
-						>
+							{#if !loadingComposers[idx]}
+								scrape
+							{:else}
+								...
+							{/if}
+						</Button>
 					</div>
 				{/each}
 			{:else if composerInfo}

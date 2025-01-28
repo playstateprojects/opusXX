@@ -8,6 +8,8 @@ import { Composer, ComposerList } from './zodDefinitions';
 // const aiModel = "gpt-4o-mini-2024-07-18"
 const aiModel = "gpt-4o-2024-08-06"
 
+
+
 const getEmbedding = async (text: string) => {
     const embedding = await openai.embeddings.create({
         model: "text-embedding-3-small",
@@ -29,11 +31,15 @@ const chat = async (messages: AiMessage[]) => {
 }
 
 const extractComposer = async (text: string): Promise<{ data?: Composer; error?: string }> => {
+
     try {
         const response = await openai.beta.chat.completions.parse({
             model: aiModel,
             messages: [
-                { role: "system", content: "Extract data from the provided text related to the composer and their works. Ensure that the short Description is a summation of around 250 characters." },
+                {
+                    role: "system", content: `Extract data from the provided text related to the composer and their works. 
+                    Ensure that the short Description is a summation of around 250 characters. `
+                },
                 { role: "user", content: text }
             ],
             response_format: zodResponseFormat(Composer, "composer")
@@ -45,7 +51,7 @@ const extractComposer = async (text: string): Promise<{ data?: Composer; error?:
         if (!parsedData) {
             return { error: "Failed to extract composer data" };
         }
-
+        console.log("Composer data:", parsedData);
         return { data: parsedData };
     } catch (error) {
         console.error("extractComposer error:", error);

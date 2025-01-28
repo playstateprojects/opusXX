@@ -44,7 +44,7 @@ export const WorkSchema = z.object({
   'Notes': z.string().optional(),
   'Composer': z.array(z.string()).optional(),
   'Genre': z.array(z.string()).optional(),
-  'sub-genre': z.array(z.string()).optional(),
+  'Sub-Genre': z.array(z.string()).optional(),
   'Style': z.array(z.string()).optional(),
   'Period': z.array(z.string()).optional(),
   'Instrumentation': z.array(z.string()).optional(),
