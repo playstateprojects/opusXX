@@ -26,6 +26,7 @@ declare global {
 			CF_ACCOUNT_ID: string;
 			CF_AI_TOKEN: string;
 			OPENAI_API_KEY: string;
+			DEEPSEEK_API_KEY: string;
 		}
 	}
 }

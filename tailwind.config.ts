@@ -11,6 +11,13 @@ const config = {
 
 	theme: {
 		extend: {
+			fontFamily: {
+				// Replace these with your actual Adobe font family names
+				sans: ['FF Zwo Pro', 'system-ui', 'sans-serif'],
+				serif: ['FF Zwo Corr Pro', 'Georgia', 'serif'],
+				// Add more custom font families as needed
+				heading: ['FF Zwo Corr Pro', 'system-ui', 'sans-serif'],
+			},
 			colors: {
 				// flowbite-svelte
 				primary: {
@@ -28,7 +35,18 @@ const config = {
 				gray: {
 					800: '#0C2464',
 					900: '#0C2464'
-				}
+				},
+				yellow: {
+					100: '#FFF9E1',
+					200: '#FEF0B3',
+					300: '#FCE680',
+					400: '#F9DB4D',
+					500: '#EAC645', // Your custom yellow
+					600: '#D0AD39',
+					700: '#B5902F',
+					800: '#9A7525',
+					900: '#7F5C1C',
+				},
 			}
 		}
 	}

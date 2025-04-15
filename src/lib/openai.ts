@@ -1,12 +1,24 @@
 import { OPENAI_API_KEY } from '$env/static/private';
+import { DEEPSEEK_API_KEY } from '$env/static/private';
 import OpenAI from 'openai';
 import type { AiMessage } from './types';
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-import { zodResponseFormat } from "openai/helpers/zod";
-import { Composer, ComposerList } from './zodDefinitions';
+import type { ThreadMessage } from 'openai/resources/beta/threads/messages';
 
-// const aiModel = "gpt-4o-mini-2024-07-18"
-const aiModel = "gpt-4o-2024-08-06"
+import { zodResponseFormat } from "openai/helpers/zod";
+import { Composer, ComposerList, WorkList } from './zodDefinitions';
+
+const useDeepseek = true;
+let aiModel = "gpt-4o-mini"
+let openai: OpenAI;
+
+if (!useDeepseek) {
+    openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+} else {
+    aiModel = "deepseek-chat"
+    openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: DEEPSEEK_API_KEY });
+}
+
+// const aiModel = "gpt-4o-2024-08-06"
 
 
 
@@ -29,6 +41,61 @@ const chat = async (messages: AiMessage[]) => {
         return { error: true }
     }
 }
+const assistant = async (messages: AiMessage[], assistantId?: string) => {
+    try {
+        // Create a thread with initial messages if provided
+        const { threadId, error: threadError } = await createThread(messages.slice(0, -1));
+        if (threadError) {
+            return { error: threadError };
+        }
+
+        // Add the most recent message to the thread
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage.role === 'user') {
+            const { error: messageError } = await addMessage(threadId, lastMessage.content as string);
+            if (messageError) {
+                return { error: messageError };
+            }
+        }
+
+        // Run the assistant and wait for completion
+        const { runId, error: runError } = await runAssistant(
+            threadId,
+            assistantId || process.env.DEFAULT_ASSISTANT_ID || ''
+        );
+        if (runError) {
+            return { error: runError };
+        }
+
+        const { error: waitError } = await waitForRun(threadId, runId);
+        if (waitError) {
+            return { error: waitError };
+        }
+
+        // Get the assistant's response
+        const { messages: threadMessages, error: messagesError } = await getMessages(threadId);
+        if (messagesError) {
+            return { error: messagesError };
+        }
+
+        // Find the latest assistant message
+        const assistantResponse = threadMessages.find(m => m.role === 'assistant');
+        if (!assistantResponse) {
+            return { error: "No assistant response found" };
+        }
+
+        // Convert to the format expected by your application
+        return {
+            role: 'assistant',
+            content: assistantResponse.content[0].type === 'text'
+                ? assistantResponse.content[0].text.value
+                : JSON.stringify(assistantResponse.content)
+        };
+    } catch (error) {
+        console.error("Error in assistant function:", error);
+        return { error: "An unexpected error occurred" };
+    }
+};
 
 const extractComposer = async (text: string): Promise<{ data?: Composer; error?: string }> => {
 
@@ -77,5 +144,33 @@ const extractComposerList = async (text: string) => {
         return { error: true }
     }
 }
+const extractWorkList = async (text: string) => {
+    try {
+        const response = await openai.beta.chat.completions.parse({
+            model: aiModel,
+            messages: [
+                {
+                    role: "system", content: `You will be provided content that is from a catalogue on classical music works. 
+                    Please extract information for each described work.
+                    Raw content should include all text from the original source.`
+                },
+                { role: "user", content: text }
+            ],
+            response_format: zodResponseFormat(WorkList, "workList")
+        });
 
-export { getEmbedding, chat, extractComposer, extractComposerList }
+        console.log("Worklist response: ", response);
+
+        const parsedData = response?.choices?.[0]?.message?.parsed;
+        if (!parsedData) {
+            return { error: "Failed to extract work data" };
+        }
+        console.log("Work data:", parsedData);
+        return { data: parsedData };
+    } catch (error) {
+        console.error("extractWork error:", error);
+        return { error: "An unexpected error occurred" };
+    }
+}
+
+export { getEmbedding, chat, extractComposer, extractComposerList, extractWorkList }

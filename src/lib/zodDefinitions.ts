@@ -121,6 +121,61 @@ const styles = z.enum([
     'experimental',
     'unkown'
 ])
+const genreSubGenre = z.enum([
+    "Vocal-Anthem",
+    "Choral-Anthem",
+    "Solo-Bagatelle",
+    "Orchestral-Ballet",
+    "Cantata-",
+    "Opera-ChildrensOpera",
+    "Vocal-Chorale",
+    "Choral-Chorale",
+    "Opera-ComicOpera",
+    "Orchestral-Concerto",
+    "Concerto-",
+    "Orchestral-ConcertoGrosso",
+    "Solo-Divertimento",
+    "Opera-Drame",
+    "ChamberMusic-Duo",
+    "ChamberMusic-Ensemble",
+    "ChamberMusic-Ensemble",
+    "Solo-Etude",
+    "Solo-Fugue",
+    "Opera-GrandOpera",
+    "Choral-Hymn",
+    "Vocal-Hymn",
+    "Impromptu-",
+    "Instrumental-",
+    "Vocal-Lieder",
+    "Choral-Madrigal",
+    "Masque-",
+    "Choral-Mass",
+    "Solo-Mazurka",
+    "Solo-Minuet",
+    "Vocal-Motet",
+    "Choral-Motet",
+    "Opera-OperaBuffa",
+    "Opera-OperaSeria",
+    "ChamberMusic-PianoTrio",
+    "Solo-Polonaise",
+    "Solo-Prelude",
+    "ChamberMusic-Quartet",
+    "Quartet-",
+    "ChamberMusic-Quintet",
+    "Choral-Requiem",
+    "Solo-Scherzo",
+    "Solo-Serenade",
+    "ChamberMusic-SmallMixEnsemble",
+    "Sonata-",
+    "Vocal-Songs",
+    "Solo-Suite",
+    "Orchestral-Suite",
+    "Orchestral-SymphonicPoem",
+    "Orchestral-Symphony",
+    "Orchestral-TonePoem",
+    "ChamberMusic-Trio"
+]
+)
 const Work = z.object({
     title: z.string(),
     composer: z.string(),
@@ -133,11 +188,14 @@ const Work = z.object({
     media: z.array(z.string()).optional(),
     links: z.array(z.string()).optional(),
     instrumentation: z.array(z.string()).optional(),
-    refrences: z.array(Reference),
+    references: z.array(Reference),
     period: periods.optional(),
     genre: genres.optional(),
     subGenre: subGenres.optional(),
+    genreSubGenre: genreSubGenre.optional(),
     style: styles.optional(),
+    sources: z.array(z.string()).optional(),
+    rawContent: z.string()
 })
 
 const Media = z.object({
@@ -177,6 +235,7 @@ const Composer = z.object({
     'Work': z.array(z.string()).optional(),
     'Alernate Names': z.array(z.string()).optional(),
     loading: z.boolean().optional(),
+    nationality: z.string().optional(),
 
 })
 
@@ -188,7 +247,9 @@ const ComposerList = z.object({
     )
 })
 
-
+const WorkList = z.object({
+    works: z.array(Work)
+})
 
 const Genres = z.array(z.object({
     name: z.string(),
@@ -197,10 +258,11 @@ const Genres = z.array(z.object({
 
 type Composer = z.infer<typeof Composer>
 type Work = z.infer<typeof Work>
+type WorkList = z.infer<typeof WorkList>
 type Reference = z.infer<typeof Reference>
 type ComposerList = z.infer<typeof ComposerList>
 type Genres = z.infer<typeof Genres>
 
 
 
-export { Reference, Work, Composer, ComposerList, Source, Genres }
+export { Reference, Work, Composer, ComposerList, Source, Genres, WorkList }
