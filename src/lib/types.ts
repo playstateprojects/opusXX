@@ -5,10 +5,20 @@ export enum AiRole {
 
 }
 
+export enum AiOptionIcon {
+    period = "period",
+    theme = "theme",
+    drama = "drama",
+}
+
 export interface AiMessage {
     role: AiRole,
     content: string,
     time?: Date
+}
+export interface AiOption {
+    content: string,
+    icon?: AiOptionIcon
 }
 
 export interface VectorInfo {

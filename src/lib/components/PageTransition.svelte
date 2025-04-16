@@ -8,15 +8,13 @@
 	import { writable } from 'svelte/store';
 	import SpotlightCard from '$lib/components/SpotlightCard.svelte';
 	import SplitPage from '$lib/components/SplitPage.svelte';
+	import { page } from '$app/stores';
+	import { fade } from 'svelte/transition';
+
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
 
-	function updateMatch(e: MediaQueryListEvent | MediaQueryList) {
-		isWideScreen.set(e.matches);
-	}
-
 	export let data: LayoutData;
-
 	$: ({ supabase, session } = data);
 
 	onMount(() => {
@@ -31,6 +29,7 @@
 
 		updateMatch(mediaQuery);
 		mediaQuery.addEventListener('change', updateMatch);
+
 		const {
 			data: { subscription }
 		} = supabase.auth.onAuthStateChange((event, _session) => {
@@ -48,10 +47,14 @@
 
 <div class="flex h-screen w-screen flex-col overflow-hidden">
 	<XXHeader />
-	<div class="flex-grow overflow-auto">
-		<SplitPage isWideScreen={true}>
+	<div class="flex-grow overflow-hidden">
+		<SplitPage isWideScreen={$isWideScreen}>
 			<svelte:fragment slot="main">
-				<slot />
+				{#key $page.url.pathname}
+					<div in:fade={{ duration: 150, delay: 150 }} out:fade={{ duration: 150 }}>
+						<slot />
+					</div>
+				{/key}
 			</svelte:fragment>
 			<svelte:fragment slot="side">
 				<div class="flex h-full w-full flex-grow justify-center p-10">
@@ -59,13 +62,13 @@
 						title="Barbara Strozzi"
 						image="/images/barbara.jpeg"
 						subtitle="1619-1677, Venice"
-						cta={{ link: 'google.com', label: 'more' }}
+						cta={{ link: '/capture', label: 'more' }}
 					>
 						<div class="mx-2 p-4 text-center font-semibold">
 							"marked by expressive intensity, daring harmonic choices, and a bold command of text
 							and drama"
-						</div></SpotlightCard
-					>
+						</div>
+					</SpotlightCard>
 				</div>
 			</svelte:fragment>
 		</SplitPage>
