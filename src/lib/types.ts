@@ -17,3 +17,7 @@ export interface VectorInfo {
     meta: string;
     namespace: string
 }
+export interface CTA {
+    link: string;
+    label: string
+}

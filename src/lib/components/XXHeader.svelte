@@ -38,16 +38,16 @@
 
 <Navbar>
 	<NavBrand href="/">
-		<img src="/images/xxgenerator.webp" class="me-3 h-6 sm:h-9" alt="Flowbite Logo" />
-		<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">OpusXX</span>
+		<img src="/images/logo.png" class="me-3 w-[140px]" alt="Flowbite Logo" />
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if $user}
-			<Avatar id="avatar-menu" src="/images/xxgenerator.webp" />
+			<Avatar id="avatar-menu" size="xs" />
 		{:else}
 			<Button href="/login">Login</Button>
 		{/if}
 	</div>
+
 	{#if $user}
 		<Dropdown placement="bottom" triggeredBy="#avatar-menu">
 			<DropdownHeader>
@@ -58,8 +58,9 @@
 			<DropdownItem on:click={handleSignOut}>Sign out</DropdownItem>
 		</Dropdown>
 	{/if}
-	<NavUl>
-		<NavLi href="/about">About</NavLi>
-		<NavLi href="/contact">Contact</NavLi>
+	<NavUl class="ml-auto">
+		<NavLi href="/about" class="uppercase">About</NavLi>
+		<NavLi href="/faq" class="uppercase">FAQ</NavLi>
+		<NavLi href="/contact" class="uppercase">Contact</NavLi>
 	</NavUl>
 </Navbar>

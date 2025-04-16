@@ -3,7 +3,7 @@
 </script>
 
 <div class="flex h-full w-full flex-col overflow-hidden md:flex-row">
-	<div class="w-full p-4 md:w-1/2">
+	<div class="relative w-full p-4 md:w-1/2">
 		<slot name="main" />
 	</div>
 

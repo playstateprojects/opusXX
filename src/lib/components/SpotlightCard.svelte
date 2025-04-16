@@ -1,10 +1,12 @@
 <script lang="ts">
-	let { image, title, subtitle, description, actionLink } = $props<{
+	import type { CTA } from '$lib/types';
+	import XxButton from './XXButton.svelte';
+
+	let { image, title, subtitle, description, children, cta } = $props<{
 		image: string;
 		title: string;
 		subtitle: string;
-		description?: string;
-		actionLink?: string;
+		cta?: CTA;
 	}>();
 </script>
 
@@ -12,26 +14,26 @@
 	<img src={image} alt={title} class="absolute inset-0 h-full w-full object-cover" />
 
 	<div
-		class="absolute flex w-full flex-col items-center justify-center bg-gradient-to-t from-black/80 to-transparent p-4 text-white"
+		class="absolute flex h-full w-full flex-col justify-between bg-gradient-to-t from-black/80 to-transparent p-4 text-white"
 	>
-		<div class="mb-1 flex rounded-full bg-yellow-500 px-2 py-1 text-xs uppercase text-black">
-			Publisher Spotlight
-		</div>
-		<h2 class="text-2xl font-bold leading-tight text-yellow-400">{title}</h2>
-		<div class="text-md mt-1">{subtitle}</div>
-		{#if description}
-			<div class="mt-2 text-sm italic">“{description}”</div>
-		{/if}
-		{#if actionLink}
-			<div class="mt-4">
-				<a
-					href={listenLink}
-					target="_blank"
-					class="rounded bg-white px-4 py-2 text-sm font-medium text-black hover:bg-gray-100"
-				>
-					Listen ↘
-				</a>
+		<!-- Top Section -->
+		<div class="flex flex-col items-center">
+			<div class="mb-1 rounded-full bg-yellow-500 px-2 py-1 text-xs uppercase text-black">
+				Publisher Spotlight
 			</div>
-		{/if}
+			<h2 class="mt-4 text-2xl font-bold leading-tight text-yellow-400">{title}</h2>
+			<div class="text-md mt-1">{subtitle}</div>
+		</div>
+
+		<!-- Bottom Section -->
+		<div class="mb-4 mt-auto w-full text-center">
+			{@render children()}
+
+			{#if cta}
+				<div class="mt-4">
+					<XxButton link={cta.link} label={cta.label} />
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
