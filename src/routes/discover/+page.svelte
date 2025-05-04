@@ -14,30 +14,6 @@
 	let userMessage = '';
 	let loading = false;
 	let containerDiv: HTMLDivElement;
-	const onSubmit = async () => {
-		loading = true;
-		messages = [...messages, { role: AiRole.User, content: userMessage }];
-		setTimeout(() => {
-			containerDiv.scrollTop = containerDiv.scrollHeight;
-		}, 0);
-		const response = await fetch('/api/chat', {
-			method: 'POST',
-			body: JSON.stringify({ messages: messages })
-		});
-		try {
-			const newMessage = await response.json();
-			messages = [...messages, newMessage];
-			setTimeout(() => {
-				containerDiv.scrollTop = containerDiv.scrollHeight;
-			}, 0);
-		} catch {
-			console.log('an error occured');
-			loading = false;
-		}
-
-		loading = false;
-		userMessage = '';
-	};
 	const handleKeydown = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') {
 			if (!event.shiftKey) {

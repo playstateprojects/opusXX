@@ -8,9 +8,7 @@
 	</div>
 
 	{#if isWideScreen}
-		<div
-			class="flex w-full items-center justify-center border-t border-gray-200 bg-gray-50 p-4 md:w-1/2 md:border-l md:border-t-0"
-		>
+		<div class="flex w-full items-center justify-center p-4 md:w-1/2">
 			<slot name="side" />
 		</div>
 	{/if}

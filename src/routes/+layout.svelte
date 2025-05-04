@@ -46,7 +46,9 @@
 	});
 </script>
 
-<div class="flex h-screen w-screen flex-col overflow-hidden">
+<div
+	class="bg-gradient flex h-screen w-screen flex-col overflow-hidden bg-gradient-to-b from-white via-white via-15% to-gray-300"
+>
 	<XXHeader />
 	<div class="flex-grow overflow-auto">
 		<SplitPage isWideScreen={true}>

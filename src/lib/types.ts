@@ -20,6 +20,10 @@ export interface AiOption {
     content: string,
     icon?: AiOptionIcon
 }
+export interface ChatAction {
+    label: string,
+    action?: () => void
+}
 
 export interface VectorInfo {
     sourceUrl: string;

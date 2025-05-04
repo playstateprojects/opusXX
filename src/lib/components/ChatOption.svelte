@@ -12,7 +12,7 @@
 	onclick={() => {
 		optionSelected(content);
 	}}
-	class="border-width-1 m-1 flex items-center gap-1 rounded-lg border-solid border-black px-4 py-1 align-middle text-xs text-black"
+	class="m-1 flex items-center gap-1 rounded-lg border-[1.5px] border-solid border-black px-4 py-1 align-middle text-xs text-black"
 >
 	{#if icon == AiOptionIcon.drama}
 		<svg
