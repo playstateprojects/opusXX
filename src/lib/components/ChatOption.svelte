@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { type AiOption, AiOptionIcon } from '$lib/types';
-	import { createEventDispatcher } from 'svelte';
 	let { content, icon, optionSelected } = $props<{
 		content: string;
 		icon?: AiOptionIcon;

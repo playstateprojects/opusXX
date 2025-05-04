@@ -5,6 +5,7 @@
 	import { get } from 'svelte/store';
 	import { AiOptionIcon, AiRole } from '$lib/types';
 	import XxButton from '$lib/components/XXButton.svelte';
+	import { goto } from '$app/navigation';
 	let pageNumber = 1;
 	let startMessages = [
 		{
@@ -43,7 +44,8 @@
 		}
 	]);
 	const showWaitlist = () => {
-		console.log('here');
+		console.log('w');
+		goto('/waitlist');
 	};
 </script>
 
@@ -59,24 +61,13 @@
 			</p>
 		</div>
 	{/if}
-	<div class={pageNumber > 1 ? 'mt-16' : ''}>
+	<div class="flex w-full items-center justify-center">
 		<XxButton
 			excludeIcon={true}
 			color="acid-500"
 			label="Join the waiting list"
 			class="mt-4"
-			action={showWaitlist}
+			link="/waitlist"
 		></XxButton>
-	</div>
-	<div>
-		<div id="getWaitlistContainer" data-waitlist_id="26126" data-widget_type="WIDGET_1"></div>
-		<link
-			rel="stylesheet"
-			type="text/css"
-			href="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.css"
-		/>
-		<script
-			src="https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js"
-		></script>
 	</div>
 </div>

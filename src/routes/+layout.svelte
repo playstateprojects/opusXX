@@ -5,23 +5,19 @@
 	import type { LayoutData } from './$types';
 	import '../app.css';
 	import XXHeader from '$lib/components/XXHeader.svelte';
-	import { writable } from 'svelte/store';
-	import SpotlightCard from '$lib/components/SpotlightCard.svelte';
+	import SpotlightCard from '$lib/components/cards/SpotlightCard.svelte';
 	import SplitPage from '$lib/components/SplitPage.svelte';
+	import { writable } from 'svelte/store';
+	import { cardStore } from '$lib/stores/cardStore'; // adjust path if needed
+
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
 
-	function updateMatch(e: MediaQueryListEvent | MediaQueryList) {
-		isWideScreen.set(e.matches);
-	}
-
 	export let data: LayoutData;
-
 	$: ({ supabase, session } = data);
 
 	onMount(() => {
-		if (!supabase) return;
-		if (!browser) return;
+		if (!supabase || !browser) return;
 
 		const mediaQuery = window.matchMedia('(min-width: 768px)');
 
@@ -31,6 +27,7 @@
 
 		updateMatch(mediaQuery);
 		mediaQuery.addEventListener('change', updateMatch);
+
 		const {
 			data: { subscription }
 		} = supabase.auth.onAuthStateChange((event, _session) => {
@@ -55,21 +52,39 @@
 			<svelte:fragment slot="main">
 				<slot />
 			</svelte:fragment>
+
 			<svelte:fragment slot="side">
-				<div class="flex h-full w-full flex-grow justify-center p-10">
-					<SpotlightCard
-						title="Barbara Strozzi"
-						image="/images/barbara.jpeg"
-						subtitle="1619-1677, Venice"
-						cta={{ link: 'google.com', label: 'more' }}
-					>
-						<div class="mx-2 p-4 text-center font-semibold">
-							"marked by expressive intensity, daring harmonic choices, and a bold command of text
-							and drama"
-						</div></SpotlightCard
-					>
-				</div>
+				{#if $cardStore.length > 0}
+					<div class="flex h-full w-full flex-col justify-center overflow-hidden p-10">
+						<div class="flex gap-4 overflow-x-auto pb-4">
+							{#each $cardStore as card (card.work.title)}
+								<div class="w-80 flex-shrink-0 snap-center">
+									<SpotlightCard title={card.work.title} image={card.work.composer.name}>
+										<div class="mx-2 p-4 text-center font-semibold">
+											{card.work.shortDescription}
+										</div>
+									</SpotlightCard>
+								</div>
+							{/each}
+						</div>
+					</div>
+				{:else}
+					<div class="flex h-full w-full flex-grow justify-center p-10">
+						<SpotlightCard
+							title="Barbara Strozzi"
+							image="/images/barbara.jpeg"
+							subtitle="1619–1677, Venice"
+							cta={{ link: 'google.com', label: 'more' }}
+						>
+							<div class="mx-2 p-4 text-center font-semibold">
+								"marked by expressive intensity, daring harmonic choices, and a bold command of text
+								and drama"
+							</div>
+						</SpotlightCard>
+					</div>
+				{/if}
 			</svelte:fragment>
 		</SplitPage>
+		<div class="bg-acid-500"></div>
 	</div>
 </div>

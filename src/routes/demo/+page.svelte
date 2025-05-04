@@ -43,7 +43,7 @@
 	]);
 </script>
 
-<div class="flex h-full w-full flex-col">
+<div class="my-10 flex h-full max-h-full w-full flex-grow-0 flex-col overflow-hidden">
 	{#if pageNumber == 1}
 		<div class="flex w-full flex-col p-16" out:slide={{ duration: 500, axis: 'y' }}>
 			<h1 class="text-center text-3xl font-extrabold">
@@ -55,7 +55,5 @@
 			</p>
 		</div>
 	{/if}
-	<div class={pageNumber > 1 ? 'mt-16' : ''}>
-		<Chat showInput={pageNumber > 1} />
-	</div>
+	<Chat showInput={pageNumber > 1} />
 </div>

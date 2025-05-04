@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { CTA } from '$lib/types';
-	import XxButton from './XXButton.svelte';
+	import XxButton from '$lib/components/XXButton.svelte';
 
 	let { image, title, subtitle, description, children, cta } = $props<{
 		image: string;
