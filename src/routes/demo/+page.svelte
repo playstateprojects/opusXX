@@ -47,8 +47,10 @@
 <div class="flex h-full max-h-full w-full flex-grow-0 flex-col overflow-hidden">
 	{#if pageNumber == 1}
 		<div class="flex w-full flex-col px-16 pb-0 pt-16" out:slide={{ duration: 500, axis: 'y' }}>
-			<span class="text-center font-serif text-2xl font-light text-gray-500">OpusXX Generator</span>
-			<h1 class="text-center text-5xl font-extrabold">
+			<span class="font-zwocorr text-center text-2xl font-light text-gray-500"
+				>OpusXX Generator</span
+			>
+			<h1 class="font-zwo text-center text-5xl font-extrabold">
 				Inspire Audiences.<br />Lead The Way.
 			</h1>
 			<p class="mt-4 text-center">

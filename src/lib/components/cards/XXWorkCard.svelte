@@ -47,7 +47,7 @@
 					<ArrowUpRightFromSquareOutline class="h-5 w-5  text-sm text-primary-600" />
 				</div>
 			</button>
-			<div class="flex h-full max-h-full flex-col overflow-y-scroll">
+			<div class="flex flex-1 flex-col overflow-y-auto">
 				<div class="flex flex-col p-4">
 					<h3 class="font-extrabold">{workCard.work.title}</h3>
 					<span class="text-sm italic">{workCard.work.publicationYear}</span>

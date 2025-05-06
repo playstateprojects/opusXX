@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -20,9 +21,9 @@ body {
 
 /* Font fallbacks */
 body {
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .wf-active body {
-	font-family: ff-zwo-pro, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+	font-family: Roboto, ff-zwo-pro, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }

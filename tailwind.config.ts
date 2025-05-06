@@ -13,10 +13,12 @@ const config = {
 		extend: {
 			fontFamily: {
 				// Replace these with your actual Adobe font family names
-				sans: ['ff-zwo-web-pro', 'system-ui', 'sans-serif'],
-				serif: ['ff-zwo-corr-web-pro', 'Georgia', 'serif'],
+				sans: ['Roboto', 'ff-zwo-web-pro', 'system-ui', 'sans-serif'],
+				serif: ['courier', 'Georgia', 'serif'],
+				zwo: ['ff-zwo-web-pro', 'Georgia', 'serif'],
 				// Add more custom font families as needed
 				heading: ['ff-zwo-corr-web-pro', 'system-ui', 'sans-serif'],
+				zwocorr: ['ff-zwo-corr-web-pro', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				// flowbite-svelte
