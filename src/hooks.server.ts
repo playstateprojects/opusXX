@@ -1,5 +1,10 @@
-import { randomBytes } from 'crypto';
 import type { Handle } from '@sveltejs/kit';
+
+function generateNonce() {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit';
 
 const PUBLIC_SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
@@ -19,7 +24,7 @@ export const handle: Handle = async ({ event, resolve }) => {
         return session;
     };
 
-    const nonce = randomBytes(16).toString('hex');
+    const nonce = generateNonce();
 
     const response = await resolve(event, {
         filterSerializedResponseHeaders(name) {
