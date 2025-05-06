@@ -64,6 +64,12 @@
             "genre": "Orchestral",
             "subGenre": "Symphony",
             "style": "tonal",
+            "sections": [
+                {
+                    "title": "Mood and Style",
+                    "content": "Energetic · Mechanical · Driving"
+                }
+            ],
             "sources": [
                 "Historical Music Archives",
                 "Farrenc Society Publications"
@@ -156,7 +162,7 @@
                 "deathLocation": "London, UK",
                 "longDescription": "Alice Mary Smith (née Meadows White) was an English composer, one of the most prolific and notable female composers of the Victorian era. Born in London, she studied composition with William Sterndale Bennett and George Alexander Macfarren. In 1867, she married Frederick Meadows White, a lawyer who supported her musical career. Smith was the first woman to have a symphony performed in England, with her Symphony in C minor premiered by the Musical Society of London in 1863. She composed a wide range of works including two symphonies, a clarinet concerto, four cantatas, chamber music, and numerous songs and part-songs. She was also active in London's musical life, serving on the board of the Royal Academy of Music and as a member of various musical societies. Despite her achievements and recognition during her lifetime, her works were largely forgotten after her death until recent revival efforts brought her music back to public attention.",
                 "shortDescription": "English composer who was the first woman to have a symphony performed in England.",
-                "imageURL": "https://v5.airtableusercontent.com/v3/u/40/40/1746439200000/zThxJqZVlySJv3tJXwBfqA/xTQc1O6O3z1R6EQGjq7KiiwyLdM47ZGFeI1TSUP-LTMAxKT7x5ay4gxPFCwlXB0txR3LleNT4wgl_jXvpUKvOoB-tiA2f2FrLifQ_RNO8_zypdHYtuYE6hfu2AU2UClH-s9ZanJW6Z-OoO53gASchw/48SmYniIYYVlQZFVq2gDHtsdXVhcZLvBDkFsEDyLx1o",
+                "imageURL": "https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/a26abaa5-5ba7-46a4-86c9-94f5975a8f00/public",
                 "tags": [
                     "Romantic",
                     "British",

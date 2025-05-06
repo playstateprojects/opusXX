@@ -179,6 +179,10 @@ const genreSubGenre = z.enum([
     "ChamberMusic-Trio"
 ]
 )
+const CardSection = z.object({
+    title: z.string(),
+    content: z.string()
+})
 const Media = z.object({
     url: z.string().optional(),
     type: z.enum(["image", "video", "audio", "document"]),
@@ -208,6 +212,7 @@ Composer = z.object({
     'Alernate Names': z.array(z.string()).optional(),
     loading: z.boolean().optional(),
     nationality: z.string().optional(),
+    sections: z.array(CardSection).optional()
 
 })
 Work = z.object({
@@ -230,7 +235,8 @@ Work = z.object({
     genreSubGenre: genreSubGenre.optional(),
     style: styles.optional(),
     sources: z.array(z.string()).optional(),
-    rawContent: z.string()
+    rawContent: z.string(),
+    sections: z.array(CardSection).optional()
 })
 
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Chat from '$lib/components/Chat.svelte';
+	import XXFooter from '$lib/components/XXFooter.svelte';
 	import { slide } from 'svelte/transition';
 	import { actions, messages } from '$lib/stores/chatStore';
 	import { get } from 'svelte/store';
@@ -43,7 +44,7 @@
 	]);
 </script>
 
-<div class="my-10 flex h-full max-h-full w-full flex-grow-0 flex-col overflow-hidden">
+<div class="flex h-full max-h-full w-full flex-grow-0 flex-col overflow-hidden">
 	{#if pageNumber == 1}
 		<div class="flex w-full flex-col px-16 pb-0 pt-16" out:slide={{ duration: 500, axis: 'y' }}>
 			<span class="text-center font-serif text-2xl font-light text-gray-500">OpusXX Generator</span>
@@ -57,13 +58,18 @@
 		</div>
 	{/if}
 	<Chat showInput={pageNumber > 1}>
-		<button
-			class="font-extralight uppercase underline"
-			onclick={() => {
-				alert('suprise!');
-			}}
-		>
-			Surprise Me!
-		</button>
+		{#if pageNumber == 1}
+			<button
+				class="font-extralight uppercase underline"
+				onclick={() => {
+					alert('suprise!');
+				}}
+			>
+				Surprise Me!
+			</button>
+		{/if}
 	</Chat>
+	{#if pageNumber == 1}
+		<XXFooter></XXFooter>
+	{/if}
 </div>

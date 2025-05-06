@@ -87,7 +87,7 @@
 			newMessages.push(
 				{
 					role: AiRole.System,
-					content: 'Would you preffer works from a specific period?',
+					content: 'Would you prefer works from a specific period?',
 					time: now
 				},
 				[
@@ -133,7 +133,7 @@
 </script>
 
 <div
-	class="mb-16 flex h-full max-h-full w-full flex-col items-center justify-between overflow-y-hidden text-center"
+	class="mb-8 flex h-full max-h-full w-full flex-col items-center justify-between overflow-y-hidden text-center"
 >
 	<div
 		bind:this={scrollContainer}

@@ -14,9 +14,11 @@
 	<a
 		href={link ?? '#'}
 		onclick={action}
-		class="rounded-full border-2 border-solid border-black bg-{color ?? 'white'} {size ===
+		class="rounded-full border-[1px] border-solid border-black font-extralight {size ===
 		ButtonSizes.sm
-			? 'px-3 py-1.5'
+			? ''
+			: 'shadow-[0_2px_0_0_rgba(156,163,175)]'} bg-{color ?? 'white'} {size === ButtonSizes.sm
+			? 'px-3 py-1.5 text-xs'
 			: size === ButtonSizes.md
 				? 'px-4 py-2'
 				: size === ButtonSizes.lg
