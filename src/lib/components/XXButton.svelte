@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { ButtonSizes } from '$lib/types';
 	export let link: string = '#';
 	export let label: string = '';
 	export let action: (() => void) | undefined = undefined;
 	export let color: string = 'white';
 	export let excludeIcon: boolean = false;
+	export let size: ButtonSizes = ButtonSizes.md;
 
 	// All rest props
 </script>
@@ -12,8 +14,14 @@
 	<a
 		href={link ?? '#'}
 		onclick={action}
-		class="rounded-full border-2 border-solid border-black bg-{color ??
-			'white'} px-4 py-2 align-middle text-black"
+		class="rounded-full border-2 border-solid border-black bg-{color ?? 'white'} {size ===
+		ButtonSizes.sm
+			? 'px-3 py-1.5'
+			: size === ButtonSizes.md
+				? 'px-4 py-2'
+				: size === ButtonSizes.lg
+					? 'px-6 py-3'
+					: 'px-8 py-4'} align-middle text-black"
 	>
 		{#if label}
 			{label}

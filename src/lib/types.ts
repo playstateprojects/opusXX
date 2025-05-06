@@ -4,6 +4,13 @@ export enum AiRole {
     Assistant = "assistant"
 
 }
+export enum ButtonSizes {
+    sm = "sm",
+    md = "md",
+    lg = "lg",
+    xl = "xl"
+
+}
 
 export enum AiOptionIcon {
     period = "period",

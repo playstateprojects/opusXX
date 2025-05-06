@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { Textarea } from 'flowbite-svelte';
+	import { Textarea, Toolbar, ToolbarButton } from 'flowbite-svelte';
+	import { PaperPlaneOutline } from 'flowbite-svelte-icons';
 
 	// Use $props() for reactive props
 	const props = $props<{
 		prompt: string;
 		onSubmit?: (message: string) => void;
+		active?: boolean;
 	}>();
 
 	// Local reactive state
@@ -14,24 +16,26 @@
 		console.log('go');
 		if (event.key === 'Enter' && !event.shiftKey) {
 			event.preventDefault();
-			console.log('here', props.onSubmit);
 			props.onSubmit?.(userMessage); // Optional chaining for safety
 			userMessage = ''; // Reset input (reactivity handled by $state)
 		}
 	};
 </script>
 
-<div id="chat-form" class="flex-co mt-4 flex w-full max-w-sm">
-	<div
-		class="mb-4 w-full rounded-lg rounded-b-none border-0 border-b-2 border-b-black bg-white text-left"
+<div id="chat-form" class="flex w-full flex-col">
+	<Textarea
+		class="mb-4 w-full "
+		placeholder="Write a comment"
+		bind:value={userMessage}
+		on:keydown={handleKeydown}
 	>
-		<span class="mx-2 mt-4">{props.prompt}</span>
-		<Textarea
-			placeholder="Write a comment"
-			bind:value={userMessage}
-			class="mb-0 w-full border-0 bg-white focus:border-0 focus:outline-none focus:ring-0"
-			on:keydown={handleKeydown}
-			aria-label="Chat input"
-		/>
-	</div>
+		<div slot="footer" class="flex items-center justify-end">
+			<Toolbar embedded>
+				<ToolbarButton type="submit" name="Attach file" disabled={!props.active}
+					><PaperPlaneOutline class="h-6 w-6 rotate-45" />
+					<span class="sr-only">Send message</span></ToolbarButton
+				>
+			</Toolbar>
+		</div>
+	</Textarea>
 </div>

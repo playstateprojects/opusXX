@@ -9,6 +9,7 @@
 	import SplitPage from '$lib/components/SplitPage.svelte';
 	import { writable } from 'svelte/store';
 	import { cardStore } from '$lib/stores/cardStore'; // adjust path if needed
+	import XxWorkCard from '$lib/components/cards/XXWorkCard.svelte';
 
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
@@ -59,11 +60,9 @@
 						<div class="flex gap-4 overflow-x-auto pb-4">
 							{#each $cardStore as card (card.work.title)}
 								<div class="w-80 flex-shrink-0 snap-center">
-									<SpotlightCard title={card.work.title} image={card.work.composer.name}>
-										<div class="mx-2 p-4 text-center font-semibold">
-											{card.work.shortDescription}
-										</div>
-									</SpotlightCard>
+									<XxWorkCard workCard={card}>
+										<div class="mx-2 p-4 text-center font-semibold"></div>
+									</XxWorkCard>
 								</div>
 							{/each}
 						</div>

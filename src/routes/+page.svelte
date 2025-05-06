@@ -6,6 +6,7 @@
 	import { AiOptionIcon, AiRole } from '$lib/types';
 	import XxButton from '$lib/components/XXButton.svelte';
 	import { goto } from '$app/navigation';
+	import XxFooter from '$lib/components/XXFooter.svelte';
 	let pageNumber = 1;
 	let startMessages = [
 		{
@@ -49,19 +50,20 @@
 	};
 </script>
 
-<div class="flex h-full w-full flex-col">
+<div class="flex h-full w-full flex-col justify-between">
 	{#if pageNumber == 1}
-		<div class="flex w-full flex-col p-16" out:slide={{ duration: 500, axis: 'y' }}>
-			<h1 class="text-center text-3xl font-extrabold">
-				Inspire Audiences.<br />Lead The Way.<br />Unlock New Opportunities.
+		<div class="flex w-full flex-col px-16 pb-0 pt-16" out:slide={{ duration: 500, axis: 'y' }}>
+			<span class="text-center font-serif text-2xl font-light">OpusXX Generator</span>
+			<h1 class="text-center text-5xl font-extrabold">
+				Inspire Audiences.<br />Lead The Way.
 			</h1>
 			<p class="mt-4 text-center">
-				Discover repertoire by female composers that fits your ensemble, theme, and artistic
-				goals—plus the resources to programme it with confidence.
+				I’ll help you discover repertoire by female composers that fits your ensemble, theme, and
+				artistic goals—plus the resources to programme it with confidence.
 			</p>
 		</div>
 	{/if}
-	<div class="flex w-full items-center justify-center">
+	<div class="mb-4 flex w-full items-center justify-center">
 		<XxButton
 			excludeIcon={true}
 			color="acid-500"
@@ -70,4 +72,5 @@
 			link="/waitlist"
 		></XxButton>
 	</div>
+	<XxFooter></XxFooter>
 </div>

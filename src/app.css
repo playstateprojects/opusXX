@@ -8,3 +8,21 @@ body {
 	margin: 0;
 	padding: 0;
 }
+
+/* Font loading states */
+.wf-loading {
+	visibility: hidden;
+}
+
+.wf-active {
+	visibility: visible;
+}
+
+/* Font fallbacks */
+body {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.wf-active body {
+	font-family: ff-zwo-pro, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}

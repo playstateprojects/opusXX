@@ -13,9 +13,10 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: cloudflare(),
 		csp: {
+			mode: 'auto',
 			directives: {
-				'script-src': ['self', 'https://use.typekit.net'],
-				'style-src': ['self', 'https://use.typekit.net', 'https://p.typekit.net'],
+				'script-src': ['self', 'https://use.typekit.net', 'unsafe-inline'],
+				'style-src': ['self', 'https://use.typekit.net', 'https://p.typekit.net', 'unsafe-inline'],
 				'font-src': ['self', 'https://use.typekit.net', 'https://p.typekit.net']
 			}
 		}
