@@ -119,7 +119,7 @@
 				</div>
 				<button
 					class="mt-4 text-xs text-primary-400 underline"
-					onClick={() => (state.showBack = false)}
+					onclick={() => (state.showBack = false)}
 				>
 					Back
 				</button>

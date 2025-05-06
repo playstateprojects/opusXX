@@ -2,13 +2,13 @@
 	import { Button, Card, Input, Label } from 'flowbite-svelte';
 	import TurndownService from 'turndown';
 	import { gfm } from 'turndown-plugin-gfm';
-	let scraperUrl = 'https://en.wikipedia.org/wiki/List_of_women_composers_by_birth_date';
+	let scraperUrl = $state('https://en.wikipedia.org/wiki/List_of_women_composers_by_birth_date');
 	import { load } from 'cheerio';
 	import type { Composer, ComposerList, Source } from '$lib/zodDefinitions';
 	import composers from '$lib/composerList.json';
-	const loadingComposers: boolean[] = composers.map(() => false);
-	let composerInfo: Composer;
-	let composerList: ComposerList;
+	let loadingComposers = $state(composers.map(() => false));
+	let composerInfo = $state<Composer>();
+	let composerList = $state<ComposerList>();
 	let { data } = $props();
 	let { genres } = $derived(data);
 

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Button, Label, Input, Card } from 'flowbite-svelte';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	let email = '';
 	let password = '';
-	export let data;
 	let loading = false;
-	const { supabase } = data;
+	const supabase = $page.data.supabase;
 
 	async function handleSignIn() {
 		if (!supabase) return;
@@ -48,8 +48,8 @@
 	}
 
 	async function handleGoogleSignIn() {
-		if (!data.supabase) return;
-		const { error } = await data.supabase.auth.signInWithOAuth({
+		if (!supabase) return;
+		const { error } = await supabase.auth.signInWithOAuth({
 			provider: 'google'
 		});
 		if (error) alert(error.message);
