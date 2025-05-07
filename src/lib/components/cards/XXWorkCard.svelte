@@ -116,7 +116,7 @@
 					<img
 						src={workCard.work.composer.imageURL.replace(
 							'public',
-							'w=800,h=350,fit=cover,gravity=0.5x0.45'
+							'w=800,h=500,fit=cover,gravity=0.5x0.35'
 						)}
 						alt=""
 						class="mb-2 aspect-[2.2] w-24 w-full object-cover"
