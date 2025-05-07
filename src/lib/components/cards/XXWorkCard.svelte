@@ -108,7 +108,7 @@
 					/>
 				{/if}
 			</button>
-			<div class="flex flex-col p-4">
+			<div class="flex h-full flex-col p-4">
 				<XxComposerCard composer={workCard.work.composer} />
 			</div>
 			<section>
@@ -120,7 +120,7 @@
 			</section>
 			<section class="my-4 flex items-center justify-center gap-x-4">
 				<XxButton label="SAVE" size="sm" excludeIcon />
-				<XxButton label="SHARE" size="sm" excludeIcon />
+				<XxButton label="SHARE" size="sm" excludeIcon link="mailto:tom@playstateprojects.com" />
 			</section>
 		</div>
 	</div>
