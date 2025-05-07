@@ -35,7 +35,7 @@
 
 			{#if cta}
 				<div class="mt-4 flex items-center justify-center">
-					<XxButton link={cta.link} label={cta.label}></XxButton>
+					<XxButton link={cta.link} label={cta.label} size="md"></XxButton>
 				</div>
 			{/if}
 		</div>

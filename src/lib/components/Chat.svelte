@@ -266,7 +266,7 @@
 						color="acid-500"
 						label={action.label}
 						action={action.action}
-						size={ButtonSizes.lg}
+						size={'lg'}
 					/>
 				{/each}
 			</div>
