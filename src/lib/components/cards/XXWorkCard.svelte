@@ -27,7 +27,7 @@
 			id="card_front"
 			class="flip-front absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
-			<button class="flex w-full bg-[#F47C7C]" onclick={() => (state.showBack = true)}>
+			<button class="flex w-full bg-[#F47C7C] font-zwocorr" onclick={() => (state.showBack = true)}>
 				{#if workCard.work.composer.imageURL}
 					<img
 						src={workCard.work.composer.imageURL.replace(
@@ -39,7 +39,7 @@
 					/>
 				{/if}
 				<div class="flex w-full flex-col items-start justify-center p-2">
-					<span class="font-bold">{workCard.work.composer.name}</span>
+					<span class="text-left font-bold">{workCard.work.composer.name}</span>
 					<span class="text-xs">{workCard.work.period}</span>
 					<span class="text-xs">{workCard.work.composer.birthLocation}</span>
 					<span class="text-xs"

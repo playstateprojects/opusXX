@@ -95,6 +95,60 @@
 			cardStore.set(workCards);
 		}
 	};
+	const refineSearch = () => {
+		actions.set([]);
+	};
+	const runDemo2 = (newMessages: (AiMessage | AiOption[])[], content: string) => {
+		const now = new Date();
+		if (['A piece that matches a program theme'].includes(content)) {
+			newMessages.push(
+				{
+					role: AiRole.System,
+					content: 'What theme would you like to explore?',
+					time: now
+				},
+				[
+					{ content: 'Sacred Tension', icon: AiOptionIcon.theme },
+					{ content: 'Elemental Pulse', icon: AiOptionIcon.theme },
+					{ content: 'Forgotten Futures', icon: AiOptionIcon.theme }
+				]
+			);
+		}
+		if (content.toLowerCase() == 'movement and change') {
+			newMessages.push(
+				{
+					role: AiRole.System,
+					content:
+						'“Movement & Change” is a strong, evocative theme—dynamic and wide open. Great instinct. To sharpen its emotional or narrative focus, consider variations like:',
+					time: now
+				},
+				[
+					{ content: 'Transformation & Inner Journey', icon: AiOptionIcon.theme },
+					{ content: 'Momentum & Physical Motion', icon: AiOptionIcon.theme },
+					{ content: `Nature’s Cycles & Evolution`, icon: AiOptionIcon.theme },
+					{ content: 'Revolution & Social Change', icon: AiOptionIcon.theme }
+				]
+			);
+		}
+		if (content == 'Revolution & Social Change') {
+			newMessages.push({
+				role: AiRole.System,
+				content: `I’ve found some works that could be a great fit for you! 
+					Take a look and let me know what you think.`,
+				time: now
+			});
+
+			let workCards: WorkCard[] = [];
+			try {
+				workCards = [...demo2] as WorkCard[];
+			} catch (err) {
+				console.error(err);
+			}
+			cardStore.set(workCards);
+			actions.set([{ label: 'SHOW ME MORE' }, { label: 'REFINE SEARCH', action: refineSearch }]);
+		}
+	};
+
 	const optionSelected = async (content: string) => {
 		const now = new Date();
 
@@ -116,6 +170,7 @@
 		state.loading = false;
 		newMessages = [];
 		runDemo1(newMessages, content);
+		runDemo2(newMessages, content);
 		// //-----debug---------
 		// let workCards: WorkCard[] = [];
 		// try {
@@ -132,8 +187,7 @@
 			...newMessages
 		]);
 	};
-	const onSubmit = (message: string) => {
-		console.log('ffff');
+	const onSubmit = async (message: string) => {
 		const newUserMessage: AiMessage = {
 			role: AiRole.User,
 			content: message,
@@ -141,6 +195,16 @@
 		};
 
 		messages.update((msg) => [...msg, newUserMessage]);
+		let systemMessages: AiMessage[] | AiOption[] = [];
+		await randomDelay();
+		runDemo2(systemMessages, message);
+
+		messages.update((msg: any) => [
+			...msg.filter((opt: any) => {
+				return !Array.isArray(opt);
+			}),
+			...systemMessages
+		]);
 	};
 </script>
 
@@ -174,16 +238,19 @@
 				{/if}
 			{/if}
 		{/each}
-		{#each $actions as action}
-			<XxButton
-				excludeIcon={true}
-				color="acid-500"
-				label={action.label}
-				class=" my-4"
-				action={action.action}
-				size={ButtonSizes.lg}
-			/>
-		{/each}
+		{#if $actions && $actions.length}
+			<div class="flex w-full items-center justify-center space-x-4">
+				{#each $actions as action}
+					<XxButton
+						excludeIcon={true}
+						color="acid-500"
+						label={action.label}
+						action={action.action}
+						size={ButtonSizes.lg}
+					/>
+				{/each}
+			</div>
+		{/if}
 
 		{#if state.loading}
 			<Spinner />
@@ -191,7 +258,7 @@
 		{@render children?.()}
 	</div>
 
-	{#if showInput}
+	{#if showInput && !$actions.length}
 		<div class="mt-4 w-full">
 			<ChatInput prompt={'Something else?'} {onSubmit} />
 		</div>

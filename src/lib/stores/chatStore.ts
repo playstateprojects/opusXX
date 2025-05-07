@@ -1,7 +1,6 @@
 // src/lib/stores/chatStore.ts
 import { writable } from 'svelte/store';
-import type { AiMessage, AiOption, ChatAction } from '$lib/types';
-import { AiRole, AiOptionIcon } from '$lib/types';
+import type { AiMessage, AiOption, ChatAction } from '$lib/types.ts';
 
 export const messages = writable<(AiMessage | AiOption[])[]>([]);
 
