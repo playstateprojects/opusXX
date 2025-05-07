@@ -6,19 +6,19 @@
 		type AiMessage,
 		type AiOption,
 		type ChatAction
-	} from '$lib/types';
+	} from '$lib/types.js';
 	import { derived } from 'svelte/store';
 	import ChatOption from './ChatOption.svelte';
 	import XxButton from './XXButton.svelte';
-	import { messages, actions } from '$lib/stores/chatStore';
+	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
 	import { cardStore } from '$lib/stores/cardStore.js';
 	import demo from '$lib/demo1.json';
 	import demo2 from '$lib/demo2.json';
 	import demo2b from '$lib/demo2b.json';
+	import demo3 from '$lib/demo3.json';
 	import type { WorkCard } from '$lib/zodDefinitions.js';
 	import { randomDelay } from '$lib/utils.js';
-	import { IconOutline } from 'flowbite-svelte-icons';
 	import { Spinner } from 'flowbite-svelte';
 	const state = $state({
 		loading: false
@@ -169,6 +169,41 @@
 			cardStore.set(workCardsB);
 		}
 	};
+	const runDemo3 = (newMessages: (AiMessage | AiOption[])[], content: string) => {
+		const now = new Date();
+		if (['A piece that creates a particular atmosphere'].includes(content)) {
+			newMessages.push(
+				{
+					role: AiRole.System,
+					content: `Tell me about the atmosphere you'd like to evoke.`,
+					time: now
+				},
+				[
+					{ content: 'Calm & Meditative', icon: AiOptionIcon.theme },
+					{ content: 'Dramatic & Intense', icon: AiOptionIcon.theme },
+					{ content: 'Mystical & Ethereal', icon: AiOptionIcon.theme },
+					{ content: 'Majestic & Triumphant', icon: AiOptionIcon.theme },
+					{ content: 'Romantic & Lyrical', icon: AiOptionIcon.theme }
+				]
+			);
+		}
+		if (content.toLowerCase() == 'sensuousness') {
+			newMessages.push({
+				role: AiRole.System,
+				content:
+					'You’ve selected Sensuousness — music shaped by warmth, intimacy, and emotional nuance. These works invite deep listening and subtle reflection',
+				time: now
+			});
+			let workCards: WorkCard[] = [];
+			try {
+				workCards = [...demo3] as WorkCard[];
+			} catch (err) {
+				console.error(err);
+			}
+			cardStore.set(workCards);
+			actions.set([{ label: 'SHOW ME MORE' }, { label: 'REFINE SEARCH', action: refineSearch }]);
+		}
+	};
 
 	const optionSelected = async (content: string) => {
 		const now = new Date();
@@ -192,6 +227,7 @@
 		newMessages = [];
 		runDemo1(newMessages, content);
 		runDemo2(newMessages, content);
+		runDemo3(newMessages, content);
 		// //-----debug---------
 		// let workCards: WorkCard[] = [];
 		// try {
@@ -219,6 +255,7 @@
 		let systemMessages: AiMessage[] | AiOption[] = [];
 		await randomDelay();
 		runDemo2(systemMessages, message);
+		runDemo3(systemMessages, message);
 
 		messages.update((msg: any) => [
 			...msg.filter((opt: any) => {

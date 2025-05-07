@@ -19,7 +19,13 @@
 		onclick={() => {
 			console.log('li', link);
 			if (link && link != '#') {
-				goto(link);
+				if (link.startsWith('http://') || link.startsWith('https://')) {
+					// External link - open in new tab
+					window.open(link, '_blank');
+				} else if (link !== '#') {
+					// Internal link - use Svelte's goto
+					goto(link);
+				}
 			}
 			action();
 		}}

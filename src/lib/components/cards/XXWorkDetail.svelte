@@ -64,7 +64,10 @@
 			<div class="flex gap-x-2">
 				<XxButton excludeIcon size="sm"><BookmarkOutline class="h-5 w-5" /></XxButton>
 				<XxButton excludeIcon size="sm"><ShareIcon /></XxButton>
-				<XxButton excludeIcon size="sm"
+				<XxButton
+					excludeIcon
+					size="sm"
+					link="https://www.universaledition.com/Werke/Angelus/P0058207"
 					>Publisher&nbsp;&nbsp;<ListMusicOutline class="h4 w-4"></ListMusicOutline></XxButton
 				>
 			</div>

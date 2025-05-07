@@ -1,0 +1,151 @@
+[
+    {
+        "work": {
+            "title": "... and time is running past midnight ...",
+            "composer": {
+                "name": "Victoria Borisova-Ollas",
+                "birthDate": "1969",
+                "deathDate": "",
+                "birthLocation": "Russia",
+                "deathLocation": "",
+                "longDescription": "Victoria Borisova-Ollas is a Russian-Swedish composer whose work is noted for its emotional depth and cinematic texture. Her compositions frequently explore themes of memory, dream states, and surrealism through atmospheric orchestration and nuanced pacing.",
+                "shortDescription": "Russian-Swedish composer of textured, emotionally rich contemporary orchestral music.",
+                "imageURL": "https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/7f43185c-e51e-447d-f631-0046791ddd00/public",
+                "tags": [
+                    "Contemporary",
+                    "Atmospheric",
+                    "Swedish"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Dream",
+                    "Time",
+                    "Liminality"
+                ],
+                "representativeWorks": [
+                    "Symphony No. 1 'The Triumph of Heaven'",
+                    "... and time is running past midnight ..."
+                ],
+                "gender": "female",
+                "sources": [
+                    "Contemporary Music Sweden",
+                    "Composer Archives"
+                ],
+                "nationality": "Swedish"
+            },
+            "location": "Stockholm, Sweden",
+            "publicationYear": "2014",
+            "duration": "~10 MINUTES",
+            "shortDescription": "A surreal, cinematic orchestral soundscape exploring time, dream, and disquiet.",
+            "longDescription": "Premiered by the Royal Stockholm Philharmonic in 2014, this richly textured orchestral piece evokes a deserted city at night, inviting the listener into a liminal world of altered perception. With shimmering celesta, haunting winds, and ambient percussion, Borisova-Ollas crafts a spellbinding meditation on emotional atmosphere and surreal experience.",
+            "instrumentation": [
+                "Flutes",
+                "Oboes",
+                "Clarinets",
+                "Bassoons",
+                "Horns",
+                "Trumpets",
+                "Trombones",
+                "Tuba",
+                "Timpani",
+                "Percussion",
+                "Harp",
+                "Piano",
+                "Celesta",
+                "Strings"
+            ],
+            "references": [
+                {
+                    "content": "Publisher Link",
+                    "source": "https://www.universaledition.com/Werke/Angelus/P0058207",
+                    "tags": [
+                        "publisher"
+                    ]
+                }
+            ],
+            "period": "Contemporary",
+            "genre": "Orchestral",
+            "subGenre": "Atmospheric / Programmatic",
+            "style": "atonal",
+            "sections": [
+                {
+                    "title": "Mood and Style",
+                    "content": "Cinematic · Unsettling · Enchanted"
+                }
+            ],
+            "sources": [
+                "Swedish Music Information Centre",
+                "Program Notes"
+            ],
+            "rawContent": "ORCHESTRAL · ATMOSPHERIC / PROGRAMMATIC\n\n~10 MINUTES\n\nInstrumentation Summary\n\nFull Orchestra (including harp, piano, celesta, and rich percussion)\n\nMood and Style\n\nCinematic · Unsettling · Enchanted"
+        },
+        "insight": "Hovering between dream and disquiet, this piece unfolds like the soundtrack to a surreal, late-night encounter. Moody textures, shimmering percussion, and strange beauty make it perfect for listeners craving something unexpected, haunting, and spellbinding."
+    },
+    {
+        "work": {
+            "title": "D’un soir triste",
+            "composer": {
+                "name": "Lili Boulanger",
+                "birthDate": "1893",
+                "deathDate": "1918",
+                "birthLocation": "Paris, France",
+                "deathLocation": "Paris, France",
+                "longDescription": "Lili Boulanger was a prodigious French composer whose brief life yielded works of striking emotional depth and harmonic sophistication. A student of Fauré and the first woman to win the Prix de Rome, her music blends Impressionist textures with deep expressive power.",
+                "shortDescription": "French composer of radiant, expressive works that blend Impressionism with emotional depth.",
+                "imageURL": "https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/92c280b8-c852-4d66-7d44-7e588fa59300/public",
+                "tags": [
+                    "Impressionist",
+                    "French",
+                    "Chamber"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Twilight",
+                    "Melancholy",
+                    "Sensuality"
+                ],
+                "representativeWorks": [
+                    "Pie Jesu",
+                    "D’un soir triste"
+                ],
+                "gender": "female",
+                "sources": [
+                    "Paris Conservatory Records",
+                    "Boulanger Archives"
+                ],
+                "nationality": "French"
+            },
+            "location": "Paris, France",
+            "publicationYear": "1918",
+            "duration": "~10 MINUTES",
+            "shortDescription": "A velvet-hued chamber meditation on grief, sensuality, and emotional twilight.",
+            "longDescription": "Composed in the final year of her life, Lili Boulanger’s D’un soir triste is a lush, introspective work scored for a chamber ensemble of piano, harp, strings, horn, and clarinet. Its emotional tone is layered with ambiguity and longing, drawing from Impressionist harmony to build a sound world of suspended beauty and quiet sorrow.",
+            "instrumentation": [
+                "Clarinet",
+                "Horn",
+                "Harp",
+                "Piano",
+                "Strings"
+            ],
+            "references": [],
+            "period": "20th Centuary",
+            "genre": "Chamber",
+            "subGenre": "Chamber Orchestra / Large Ensemble",
+            "style": "tonal",
+            "sections": [
+                {
+                    "title": "Mood and Style",
+                    "content": "Dusky · Lush · Wistful"
+                }
+            ],
+            "sources": [
+                "Boulanger Sisters Legacy",
+                "Conservatory Archives"
+            ],
+            "rawContent": "CHAMBER ORCHESTRA / LARGE ENSEMBLE\n\n~10 MINUTES\n\nInstrumentation Summary\n\nPiano, Harp, Strings, Horn, Clarinet (also available in full orchestral version)\n\nMood and Style\n\nDusky · Lush · Wistful"
+        },
+        "insight": "Boulanger’s final completed work is a glowing, sorrow-tinged meditation in sound. Its velvet harmonies and emotional depth create a sensuous haze — perfect for programs exploring twilight moods and the quiet ache of beauty."
+    }
+]
