@@ -57,8 +57,8 @@
 
 			<svelte:fragment slot="side">
 				{#if $cardStore.length > 0}
-					<div class="flex h-full w-full flex-col justify-center overflow-hidden p-10">
-						<div class="flex gap-4 overflow-x-auto pb-4">
+					<div class="flex h-full w-full flex-col justify-center overflow-hidden p-2">
+						<div class="flex gap-4 overflow-x-auto">
 							{#each $cardStore as card (card.work.title)}
 								<div class="w-80 flex-shrink-0 snap-center">
 									<XxWorkCard workCard={card}>
@@ -69,7 +69,7 @@
 						</div>
 					</div>
 				{:else}
-					<div class="flex h-full w-full flex-grow justify-center p-10">
+					<div class="flex h-full w-full flex-grow justify-center px-10">
 						<SpotlightCard
 							title="Die dunkle Seite des Mondes"
 							image="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/9179d099-a569-423a-ff16-1137ff724300/public"

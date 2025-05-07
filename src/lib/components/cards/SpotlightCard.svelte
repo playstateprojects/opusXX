@@ -10,7 +10,7 @@
 	}>();
 </script>
 
-<div class="relative aspect-[calc(9/16)] h-full max-w-md overflow-hidden rounded-3xl shadow-lg">
+<div class="relative aspect-[0.52] h-full max-w-md overflow-hidden rounded-3xl shadow-lg">
 	<img src={image} alt={title} class="absolute inset-0 h-full w-full object-cover" />
 
 	<div
@@ -19,11 +19,11 @@
 		<!-- Top Section -->
 		<div class="flex flex-col items-center">
 			<div
-				class="bg-spotlight-premiere mb-1 rounded-full px-2 py-1 font-zwo text-xs uppercase text-black"
+				class="mb-1 rounded-full bg-spotlight-premiere px-8 py-1 font-zwo text-xs font-light uppercase text-black"
 			>
 				WORLD Premier
 			</div>
-			<h2 class="text-spotlight-premiere mt-4 px-8 text-center text-2xl font-bold leading-tight">
+			<h2 class="mt-4 px-6 text-center text-2xl font-bold leading-tight text-spotlight-premiere">
 				{title}
 			</h2>
 			<div class="text-md mt-1">{subtitle}</div>
