@@ -61,8 +61,10 @@ const config = {
 					"late_romantic": '#F47C7C',
 					"early_romantic": '#F47C7C',
 					"baroque": '#EAC645',
+					"baroque_text": '#000',
 					"contemporary": '#FF5733',
 					"20th_century": '#A4FCFE',
+					"20th_century_text": '#000',
 				}
 			}
 		}

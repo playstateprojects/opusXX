@@ -23,7 +23,7 @@
 			}
 			action();
 		}}
-		class="flex items-center justify-center gap-1 rounded-full border-[1px] border-solid border-black font-light {size ===
+		class="flex items-center justify-center gap-1 rounded-full border-[1px] border-solid border-black font-light uppercase {size ===
 		ButtonSizes.sm
 			? ''
 			: 'shadow-[0_2px_0_0_rgba(156,163,175)]'} bg-{color ?? 'white'} {size === ButtonSizes.sm

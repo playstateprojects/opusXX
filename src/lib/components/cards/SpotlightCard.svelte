@@ -19,7 +19,7 @@
 		<!-- Top Section -->
 		<div class="flex flex-col items-center">
 			<div
-				class="mb-1 rounded-full bg-spotlight-premiere px-8 py-1 font-zwo text-xs font-light uppercase text-black"
+				class="mb-1 mt-6 rounded-full bg-spotlight-premiere px-8 py-1 font-zwo text-xs font-light uppercase text-black"
 			>
 				WORLD Premier
 			</div>

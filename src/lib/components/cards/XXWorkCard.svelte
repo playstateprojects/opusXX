@@ -29,7 +29,7 @@
 			class="flip-front absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
 			<button
-				class="flex w-full bg-period-{workCard.work.period
+				class="flex w-full text-black bg-period-{workCard.work.period
 					.toLowerCase()
 					.trim()
 					.replace(' ', '_')} font-zwocorr"
@@ -116,7 +116,10 @@
 			class="flip-back absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
 			<button
-				class="flex w-full cursor-pointer bg-[#F47C7C]"
+				class="flex w-full cursor-pointer bg-period-{workCard.work.period
+					.toLowerCase()
+					.trim()
+					.replace(' ', '_')}"
 				onclick={() => (state.showBack = false)}
 			>
 				{#if workCard.work.composer.imageURL}
