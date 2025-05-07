@@ -28,7 +28,13 @@
 			id="card_front"
 			class="flip-front absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
-			<button class="flex w-full bg-[#F47C7C] font-zwocorr" onclick={() => (state.showBack = true)}>
+			<button
+				class="flex w-full bg-period-{workCard.work.period
+					.toLowerCase()
+					.trim()
+					.replace(' ', '_')} font-zwocorr"
+				onclick={() => (state.showBack = true)}
+			>
 				{#if workCard.work.composer.imageURL}
 					<img
 						src={workCard.work.composer.imageURL.replace(

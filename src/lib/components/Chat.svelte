@@ -12,12 +12,12 @@
 	import XxButton from './XXButton.svelte';
 	import { messages, actions } from '$lib/stores/chatStore';
 	import ChatInput from './ChatInput.svelte';
-	import { cardStore } from '$lib/stores/cardStore';
+	import { cardStore } from '$lib/stores/cardStore.js';
 	import demo from '$lib/demo1.json';
 	import demo2 from '$lib/demo2.json';
 	import demo2b from '$lib/demo2b.json';
-	import type { WorkCard } from '$lib/zodDefinitions';
-	import { randomDelay } from '$lib/utils';
+	import type { WorkCard } from '$lib/zodDefinitions.js';
+	import { randomDelay } from '$lib/utils.js';
 	import { IconOutline } from 'flowbite-svelte-icons';
 	import { Spinner } from 'flowbite-svelte';
 	const state = $state({
@@ -60,13 +60,16 @@
 					time: now
 				},
 				[
-					{ content: 'Violin Solo', icon: AiOptionIcon.theme },
-					{ content: 'Symphonic Orchestra', icon: AiOptionIcon.theme },
-					{ content: 'Quartet', icon: AiOptionIcon.theme }
+					{ content: 'Chamber music', icon: AiOptionIcon.theme },
+					{ content: 'Choral', icon: AiOptionIcon.theme },
+					{ content: 'Opera', icon: AiOptionIcon.theme },
+					{ content: 'Orchestral', icon: AiOptionIcon.theme },
+					{ content: 'Solo', icon: AiOptionIcon.theme },
+					{ content: 'Vocal', icon: AiOptionIcon.theme }
 				]
 			);
 		}
-		if (['Symphonic Orchestra'].includes(content)) {
+		if (content.toLowerCase().indexOf('orchestral') > -1) {
 			newMessages.push(
 				{
 					role: AiRole.System,
@@ -74,8 +77,10 @@
 					time: now
 				},
 				[
-					{ content: 'Classical' },
-					{ content: 'Romantic', icon: AiOptionIcon.theme },
+					{ content: 'Medieval' },
+					{ content: 'Renaissance' },
+					{ content: 'Baroque' },
+					{ content: 'Romantic' },
 					{ content: '20th Century', icon: AiOptionIcon.theme },
 					{ content: 'Contemporary', icon: AiOptionIcon.theme }
 				]
@@ -233,7 +238,7 @@
 		{#each $messages as message, idx}
 			{#if Array.isArray(message)}
 				<!-- Handle AiOption[] case -->
-				<div class="mt-2 flex flex-wrap justify-center gap-2">
+				<div class="mt-2 flex flex-wrap justify-center gap-2 px-10">
 					{#each message as option}
 						<ChatOption content={option.content} icon={option.icon} {optionSelected}></ChatOption>
 					{/each}

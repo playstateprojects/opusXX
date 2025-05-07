@@ -55,6 +55,14 @@ const config = {
 				spotlight: {
 					"premiere": "#FF5733"
 
+				},
+				period: {
+					"romantic": '#F47C7C',
+					"late_romantic": '#F47C7C',
+					"early_romantic": '#F47C7C',
+					"baroque": '#EAC645',
+					"contemporary": '#FF5733',
+					"20th_century": '#A4FCFE',
 				}
 			}
 		}

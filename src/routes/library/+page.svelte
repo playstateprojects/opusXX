@@ -1,7 +1,6 @@
 <script lang="ts">
 	import XxButton from '$lib/components/XXButton.svelte';
 	import lib from '$lib/library.json';
-	import { ShareAllOutline } from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 	import lib1 from '$lib/lib1.json';
 	import { cardStore } from '$lib/stores/cardStore.js';

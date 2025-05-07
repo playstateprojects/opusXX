@@ -11,6 +11,7 @@
 	import { cardStore } from '$lib/stores/cardStore'; // adjust path if needed
 	import XxWorkCard from '$lib/components/cards/XXWorkCard.svelte';
 	import XxWorkDetail from '$lib/components/cards/XXWorkDetail.svelte';
+	import ColourLoader from '$lib/components/ColourLoader.svelte';
 
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
@@ -95,6 +96,9 @@
 				<XxWorkDetail />
 			</svelte:fragment>
 		</SplitPage>
-		<div class="bg-acid-500"></div>
+		<div
+			class="bg-acid-500 bg-period-baroque bg-period-early_romantic bg-period-late_romantic"
+		></div>
 	</div>
 </div>
+<ColourLoader />
