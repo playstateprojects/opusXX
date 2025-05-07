@@ -7,6 +7,7 @@
 	import { AiOptionIcon, AiRole } from '$lib/types';
 	import { cardStore } from '$lib/stores/cardStore.js';
 	import demo4 from '$lib/demo4.json';
+	import { onMount } from 'svelte';
 	let pageNumber = 1;
 	let startMessages = [
 		{
@@ -44,6 +45,9 @@
 			action: clearIntro
 		}
 	]);
+	onMount(() => {
+		cardStore.set([]);
+	});
 </script>
 
 <div class="flex h-full max-h-full w-full flex-grow-0 flex-col overflow-hidden">

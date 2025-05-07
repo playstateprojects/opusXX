@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { ButtonSizes } from '$lib/types';
+	import { goto } from '$app/navigation';
+	import { ButtonSizes } from '$lib/types.js';
 	let {
 		link = '#',
 		label = '',
@@ -7,7 +8,7 @@
 		color = 'white',
 		excludeIcon = false,
 		size = ButtonSizes.md,
-		children
+		children = null
 	} = $props();
 
 	// All rest props
@@ -15,11 +16,15 @@
 
 <div>
 	<button
-		href={link ?? '#'}
 		onclick={() => {
+			console.log('li', link);
+			if (link && link != '#') {
+				goto(link);
+			}
 			action();
 		}}
-		class=" rounded-full border-[1px] border-solid border-black font-light {size === ButtonSizes.sm
+		class="flex items-center justify-center gap-1 rounded-full border-[1px] border-solid border-black font-light {size ===
+		ButtonSizes.sm
 			? ''
 			: 'shadow-[0_2px_0_0_rgba(156,163,175)]'} bg-{color ?? 'white'} {size === ButtonSizes.sm
 			? 'px-2 py-2 text-xs'
@@ -33,7 +38,7 @@
 			{label}
 		{/if}
 		{#if children}
-			<div class="flex">{@render children?.()}</div>
+			{@render children?.()}
 		{/if}
 		{#if !excludeIcon}
 			<svg

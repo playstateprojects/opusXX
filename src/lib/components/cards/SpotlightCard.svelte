@@ -34,8 +34,8 @@
 			{@render children()}
 
 			{#if cta}
-				<div class="mt-4">
-					<XxButton link={cta.link} label={cta.label} />
+				<div class="mt-4 flex items-center justify-center">
+					<XxButton link={cta.link} label={cta.label}></XxButton>
 				</div>
 			{/if}
 		</div>

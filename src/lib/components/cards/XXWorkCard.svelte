@@ -9,6 +9,7 @@
 		ShareAllOutline
 	} from 'flowbite-svelte-icons';
 	import { workDetail } from '$lib/stores/cardStore.js';
+	import ShareIcon from '$lib/ShareIcon.svelte';
 	const state = $state({
 		showBack: false
 	});
@@ -50,10 +51,10 @@
 					<ArrowUpRightFromSquareOutline class="h-5 w-5  text-sm text-primary-600" />
 				</div>
 			</button>
-			<div class="flex flex-1 flex-col overflow-y-auto">
+			<div class="flex flex-1 flex-col overflow-y-auto text-xs">
 				<div class="flex flex-col p-4">
 					<h3 class="font-extrabold">{workCard.work.title}</h3>
-					<span class="text-sm italic">{workCard.work.publicationYear}</span>
+					<span class="text-xs italic">{workCard.work.publicationYear}</span>
 					<div class="mt-2 flex justify-between text-xs uppercase">
 						<span>{workCard.work.genre}</span><span>{workCard.work.duration}</span>
 					</div>
@@ -90,14 +91,14 @@
 				</button>
 			</section>
 			<section class="my-4 flex items-center justify-center gap-x-4">
-				<XxButton size="sm" excludeIcon>
+				<XxButton size="sm" excludeIcon link="/library">
 					<span class="flex items-center justify-center"
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>
 				</XxButton>
 				<XxButton size="sm" excludeIcon>
 					<span class="flex items-center justify-center"
-						>SHARE <ShareAllOutline class="h-3 w-3" /></span
+						>SHARE <ShareIcon width={14} height={14} /></span
 					>
 				</XxButton>
 			</section>
@@ -134,15 +135,13 @@
 				</button>
 			</section>
 			<section class="my-4 flex items-center justify-center gap-x-4">
-				<XxButton size="sm" excludeIcon>
+				<XxButton size="sm" excludeIcon link="/library">
 					<span class="flex items-center justify-center"
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>
 				</XxButton>
 				<XxButton size="sm" excludeIcon>
-					<span class="flex items-center justify-center"
-						>SHARE <ShareAllOutline class="h-3 w-3" /></span
-					>
+					<span class="flex items-center justify-center">SHARE <ShareIcon /></span>
 				</XxButton>
 			</section>
 		</div>

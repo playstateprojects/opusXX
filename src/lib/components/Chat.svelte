@@ -15,6 +15,7 @@
 	import { cardStore } from '$lib/stores/cardStore';
 	import demo from '$lib/demo1.json';
 	import demo2 from '$lib/demo2.json';
+	import demo2b from '$lib/demo2b.json';
 	import type { WorkCard } from '$lib/zodDefinitions';
 	import { randomDelay } from '$lib/utils';
 	import { IconOutline } from 'flowbite-svelte-icons';
@@ -147,6 +148,20 @@
 			cardStore.set(workCards);
 			actions.set([{ label: 'SHOW ME MORE' }, { label: 'REFINE SEARCH', action: refineSearch }]);
 		}
+		if (content.indexOf('vocal works with chamber') > -1) {
+			newMessages.push({
+				role: AiRole.System,
+				content: `I’ve gathered a few vocal chamber works that I think match your vision—take a look and let me know what resonates.`,
+				time: now
+			});
+			let workCardsB: WorkCard[] = [];
+			try {
+				workCardsB = [...demo2b] as WorkCard[];
+			} catch (err) {
+				console.error(err);
+			}
+			cardStore.set(workCardsB);
+		}
 	};
 
 	const optionSelected = async (content: string) => {
@@ -227,7 +242,7 @@
 				<!-- Handle AiMessage case -->
 				{#if message.role == AiRole.User}
 					<div class="flex w-full items-end justify-end">
-						<div class="mb-4 rounded-lg bg-gray-300 px-4 pb-1 text-right">
+						<div class="mb-4 rounded-lg bg-gray-300 px-4 py-3 text-right">
 							{message.content}
 						</div>
 					</div>

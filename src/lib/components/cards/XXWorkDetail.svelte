@@ -9,6 +9,7 @@
 	} from 'flowbite-svelte-icons';
 	import { sineIn } from 'svelte/easing';
 	import XxButton from '../XXButton.svelte';
+	import ShareIcon from '$lib/ShareIcon.svelte';
 
 	let transitionParamsRight = {
 		x: 320,
@@ -18,8 +19,8 @@
 </script>
 
 <Drawer
-	class=" m-4 rounded-3xl bg-black p-0"
-	width="w-1/2"
+	class="m-4 mr-8 rounded-3xl bg-black p-0"
+	width="w-1/2 w-[calc(100vw/2-3rem)]"
 	backdrop={false}
 	position="fixed"
 	placement="right"
@@ -62,9 +63,9 @@
 			</div>
 			<div class="flex gap-x-2">
 				<XxButton excludeIcon size="sm"><BookmarkOutline class="h-5 w-5" /></XxButton>
-				<XxButton excludeIcon size="sm"><ShareAllOutline class="h-5 w-5" /></XxButton>
+				<XxButton excludeIcon size="sm"><ShareIcon /></XxButton>
 				<XxButton excludeIcon size="sm"
-					>Publisher <ListMusicOutline class="h4 w-4"></ListMusicOutline></XxButton
+					>Publisher&nbsp;&nbsp;<ListMusicOutline class="h4 w-4"></ListMusicOutline></XxButton
 				>
 			</div>
 		</div>
