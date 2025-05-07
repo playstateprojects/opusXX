@@ -53,7 +53,7 @@
 			<h1 class="text-center font-zwo text-5xl font-extrabold">
 				Inspire Audiences.<br />Lead The Way.
 			</h1>
-			<p class="mt-4 text-center">
+			<p class="mt-4 text-center font-medium">
 				I’ll help you discover repertoire by female composers that fits your ensemble, theme, and
 				artistic goals—plus the resources to programme it with confidence.
 			</p>

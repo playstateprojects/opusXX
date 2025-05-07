@@ -20,8 +20,22 @@ const config = {
 			mode: 'auto',
 			directives: {
 				'script-src': ['self', 'https://use.typekit.net', 'unsafe-inline'],
-				'style-src': ['self', 'https://use.typekit.net', 'https://p.typekit.net', 'unsafe-inline'],
-				'font-src': ['self', 'https://use.typekit.net', 'https://p.typekit.net']
+				'style-src': [
+					'self',
+					'https://use.typekit.net',
+					'https://p.typekit.net',
+					'https://imagedelivery.net',
+					'https://fonts.googleapis.com',
+					'https://fonts.gstatic.com',
+					'unsafe-inline'
+				],
+				'font-src': [
+					'self',
+					'https://use.typekit.net',
+					'https://p.typekit.net',
+					'https://fonts.gstatic.com',
+					'https://imagedelivery.net'
+				]
 			}
 		}
 	}
