@@ -89,7 +89,8 @@
 		if (['Romantic'].includes(content)) {
 			newMessages.push({
 				role: AiRole.System,
-				content: "I've suggested three works",
+				content: `Based on your search for orchestral music from the Romantic period, I’ve selected three works that capture the era’s emotional richness, lyrical beauty, and sweeping dynamism. 
+					Let me know if you’d like to refine your search further.`,
 				time: now
 			});
 			let workCards: WorkCard[] = [];
