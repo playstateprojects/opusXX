@@ -21,7 +21,7 @@
 	class=" m-4 rounded-3xl bg-black p-0"
 	width="w-1/2"
 	backdrop={false}
-	position="absolute"
+	position="fixed"
 	placement="right"
 	transitionParams={transitionParamsRight}
 	hidden={$workDetail === null}

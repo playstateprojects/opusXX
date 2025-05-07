@@ -19,8 +19,7 @@
 		onclick={() => {
 			action();
 		}}
-		class=" rounded-full border-[1px] border-solid border-black font-extralight {size ===
-		ButtonSizes.sm
+		class=" rounded-full border-[1px] border-solid border-black font-light {size === ButtonSizes.sm
 			? ''
 			: 'shadow-[0_2px_0_0_rgba(156,163,175)]'} bg-{color ?? 'white'} {size === ButtonSizes.sm
 			? 'px-2 py-2 text-xs'

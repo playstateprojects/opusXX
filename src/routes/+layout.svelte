@@ -10,6 +10,7 @@
 	import { writable } from 'svelte/store';
 	import { cardStore } from '$lib/stores/cardStore'; // adjust path if needed
 	import XxWorkCard from '$lib/components/cards/XXWorkCard.svelte';
+	import XxWorkDetail from '$lib/components/cards/XXWorkDetail.svelte';
 
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
@@ -91,6 +92,7 @@
 						</SpotlightCard>
 					</div>
 				{/if}
+				<XxWorkDetail />
 			</svelte:fragment>
 		</SplitPage>
 		<div class="bg-acid-500"></div>

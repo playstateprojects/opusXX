@@ -14,6 +14,7 @@
 	import ChatInput from './ChatInput.svelte';
 	import { cardStore } from '$lib/stores/cardStore';
 	import demo from '$lib/demo1.json';
+	import demo2 from '$lib/demo2.json';
 	import type { WorkCard } from '$lib/zodDefinitions';
 	import { randomDelay } from '$lib/utils';
 	import { IconOutline } from 'flowbite-svelte-icons';
@@ -48,27 +49,8 @@
 			return !Array.isArray(item) ? currentIndex : lastIndex;
 		}, -1);
 	});
-
-	const optionSelected = async (content: string) => {
+	const runDemo1 = (newMessages: (AiMessage | AiOption[])[], content: string) => {
 		const now = new Date();
-
-		let newMessages: (AiMessage | AiOption[])[] = [
-			{
-				role: AiRole.User,
-				content,
-				time: now
-			}
-		];
-		messages.update((msg) => [
-			...msg.filter((opt) => {
-				return !Array.isArray(opt);
-			}),
-			...newMessages
-		]);
-		state.loading = true;
-		await randomDelay();
-		state.loading = false;
-		newMessages = [];
 		if (['A piece for specific instrumentation'].includes(content)) {
 			newMessages.push(
 				{
@@ -112,6 +94,28 @@
 			}
 			cardStore.set(workCards);
 		}
+	};
+	const optionSelected = async (content: string) => {
+		const now = new Date();
+
+		let newMessages: (AiMessage | AiOption[])[] = [
+			{
+				role: AiRole.User,
+				content,
+				time: now
+			}
+		];
+		messages.update((msg) => [
+			...msg.filter((opt) => {
+				return !Array.isArray(opt);
+			}),
+			...newMessages
+		]);
+		state.loading = true;
+		await randomDelay();
+		state.loading = false;
+		newMessages = [];
+		runDemo1(newMessages, content);
 		// //-----debug---------
 		// let workCards: WorkCard[] = [];
 		// try {
@@ -119,8 +123,8 @@
 		// } catch (err) {
 		// 	console.error(err);
 		// }
+		//cardStore.set(workCards);
 		// //-----debug---------
-		cardStore.set(workCards);
 		messages.update((msg) => [
 			...msg.filter((opt) => {
 				return !Array.isArray(opt);

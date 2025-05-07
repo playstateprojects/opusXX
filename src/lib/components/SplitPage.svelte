@@ -10,9 +10,8 @@
 	</div>
 
 	{#if isWideScreen}
-		<div class="flex w-full items-center justify-center p-4 md:w-1/2">
+		<div class="relative flex w-full items-center justify-center p-4 md:w-1/2">
 			<slot name="side" />
 		</div>
-		<XxWorkDetail />
 	{/if}
 </div>

@@ -44,7 +44,7 @@
 		{#if $user}
 			<Avatar id="avatar-menu" size="xs" />
 		{:else}
-			<Button href="/login">Login</Button>
+			<Button href="/login">LOGIN</Button>
 		{/if}
 	</div>
 

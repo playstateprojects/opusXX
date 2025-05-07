@@ -1,0 +1,208 @@
+[
+    {
+        "work": {
+            "title": "Sea Sketches",
+            "composer": {
+                "name": "Grace Williams",
+                "birthDate": "1906",
+                "deathDate": "1977",
+                "birthLocation": "Wales, UK",
+                "deathLocation": "Wales, UK",
+                "longDescription": "Grace Williams was a pioneering Welsh composer who became the first woman from Wales to achieve international recognition in classical music. A student of Vaughan Williams, she combined British pastoral idioms with her own lyrical and modern voice. Her work often reflects the natural landscapes of Wales, as well as deep emotional undercurrents.",
+                "shortDescription": "First internationally recognized female Welsh composer, known for lyrical and landscape-inspired works.",
+                "imageURL": "",
+                "tags": [
+                    "20th Century",
+                    "Welsh",
+                    "String Orchestra"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Nature",
+                    "Exile",
+                    "Landscape"
+                ],
+                "representativeWorks": [
+                    "Sea Sketches (1944)",
+                    "Fantasia on Welsh Nursery Tunes (1940)"
+                ],
+                "gender": "female",
+                "sources": [
+                    "Welsh Music Archive",
+                    "BBC Archives"
+                ],
+                "nationality": "Welsh"
+            },
+            "location": "Wales / London",
+            "publicationYear": "1944",
+            "duration": "~15 MINUTES",
+            "shortDescription": "A poetic five-movement suite reflecting the changing moods of the sea and longing for home.",
+            "longDescription": "Sea Sketches is a five-movement suite composed by Grace Williams in 1944 during her wartime exile in London. Written for string orchestra, the work depicts various aspects of the ocean through rich, lyrical textures and gently modern harmonic language. It is widely considered one of her most personal and evocative works.",
+            "instrumentation": [
+                "Violin I",
+                "Violin II",
+                "Viola",
+                "Cello",
+                "Double Bass"
+            ],
+            "references": [],
+            "period": "20th Century",
+            "genre": "Orchestral",
+            "subGenre": "String Orchestra Suite",
+            "style": "tonal",
+            "sections": [
+                {
+                    "title": "Mood and Style",
+                    "content": "Atmospheric · Flowing · Lyrical"
+                }
+            ],
+            "sources": [
+                "BBC Music",
+                "Grace Williams Trust"
+            ],
+            "rawContent": "ORCHESTRAL · STRING ORCHESTRA SUITE\n\n~15 MINUTES\n\nInstrumentation Summary\n\nString Orchestra (no winds or percussion)\n\nMood and Style\n\nAtmospheric · Flowing · Lyrical"
+        },
+        "insight": "Written during WWII exile and infused with longing for her Welsh coast, Sea Sketches paints five vivid seascapes in music. Grace Williams was the first Welsh woman to gain international recognition as a composer — and this is one of her most poetic, personal works."
+    },
+    {
+        "work": {
+            "title": "String Quartet in B-flat major, Op. 1 No. 1",
+            "composer": {
+                "name": "Maddalena Laura Sirmen",
+                "birthDate": "1745",
+                "deathDate": "1818",
+                "birthLocation": "Venice, Italy",
+                "deathLocation": "Italy",
+                "longDescription": "Maddalena Laura Sirmen was a pioneering Classical-era violinist and composer. Trained at the Ospedale della Pietà and celebrated across Europe, she was one of the first women to publish string quartets. Her music combines Classical elegance with virtuosity and wit.",
+                "shortDescription": "Venetian violinist and composer who helped shape early Classical chamber music.",
+                "imageURL": "",
+                "tags": [
+                    "Classical",
+                    "Italian",
+                    "String Quartet"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Virtuosity",
+                    "Conversation",
+                    "Pioneering"
+                ],
+                "representativeWorks": [
+                    "String Quartet in B-flat major, Op. 1 No. 1",
+                    "Violin Concerto No. 3 in A major"
+                ],
+                "gender": "female",
+                "sources": [
+                    "Early Music Journal",
+                    "Venetian Archives"
+                ],
+                "nationality": "Italian"
+            },
+            "location": "London",
+            "publicationYear": "1769",
+            "duration": "~12–15 MINUTES",
+            "shortDescription": "One of the earliest string quartets by a woman, elegant and confident in Classical style.",
+            "longDescription": "Composed and published in 1769, this quartet by Maddalena Sirmen reveals her command of Classical form and style. A rare example of a woman contributing to the birth of the string quartet, the piece features graceful dialogue, balanced phrasing, and witty counterpoint, making it both historically significant and musically satisfying.",
+            "instrumentation": [
+                "Violin I",
+                "Violin II",
+                "Viola",
+                "Cello"
+            ],
+            "references": [],
+            "period": "Classical",
+            "genre": "Chamber",
+            "subGenre": "String Quartet",
+            "style": "tonal",
+            "sections": [
+                {
+                    "title": "Mood and Style",
+                    "content": "Elegant · Conversational · Confident"
+                }
+            ],
+            "sources": [
+                "Early Music Archive",
+                "Sirmen Manuscripts"
+            ],
+            "rawContent": "CHAMBER · STRING QUARTET\n\n~12–15 MINUTES\n\nInstrumentation Summary\n\n2 Violins, Viola, Cello\n\nMood and Style\n\nElegant · Conversational · Confident"
+        },
+        "insight": "One of the first known string quartets by a woman, this graceful, witty work helped shape the genre at its birth. Sirmen was a violin virtuoso trained in Venice, admired across Europe, and a rare female presence in the musical public sphere of her time."
+    },
+    {
+        "work": {
+            "title": "... and time is running past midnight ...",
+            "composer": {
+                "name": "Victoria Borisova-Ollas",
+                "birthDate": "1969",
+                "deathDate": "",
+                "birthLocation": "Russia",
+                "deathLocation": "",
+                "longDescription": "Victoria Borisova-Ollas is a Russian-Swedish composer known for richly textured, cinematic orchestral works. Her music often explores liminality, memory, and the surreal, blending lush instrumentation with haunting atmospheres. She has composed extensively for orchestras across Europe.",
+                "shortDescription": "Russian-Swedish composer of atmospheric, cinematic orchestral music.",
+                "imageURL": "",
+                "tags": [
+                    "Contemporary",
+                    "Atmospheric",
+                    "Swedish"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Dream",
+                    "Time",
+                    "Liminality"
+                ],
+                "representativeWorks": [
+                    "Symphony No. 1 'The Triumph of Heaven'",
+                    "... and time is running past midnight ..."
+                ],
+                "gender": "female",
+                "sources": [
+                    "Contemporary Music Sweden",
+                    "Composer Archives"
+                ],
+                "nationality": "Swedish"
+            },
+            "location": "Stockholm, Sweden",
+            "publicationYear": "2014",
+            "duration": "~10 MINUTES",
+            "shortDescription": "A surreal, cinematic work exploring dream states and urban solitude.",
+            "longDescription": "Premiered by the Royal Stockholm Philharmonic in 2014, this haunting and textured orchestral piece evokes the feeling of walking through a deserted city after midnight. With shimmering harp and celesta, subtle dissonances, and ghostly lines, it inhabits a dreamlike world where time bends and meaning flickers.",
+            "instrumentation": [
+                "Flutes",
+                "Oboes",
+                "Clarinets",
+                "Bassoons",
+                "Horns",
+                "Trumpets",
+                "Trombones",
+                "Tuba",
+                "Timpani",
+                "Percussion",
+                "Harp",
+                "Piano",
+                "Celesta",
+                "Strings"
+            ],
+            "references": [],
+            "period": "Contemporary",
+            "genre": "Orchestral",
+            "subGenre": "Atmospheric / Programmatic",
+            "style": "atonal",
+            "sections": [
+                {
+                    "title": "Mood and Style",
+                    "content": "Cinematic · Unsettling · Enchanted"
+                }
+            ],
+            "sources": [
+                "Swedish Music Information Centre",
+                "Program Notes"
+            ],
+            "rawContent": "ORCHESTRAL · ATMOSPHERIC / PROGRAMMATIC\n\n~10 MINUTES\n\nInstrumentation Summary\n\nFull Orchestra (including harp, piano, celesta, and rich percussion)\n\nMood and Style\n\nCinematic · Unsettling · Enchanted"
+        },
+        "insight": "Hovering between dream and disquiet, this piece unfolds like the soundtrack to a surreal, late-night encounter. Moody textures, shimmering percussion, and strange beauty make it perfect for listeners craving something unexpected, haunting, and spellbinding."
+    }
+]
