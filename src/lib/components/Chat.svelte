@@ -112,7 +112,14 @@
 			}
 			cardStore.set(workCards);
 		}
-
+		//debug
+		let workCards: WorkCard[] = [];
+		try {
+			workCards = [...demo] as WorkCard[];
+		} catch (err) {
+			console.error(err);
+		}
+		cardStore.set(workCards);
 		messages.update((msg) => [
 			...msg.filter((opt) => {
 				return !Array.isArray(opt);

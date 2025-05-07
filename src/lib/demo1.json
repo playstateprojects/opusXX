@@ -14,8 +14,7 @@
                 "tags": [
                     "Romantic",
                     "French",
-                    "Symphony",
-                    "Female Composer"
+                    "Symphony"
                 ],
                 "refrences": [
                     {
@@ -28,6 +27,16 @@
                     }
                 ],
                 "works": [],
+                "themes": [
+                    "Elegance",
+                    "Virtuosity",
+                    "Defiance"
+                ],
+                "representativeWorks": [
+                    "Symphony No. 3 in G minor, Op. 36 (1847)",
+                    "Overture in E minor, Op. 23 (1834)",
+                    "Grand variations on the song 'Le premier pas', for piano and orchestra, Op. 4"
+                ],
                 "gender": "female",
                 "sources": [
                     "Music Encyclopedia",
@@ -93,8 +102,7 @@
                 "tags": [
                     "Romantic",
                     "German",
-                    "Symphony",
-                    "Female Composer"
+                    "Symphony"
                 ],
                 "refrences": [
                     {
@@ -106,7 +114,11 @@
                         ]
                     }
                 ],
-                "works": [],
+                "representativeWorks": [
+                    "Symphony No. 3 in G minor, Op. 36 (1847)",
+                    "Overture in E minor, Op. 23 (1834)",
+                    "Grand variations on the song 'Le premier pas', for piano and orchestra, Op. 4"
+                ],
                 "gender": "female",
                 "sources": [
                     "German Biographical Dictionary",
@@ -166,8 +178,7 @@
                 "tags": [
                     "Romantic",
                     "British",
-                    "Symphony",
-                    "Female Composer"
+                    "Symphony"
                 ],
                 "refrences": [
                     {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { WorkCard } from '$lib/zodDefinitions';
 	import XxButton from '$lib/components/XXButton.svelte';
+	import XxComposerCard from '$lib/components/cards/XXComposerCard.svelte';
 	import { ArrowUpRightFromSquareOutline, AngleDownOutline } from 'flowbite-svelte-icons';
 	const state = $state({
 		showBack: false
@@ -103,27 +104,24 @@
 							'w=800,h=300,fit=cover,gravity=0.5x0.25'
 						)}
 						alt=""
-						class="aspect-[calc(16/7)] w-24 w-full object-cover"
+						class="mb-2 aspect-[2.2] w-24 w-full object-cover"
 					/>
 				{/if}
-				<div class="flex flex-col items-center justify-center p-4">
-					<ArrowUpRightFromSquareOutline class="h-5 w-5  text-sm text-primary-600" />
-				</div>
 			</button>
 			<div class="flex flex-col p-4">
-				<h3 class="font-extrabold">{workCard.work.title}</h3>
-				<span class="text-sm italic">{workCard.work.publicationYear}</span>
-				<span class="mt-2 text-xs uppercase">{workCard.work.genre} {workCard.work.duration}</span>
-				<div class="text-xs">
-					{workCard.work.instrumentation.toString()}
-				</div>
-				<button
-					class="mt-4 text-xs text-primary-400 underline"
-					onclick={() => (state.showBack = false)}
-				>
-					Back
-				</button>
+				<XxComposerCard composer={workCard.work.composer} />
 			</div>
+			<section>
+				<button class="flex w-full flex-col items-center justify-center text-slate-400">
+					<div class="m-0 flex items-center gap-x-2 p-0 text-xs font-bold uppercase">
+						More <AngleDownOutline class="h-4 w-4" />
+					</div>
+				</button>
+			</section>
+			<section class="my-4 flex items-center justify-center gap-x-4">
+				<XxButton label="SAVE" size="sm" excludeIcon />
+				<XxButton label="SHARE" size="sm" excludeIcon />
+			</section>
 		</div>
 	</div>
 </div>

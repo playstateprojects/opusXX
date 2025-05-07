@@ -212,7 +212,8 @@ Composer = z.object({
     'Alernate Names': z.array(z.string()).optional(),
     loading: z.boolean().optional(),
     nationality: z.string().optional(),
-    sections: z.array(CardSection).optional()
+    sections: z.array(CardSection).optional(),
+    representativeWorks: z.string().optional(),
 
 })
 Work = z.object({
