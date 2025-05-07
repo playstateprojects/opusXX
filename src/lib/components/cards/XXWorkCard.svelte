@@ -2,7 +2,13 @@
 	import type { WorkCard } from '$lib/zodDefinitions';
 	import XxButton from '$lib/components/XXButton.svelte';
 	import XxComposerCard from '$lib/components/cards/XXComposerCard.svelte';
-	import { ArrowUpRightFromSquareOutline, AngleDownOutline } from 'flowbite-svelte-icons';
+	import {
+		ArrowUpRightFromSquareOutline,
+		AngleDownOutline,
+		BookmarkOutline,
+		ShareAllOutline
+	} from 'flowbite-svelte-icons';
+	import { workDetail } from '$lib/stores/cardStore.js';
 	const state = $state({
 		showBack: false
 	});
@@ -21,11 +27,7 @@
 			id="card_front"
 			class="flip-front absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
-			<button
-				class="flex w-full bg-[#F47C7C]"
-				cursor-pointer
-				onclick={() => (state.showBack = true)}
-			>
+			<button class="flex w-full bg-[#F47C7C]" onclick={() => (state.showBack = true)}>
 				{#if workCard.work.composer.imageURL}
 					<img
 						src={workCard.work.composer.imageURL.replace(
@@ -76,15 +78,28 @@
 				</div>
 			</div>
 			<section>
-				<button class="flex w-full flex-col items-center justify-center text-slate-400">
+				<button
+					class="flex w-full flex-col items-center justify-center text-slate-400"
+					onclick={() => {
+						workDetail.set(workCard.work);
+					}}
+				>
 					<div class="m-0 flex items-center gap-x-2 p-0 text-xs font-bold uppercase">
 						More <AngleDownOutline class="h-4 w-4" />
 					</div>
 				</button>
 			</section>
 			<section class="my-4 flex items-center justify-center gap-x-4">
-				<XxButton label="SAVE" size="sm" excludeIcon />
-				<XxButton label="SHARE" size="sm" excludeIcon />
+				<XxButton size="sm" excludeIcon>
+					<span class="flex items-center justify-center"
+						>SAVE <BookmarkOutline class="h-3 w-3" /></span
+					>
+				</XxButton>
+				<XxButton size="sm" excludeIcon>
+					<span class="flex items-center justify-center"
+						>SHARE <ShareAllOutline class="h-3 w-3" /></span
+					>
+				</XxButton>
 			</section>
 		</div>
 
@@ -119,8 +134,16 @@
 				</button>
 			</section>
 			<section class="my-4 flex items-center justify-center gap-x-4">
-				<XxButton label="SAVE" size="sm" excludeIcon />
-				<XxButton label="SHARE" size="sm" excludeIcon link="mailto:tom@playstateprojects.com" />
+				<XxButton size="sm" excludeIcon>
+					<span class="flex items-center justify-center"
+						>SAVE <BookmarkOutline class="h-3 w-3" /></span
+					>
+				</XxButton>
+				<XxButton size="sm" excludeIcon>
+					<span class="flex items-center justify-center"
+						>SHARE <ShareAllOutline class="h-3 w-3" /></span
+					>
+				</XxButton>
 			</section>
 		</div>
 	</div>

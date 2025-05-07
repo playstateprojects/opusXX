@@ -1,24 +1,29 @@
 <script lang="ts">
 	import { ButtonSizes } from '$lib/types';
-	export let link: string = '#';
-	export let label: string = '';
-	export let action: (() => void) | undefined = undefined;
-	export let color: string = 'white';
-	export let excludeIcon: boolean = false;
-	export let size: ButtonSizes = ButtonSizes.md;
+	let {
+		link = '#',
+		label = '',
+		action = () => {},
+		color = 'white',
+		excludeIcon = false,
+		size = ButtonSizes.md,
+		children
+	} = $props();
 
 	// All rest props
 </script>
 
-<div {...$$props}>
-	<a
+<div>
+	<button
 		href={link ?? '#'}
-		onclick={action}
-		class="rounded-full border-[1px] border-solid border-black font-extralight {size ===
+		onclick={() => {
+			action();
+		}}
+		class=" rounded-full border-[1px] border-solid border-black font-extralight {size ===
 		ButtonSizes.sm
 			? ''
 			: 'shadow-[0_2px_0_0_rgba(156,163,175)]'} bg-{color ?? 'white'} {size === ButtonSizes.sm
-			? 'px-3 py-1.5 text-xs'
+			? 'px-2 py-2 text-xs'
 			: size === ButtonSizes.md
 				? 'px-4 py-2'
 				: size === ButtonSizes.lg
@@ -27,6 +32,9 @@
 	>
 		{#if label}
 			{label}
+		{/if}
+		{#if children}
+			<div class="flex">{@render children?.()}</div>
 		{/if}
 		{#if !excludeIcon}
 			<svg
@@ -43,5 +51,5 @@
 				/>
 			</svg>
 		{/if}
-	</a>
+	</button>
 </div>

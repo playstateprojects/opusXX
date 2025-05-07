@@ -11,6 +11,12 @@
 		"target": "ES2020",
 		"module": "ES2020",
 		"moduleResolution": "node16",
-    	"types": ["svelte"]
-	}
+		"types": ["svelte"],
+		"baseUrl": ".",
+		"paths": {
+			"$lib": ["src/lib"],
+			"$lib/*": ["src/lib/*"]
+		}
+	},
+	"include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
 }

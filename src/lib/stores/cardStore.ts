@@ -1,8 +1,9 @@
-import type { WorkCard } from '$lib/zodDefinitions';
+import type { WorkCard, Work } from '$lib/zodDefinitions.js';
 import { writable } from 'svelte/store';
 
 export const maxCards = 5; // set your max limit here
 export const cardStore = writable<WorkCard[]>([]);
+export const workDetail = writable<Work | null>(null);
 
 export function addCard(card: WorkCard) {
     cardStore.update(cards => {
