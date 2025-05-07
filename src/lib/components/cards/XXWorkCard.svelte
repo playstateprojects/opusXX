@@ -32,10 +32,10 @@
 					<img
 						src={workCard.work.composer.imageURL.replace(
 							'public',
-							'h=800,w=400,fit=cover,gravity=0.5x0.25'
+							'h=800,w=400,fit=cover,gravity=0.5x0.35'
 						)}
 						alt=""
-						class="mb-5 aspect-[calc(5/7)] h-full w-24 object-cover"
+						class="mb-5 aspect-[0.9] h-full w-24 object-cover"
 					/>
 				{/if}
 				<div class="flex w-full flex-col items-start justify-center p-2">

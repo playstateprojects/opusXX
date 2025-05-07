@@ -18,10 +18,14 @@
 	>
 		<!-- Top Section -->
 		<div class="flex flex-col items-center">
-			<div class="mb-1 rounded-full bg-yellow-500 px-2 py-1 text-xs uppercase text-black">
-				Publisher Spotlight
+			<div
+				class="bg-spotlight-premiere mb-1 rounded-full px-2 py-1 font-zwo text-xs uppercase text-black"
+			>
+				WORLD Premier
 			</div>
-			<h2 class="mt-4 text-2xl font-bold leading-tight text-yellow-400">{title}</h2>
+			<h2 class="text-spotlight-premiere mt-4 px-8 text-center text-2xl font-bold leading-tight">
+				{title}
+			</h2>
 			<div class="text-md mt-1">{subtitle}</div>
 		</div>
 

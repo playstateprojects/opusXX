@@ -70,14 +70,23 @@
 				{:else}
 					<div class="flex h-full w-full flex-grow justify-center p-10">
 						<SpotlightCard
-							title="Barbara Strozzi"
-							image="/images/barbara.jpeg"
-							subtitle="1619–1677, Venice"
+							title="Die dunkle Seite des Mondes"
+							image="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/9179d099-a569-423a-ff16-1137ff724300/public"
+							subtitle="Unsuk Chin"
 							cta={{ link: 'google.com', label: 'more' }}
 						>
-							<div class="mx-2 p-4 text-center font-semibold">
-								"marked by expressive intensity, daring harmonic choices, and a bold command of text
-								and drama"
+							<div
+								class="mb-4 flex flex-col items-center justify-center px-8 font-zwo text-sm font-light"
+							>
+								<div class="mb-4 text-white">
+									Exploring a dangerous Faustian alliance between quantum physics, psychoanalysis
+									and diabolical forces.
+								</div>
+								<img
+									src="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/91541ff1-eae5-483e-b89a-bb07c4c84000/public"
+									alt="Staats opper hamburg"
+									class="w-24"
+								/>
 							</div>
 						</SpotlightCard>
 					</div>

@@ -51,6 +51,10 @@ const config = {
 				},
 				acid: {
 					500: '#E5FF00'
+				},
+				spotlight: {
+					"premiere": "#FF5733"
+
 				}
 			}
 		}
