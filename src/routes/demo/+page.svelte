@@ -5,6 +5,8 @@
 	import { actions, messages } from '$lib/stores/chatStore';
 	import { get } from 'svelte/store';
 	import { AiOptionIcon, AiRole } from '$lib/types';
+	import { cardStore } from '$lib/stores/cardStore.js';
+	import demo4 from '$lib/demo4.json';
 	let pageNumber = 1;
 	let startMessages = [
 		{
@@ -64,7 +66,20 @@
 			<button
 				class="mt-4 font-light uppercase underline"
 				onclick={() => {
-					alert('suprise!');
+					pageNumber = 2;
+					cardStore.set(demo4);
+					messages.set([
+						{
+							content: `Three trailblazing women:
+🎻 Maddalena Laura Sirmen – 18th c. virtuoso violinist & composer, rivaled Tartini.
+🌊 Grace Williams – Wales’ symphonic voice, deeply lyrical, richly orchestrated.
+🌌 Victoria Borisova-Ollas – Modern mystic, blending texture, drama & imagination.
+A programme with power, poetry & legacy.`,
+							role: AiRole.System,
+							time: new Date()
+						}
+					]);
+					actions.set([]);
 				}}
 			>
 				Surprise Me!

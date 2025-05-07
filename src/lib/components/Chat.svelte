@@ -168,7 +168,9 @@
 						</div>
 					</div>
 				{:else}
-					<span class="mb-2 {idx == $lastMessageIndex ? 'font-bold' : ''}">{message.content}</span>
+					<span class="mb-2 whitespace-pre-line {idx == $lastMessageIndex ? 'font-bold' : ''}"
+						>{message.content}</span
+					>
 				{/if}
 			{/if}
 		{/each}
