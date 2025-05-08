@@ -72,6 +72,7 @@ const config = {
 					"20th_century": '#A4FCFE',
 					"20th_centuary": '#A4FCFE',
 					"20th_century_text": '#000',
+					"modernist": "#F7CFDB"
 				}
 			}
 		}
