@@ -21,7 +21,7 @@
 	});
 </script>
 
-<div class="flex w-1/2 flex-col items-center justify-center space-y-4 px-16 pb-0 pt-16">
+<div class="flex flex-col items-center justify-center space-y-4 px-16 pb-0 pt-16">
 	<h1 class="text-2xl">My Library</h1>
 	{#each lib as item, idx}
 		<button
