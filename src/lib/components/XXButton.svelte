@@ -19,7 +19,12 @@
 		onclick={() => {
 			console.log('li', link);
 			if (link && link != '#') {
-				if (link.startsWith('http://') || link.startsWith('https://')) {
+				if (
+					link.startsWith('http://') ||
+					link.startsWith('https://') ||
+					link.startsWith('mailto')
+				) {
+					console.log('mm');
 					// External link - open in new tab
 					window.open(link, '_blank');
 				} else if (link !== '#') {
