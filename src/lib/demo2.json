@@ -54,16 +54,11 @@
                 "Strings"
             ],
             "references": [],
-            "period": "Late Romantic",
+            "period": "Romantic",
             "genre": "Orchestral",
             "subGenre": "Symphonic Poem",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Dramatic · Bold · Lush"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Historical Music Archives",
                 "Holmès Society Publications"
@@ -131,12 +126,7 @@
             "genre": "Orchestral",
             "subGenre": "Concert Opener / Fanfare",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Mechanical · Energetic · Relentless"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Composer Website",
                 "Contemporary Music Journal"
@@ -198,12 +188,7 @@
             "genre": "Orchestral",
             "subGenre": "Experimental Fanfare",
             "style": "atonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Fierce · Fragmented · Defiant"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Contemporary Music Centre Berlin",
                 "Chin Archives"

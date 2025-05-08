@@ -48,12 +48,7 @@
             "genre": "Vocal",
             "subGenre": "Chamber Cantata",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Lamenting · Resilient · Intimate"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Strozzi Editions",
                 "Baroque Vocal Repertoire"
@@ -116,12 +111,7 @@
             "genre": "Vocal",
             "subGenre": "Voice & Chamber Ensemble",
             "style": "atonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Urgent · Dissonant · Political"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Guggenheim Archive",
                 "Contemporary Vocal Music Journal"
@@ -182,12 +172,7 @@
             "genre": "Vocal",
             "subGenre": "Voice & Chamber Ensemble",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Introspective · Tense · Lyrical"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Weir Archive",
                 "British Composers Database"

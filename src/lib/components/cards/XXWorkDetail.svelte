@@ -89,11 +89,6 @@
 				</div>
 
 				<div>
-					<h2 class="text-sm font-semibold">Mood and Style</h2>
-					<p class="text-gray-200">Lush · Passionate · Dreamlike</p>
-				</div>
-
-				<div>
 					<h2 class="text-xs font-semibold">Overview</h2>
 					<p class="space-y-1 text-gray-200">
 						The work opens with a hushed, dreamy atmosphere and gradually blossoms into a lush,

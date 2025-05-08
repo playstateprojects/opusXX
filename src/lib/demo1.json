@@ -69,16 +69,11 @@
                     ]
                 }
             ],
-            "period": "Late Romantic",
+            "period": "Romantic",
             "genre": "Orchestral",
             "subGenre": "Symphony",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Energetic · Mechanical · Driving"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Historical Music Archives",
                 "Farrenc Society Publications"
@@ -97,12 +92,11 @@
                 "birthLocation": "Friedland, Germany",
                 "deathLocation": "Berlin, Germany",
                 "longDescription": "Emilie Mayer was a German composer of the Romantic period. Born in Friedland, Mecklenburg, she was the daughter of a pharmacist who was also an amateur musician. After her father's suicide in 1840, she began to study composition seriously with Carl Loewe in Stettin and later with Adolph Bernhard Marx and Wilhelm Wieprecht in Berlin. She was an extremely prolific composer, writing eight symphonies, numerous chamber works, lieder, and several overtures and other orchestral works. She was often referred to as the 'female Beethoven' by her contemporaries due to the power and scope of her compositions. Despite her success during her lifetime, with regular performances of her works in Berlin and beyond, her music fell into obscurity after her death. In recent years, there has been a revival of interest in her compositions, with new recordings and performances bringing her music to a wider audience.",
-                "shortDescription": "German composer known for her symphonies and chamber music, often called the 'female Beethoven' by contemporaries.",
+                "shortDescription": "German composer often referred to as ‘the female Beethoven’ by her contemporaries. She composed extensively, including vocal music, piano works, string quartets, a piano concerto, symphonies, and an opera. Mayer's music was influenced by the Vienna classic style early on, with her later works adopting a more Romantic style. She died in Berlin in 1883.",
                 "imageURL": "https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/aa1b4e36-a582-4940-0bb6-26571c31a500/public",
                 "tags": [
                     "Romantic",
-                    "German",
-                    "Symphony"
+                    "German"
                 ],
                 "refrences": [
                     {
@@ -138,6 +132,7 @@
                 "2 Bassoons",
                 "4 Horns",
                 "2 Trumpets",
+                "1 Trombone",
                 "Timpani",
                 "Strings"
             ],
@@ -151,7 +146,7 @@
                     ]
                 }
             ],
-            "period": "Late Romantic",
+            "period": "Romantic",
             "genre": "Orchestral",
             "subGenre": "Symphony",
             "style": "tonal",
@@ -210,6 +205,7 @@
                 "2 Bassoons",
                 "4 Horns",
                 "2 Trumpets",
+                "3 Trombones",
                 "Timpani",
                 "Strings"
             ],
@@ -223,7 +219,7 @@
                     ]
                 }
             ],
-            "period": "Late Romantic",
+            "period": "Romantic",
             "genre": "Orchestral",
             "subGenre": "Symphony",
             "style": "tonal",

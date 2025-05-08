@@ -64,6 +64,7 @@ const config = {
 				period: {
 					"romantic": '#F47C7C',
 					"late_romantic": '#F47C7C',
+					"romantic": '#F47C7C',
 					"early_romantic": '#F47C7C',
 					"classical": '#FF00E5',
 					"baroque": '#EAC645',

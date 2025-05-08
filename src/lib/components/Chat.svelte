@@ -52,20 +52,20 @@
 	});
 	const runDemo1 = (newMessages: (AiMessage | AiOption[])[], content: string) => {
 		const now = new Date();
-		if (['A piece for specific instrumentation'].includes(content)) {
+		if (['A piece for a specific instrumentation'].includes(content)) {
 			newMessages.push(
 				{
 					role: AiRole.System,
-					content: 'What instruments do you have available?',
+					content: 'Great! What instrumentation would fit your program?',
 					time: now
 				},
 				[
-					{ content: 'Chamber music', icon: AiOptionIcon.theme },
-					{ content: 'Choral', icon: AiOptionIcon.theme },
-					{ content: 'Opera', icon: AiOptionIcon.theme },
-					{ content: 'Orchestral', icon: AiOptionIcon.theme },
-					{ content: 'Solo', icon: AiOptionIcon.theme },
-					{ content: 'Vocal', icon: AiOptionIcon.theme }
+					{ content: 'Chamber music' },
+					{ content: 'Choral' },
+					{ content: 'Opera' },
+					{ content: 'Orchestral' },
+					{ content: 'Solo' },
+					{ content: 'Vocal' }
 				]
 			);
 		}
@@ -73,7 +73,7 @@
 			newMessages.push(
 				{
 					role: AiRole.System,
-					content: 'Would you prefer works from a specific period?',
+					content: 'Would you like to explore works from a specific period?',
 					time: now
 				},
 				[
@@ -81,16 +81,16 @@
 					{ content: 'Renaissance' },
 					{ content: 'Baroque' },
 					{ content: 'Romantic' },
-					{ content: '20th Century', icon: AiOptionIcon.theme },
-					{ content: 'Contemporary', icon: AiOptionIcon.theme }
+					{ content: '20th Century' },
+					{ content: 'Contemporary' }
 				]
 			);
 		}
 		if (['Romantic'].includes(content)) {
 			newMessages.push({
 				role: AiRole.System,
-				content: `Based on your search for orchestral music from the Romantic period, I’ve selected three works that capture the era’s emotional richness, lyrical beauty, and sweeping dynamism. 
-					Let me know if you’d like to refine your search further.`,
+				content: `Here are three orchestral works from the Romantic period that embody its emotional richness and lyrical character.
+Would you like to narrow the focus further — or maybe explore something slightly different?`,
 				time: now
 			});
 			let workCards: WorkCard[] = [];
@@ -115,9 +115,9 @@
 					time: now
 				},
 				[
-					{ content: 'Sacred Tension', icon: AiOptionIcon.theme },
-					{ content: 'Elemental Pulse', icon: AiOptionIcon.theme },
-					{ content: 'Forgotten Futures', icon: AiOptionIcon.theme }
+					{ content: 'Sacred Tension' },
+					{ content: 'Elemental Pulse' },
+					{ content: 'Forgotten Futures' }
 				]
 			);
 		}
@@ -130,10 +130,10 @@
 					time: now
 				},
 				[
-					{ content: 'Transformation & Inner Journey', icon: AiOptionIcon.theme },
-					{ content: 'Momentum & Physical Motion', icon: AiOptionIcon.theme },
-					{ content: `Nature’s Cycles & Evolution`, icon: AiOptionIcon.theme },
-					{ content: 'Revolution & Social Change', icon: AiOptionIcon.theme }
+					{ content: 'Transformation & Inner Journey' },
+					{ content: 'Momentum & Physical Motion' },
+					{ content: `Nature’s Cycles & Evolution` },
+					{ content: 'Revolution & Social Change' }
 				]
 			);
 		}
@@ -276,9 +276,9 @@
 		{#each $messages as message, idx}
 			{#if Array.isArray(message)}
 				<!-- Handle AiOption[] case -->
-				<div class="mt-2 flex flex-wrap justify-center gap-2 px-10">
+				<div class="mt-2 flex flex-wrap justify-center gap-2 px-14">
 					{#each message as option}
-						<ChatOption content={option.content} icon={option.icon} {optionSelected}></ChatOption>
+						<ChatOption content={option.content} {optionSelected}></ChatOption>
 					{/each}
 				</div>
 			{:else}
@@ -290,7 +290,7 @@
 						</div>
 					</div>
 				{:else}
-					<span class="mb-2 whitespace-pre-line {idx == $lastMessageIndex ? 'font-bold' : ''}"
+					<span class="mb-2 whitespace-pre-line px-14 {idx == $lastMessageIndex ? 'font-bold' : ''}"
 						>{message.content}</span
 					>
 				{/if}

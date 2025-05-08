@@ -51,12 +51,7 @@
             "genre": "Orchestral",
             "subGenre": "String Orchestra Suite",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Atmospheric · Flowing · Lyrical"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "BBC Music",
                 "Grace Williams Trust"
@@ -116,12 +111,7 @@
             "genre": "Chamber",
             "subGenre": "String Quartet",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Elegant · Conversational · Confident"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Early Music Archive",
                 "Sirmen Manuscripts"
@@ -191,12 +181,7 @@
             "genre": "Orchestral",
             "subGenre": "Atmospheric / Programmatic",
             "style": "atonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Cinematic · Unsettling · Enchanted"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Swedish Music Information Centre",
                 "Program Notes"

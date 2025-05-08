@@ -21,7 +21,7 @@
 				icon: AiOptionIcon.period
 			},
 			{
-				content: 'A piece for specific instrumentation',
+				content: 'A piece for a specific instrumentation',
 				icon: AiOptionIcon.drama
 			},
 			{

@@ -66,7 +66,7 @@
 					</div>
 					<h4 class="mt-4 font-bold">Instrumentation Summary</h4>
 					<p class="text-xs">
-						{workCard.work.instrumentation.toString()}
+						{workCard.work.instrumentation.join(', ')}
 					</p>
 					{#each workCard.work.sections as section}
 						<section>

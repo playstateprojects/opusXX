@@ -26,6 +26,7 @@ const periods = z.enum([
     'Classical',
     'Early Romantic',
     'Late Romantic',
+    'Romantic',
     '20th Century',
     'Contemporary',
     'unkown'

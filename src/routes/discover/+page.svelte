@@ -49,7 +49,7 @@
 		<form on:submit={onSubmit}>
 			<Textarea
 				class="mb-4 w-full "
-				placeholder="Write a comment"
+				placeholder="Something else?"
 				bind:value={userMessage}
 				on:keydown={handleKeydown}
 			>

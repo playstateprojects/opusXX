@@ -68,12 +68,7 @@
             "genre": "Orchestral",
             "subGenre": "Atmospheric / Programmatic",
             "style": "atonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Cinematic · Unsettling · Enchanted"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Swedish Music Information Centre",
                 "Program Notes"
@@ -134,12 +129,7 @@
             "genre": "Chamber",
             "subGenre": "Chamber Orchestra / Large Ensemble",
             "style": "tonal",
-            "sections": [
-                {
-                    "title": "Mood and Style",
-                    "content": "Dusky · Lush · Wistful"
-                }
-            ],
+            "sections": [],
             "sources": [
                 "Boulanger Sisters Legacy",
                 "Conservatory Archives"
