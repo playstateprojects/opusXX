@@ -54,7 +54,7 @@ Amy Beach`,
 			title: 'Sacred Vocal Works in 5 Volumes',
 			image:
 				'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/d3a40f70-01aa-4e67-d444-32a54e972400/public',
-			subtitle: 'Unsuk Chin',
+			subtitle: 'Mel Bonis',
 			content: `A luminous collection of sacred choral music revealing Bonis’s lyrical gift and spiritual depth.`,
 			date: '',
 			logo: 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/fdb30c6e-37d9-4c90-5d99-d03d0a156800/public',
