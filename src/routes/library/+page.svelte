@@ -19,7 +19,7 @@
 	});
 </script>
 
-<div class="flex w-full flex-col items-center justify-center space-y-4 px-16 pb-0 pt-16">
+<div class="flex flex-col items-center justify-center space-y-4 px-16 pb-0 pt-16">
 	<h1 class="text-2xl">My Library</h1>
 	{#each lib as item, idx}
 		<button
@@ -36,9 +36,9 @@
 			</div>
 
 			<!-- Text Content -->
-			<div class="max-h-28 w-full flex-1 overflow-clip px-4 py-4">
-				<h3 class="text-sm font-semibold text-gray-900">{item.title}</h3>
-				<p class="flex w-full text-sm text-gray-600">
+			<div class="max-h-28 flex-1 overflow-clip px-4 py-4">
+				<h3 class="text-left text-sm font-semibold text-gray-900">{item.title}</h3>
+				<p class="flex text-left text-sm text-gray-600">
 					{item.description}
 				</p>
 			</div>
