@@ -102,7 +102,7 @@
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>
 				</XxButton>
-				<XxButton size="sm" excludeIcon link="mailto:hello@opusxx.com">
+				<XxButton size="sm" excludeIcon link="mailto:">
 					<span class="flex items-center justify-center"
 						>SHARE <ShareIcon width={14} height={14} /></span
 					>
