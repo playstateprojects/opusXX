@@ -8,6 +8,8 @@
 	import ShareIcon from '$lib/ShareIcon.svelte';
 	import lib2 from '$lib/lib2.json';
 
+	const state = $state({ activeItem: 0 });
+
 	onMount(() => {
 		let libCards: WorkCard[] = [];
 		try {
@@ -25,8 +27,9 @@
 		<button
 			onclick={() => {
 				cardStore.set(lib2);
+				state.activeItem = idx;
 			}}
-			class="{idx === 0
+			class="{idx === state.activeItem
 				? 'bg-gray-300'
 				: ''} flex h-28 w-full items-center justify-between rounded-lg border-2 border-black shadow-[0_2px_0_0_rgba(156,163,175)] transition hover:shadow"
 		>
