@@ -79,7 +79,7 @@
 		</div>
 
 		<div class="grid gap-4 md:grid-cols-2">
-			<div class="space-y-4">
+			<div class="space-y-1">
 				<div>
 					<h2 class="text-xs font-semibold">Instrumentation Summary</h2>
 					<p class="text-gray-200">
@@ -91,55 +91,60 @@
 				<div>
 					<h2 class="text-xs font-semibold">Overview</h2>
 					<p class="space-y-1 text-gray-200">
-						The work opens with a hushed, dreamy atmosphere and gradually blossoms into a lush,
-						romantic soundscape. Sweeping string lines and warm winds build emotional intensity,
-						creating a flowing arc of desire and surrender. Holmès' orchestration is rich yet never
-						overwhelming, showcasing her gift for balancing harmonic color with emotional pacing.
+						Angelus is a radiant, slow-building orchestral work inspired by the traditional Catholic
+						prayer ritual that marks moments of reflection throughout the day. In this piece,
+						Borisova-Ollas creates a sonic icon: a musical space for listening, stillness, and
+						contemplation.
 					</p>
-					<p class="mt-1 text-gray-200">
-						Despite its brevity, the piece creates a world unto itself — tender, expansive, and
-						evocative of late-night introspection or longing. It’s perfect as a standalone
-						interlude, a prelude to a larger Romantic work, or a moment of calm between more intense
-						program segments.
+					<p class="mt-1">
+						Rather than dramatic gesture, the power of Angelus lies in accumulated resonance — in
+						the shimmer of strings and celesta, in the tolling of bells, and in the breath-like
+						pacing of its structure. It unfolds like a prayer or a ritual, inviting the listener to
+						pause and enter a shared space of spiritual or emotional depth.
+					</p>
+					<p class="mt-1">
+						Premiered by the Royal Stockholm Philharmonic, Angelus has become one of
+						Borisova-Ollas’s most frequently performed orchestral works — a testament to its quiet
+						magnetism and universal resonance.
 					</p>
 				</div>
 			</div>
 
 			<div class="space-y-2">
 				<div>
-					<h2 class="text-xs font-semibold">Why Program This Work?</h2>
-					<ul class="list-inside list-disc space-y-1 text-gray-200">
-						<li>
-							<strong>Elegant and accessible:</strong> A short, lyrical piece that offers breathing space
-							in a program — without sacrificing depth or craftsmanship.
-						</li>
-						<li>
-							<strong>Female Romantic voice:</strong> Holmès was one of the few women of her time writing
-							for large orchestra with this level of command.
-						</li>
-						<li>
-							<strong>Emotional movement:</strong> The piece subtly reflects change — from stillness
-							to emotional bloom — making it a gentle fit for themes like transformation, longing, or
-							intimacy.
-						</li>
-					</ul>
+					<h2 class="text-xs font-semibold">Thematic Fit</h2>
+					<p class="mt-0">
+						Ideal for themes of Divine Inspiration, Timelessness, or Contemplative States
+					</p>
+
+					<p class="mt-0">Offers contrast in programs focused on ritual, memory, or sacred sound</p>
+
+					<p class="mt-0">Beautifully bridges spiritual traditions and modern orchestral writing</p>
+				</div>
+				<div>
+					<h2 class="text-xs font-semibold">Musical Style</h2>
+					<p>Slowly evolving harmonic textures</p>
+
+					<p>Bell-like motifs and suspended time</p>
+
+					<p>Gentle, layered orchestration with moments of glowing intensity</p>
+
+					<p>Echoes of Messiaen and Pärt, but with Borisova-Ollas’s distinct mystical clarity</p>
 				</div>
 
 				<div>
-					<h2 class="text-xs font-semibold">Programming Ideas</h2>
-					<ul class="list-inside list-disc space-y-1 text-gray-200">
-						<li>
-							Pair with Wagner’s <em>Siegfried Idyll</em> or Debussy’s
-							<em>Prélude à l'après-midi d'un faune</em> for a soft-focus Romantic/Impressionist arc
-						</li>
-						<li>
-							Combine with a contemporary work exploring intimacy or stillness for historical
-							contrast
-						</li>
-						<li>
-							Use as a moment of still beauty in a more dramatic or politically charged program
-						</li>
-					</ul>
+					<h2 class="text-xs font-semibold">Programming Suggestions</h2>
+					<p>
+						Pair with works by Saariaho, Takemitsu, or Arvo Pärt for a program on sacred stillness
+					</p>
+					<p>
+						Use as a moment of reflection or emotional grounding within a larger, more dynamic
+						program
+					</p>
+					<p>
+						Ideal for orchestras seeking contemporary repertoire with spiritual weight and audience
+						accessibility
+					</p>
 				</div>
 			</div>
 		</div>
