@@ -65,6 +65,7 @@ const config = {
 					"romantic": '#F47C7C',
 					"late_romantic": '#F47C7C',
 					"early_romantic": '#F47C7C',
+					"classical": '#FF00E5',
 					"baroque": '#EAC645',
 					"baroque_text": '#000',
 					"contemporary": '#FF5733',
