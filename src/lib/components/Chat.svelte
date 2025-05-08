@@ -111,13 +111,16 @@ Would you like to narrow the focus further — or maybe explore something slight
 			newMessages.push(
 				{
 					role: AiRole.System,
-					content: 'What theme would you like to explore?',
+					content: `What theme would you like to explore? 
+						Here are a few suggestions to get you started.`,
 					time: now
 				},
 				[
-					{ content: 'Sacred Tension' },
-					{ content: 'Elemental Pulse' },
-					{ content: 'Forgotten Futures' }
+					{ content: 'Nature & Environment' },
+					{ content: 'Identity & Human Stories' },
+					{ content: 'Love & Loss' },
+					{ content: 'Divine Inspiration' },
+					{ content: 'Dreams & the Unconscious' }
 				]
 			);
 		}
@@ -125,8 +128,8 @@ Would you like to narrow the focus further — or maybe explore something slight
 			newMessages.push(
 				{
 					role: AiRole.System,
-					content:
-						'“Movement & Change” is a strong, evocative theme—dynamic and wide open. Great instinct. To sharpen its emotional or narrative focus, consider variations like:',
+					content: `“Movement & Change” is a strong, evocative theme—dynamic and wide open.
+						To sharpen its emotional or narrative focus, consider variations like:`,
 					time: now
 				},
 				[
@@ -157,7 +160,8 @@ Would you like to narrow the focus further — or maybe explore something slight
 		if (content.indexOf('vocal works with chamber') > -1) {
 			newMessages.push({
 				role: AiRole.System,
-				content: `I’ve gathered a few vocal chamber works that I think match your vision—take a look and let me know what resonates.`,
+				content: `I’ve gathered a few vocal chamber works that I think match your vision—
+				take a look and let me know what resonates.`,
 				time: now
 			});
 			let workCardsB: WorkCard[] = [];

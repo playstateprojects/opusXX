@@ -1,0 +1,128 @@
+[
+    {
+        "work": {
+            "title": "Che si può fare?",
+            "composer": {
+                "name": "Barbara Strozzi",
+                "birthDate": "1619",
+                "deathDate": "1677",
+                "birthLocation": "Venice, Italy",
+                "deathLocation": "Venice, Italy",
+                "longDescription": "Barbara Strozzi was one of the most prolific female composers of the Baroque era. A singer, composer, and intellectual, she published eight volumes of vocal music, a remarkable achievement for any composer of the time, let alone a woman. Her works are known for their emotional depth, intimate expression, and daring harmonies.",
+                "shortDescription": "Baroque Venetian composer and singer, renowned for her emotionally charged solo vocal music.",
+                "imageURL": "https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b2bb2270-d7de-459e-1c32-30f3fb3c7700/public",
+                "tags": [
+                    "Baroque",
+                    "Italian",
+                    "Vocal"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Lament",
+                    "Resilience",
+                    "Voice"
+                ],
+                "representativeWorks": [
+                    "Che si può fare? (Op. 8)",
+                    "Lagrime mie"
+                ],
+                "gender": "female",
+                "sources": [
+                    "Early Music History",
+                    "Venetian Manuscripts"
+                ],
+                "nationality": "Italian"
+            },
+            "location": "Venice, Italy",
+            "publicationYear": "1664",
+            "duration": "~6–8 MINUTES",
+            "shortDescription": "A piercing Baroque solo lament transforming helplessness into defiant emotional clarity.",
+            "longDescription": "Che si può fare? is a chamber cantata by Barbara Strozzi, published in 1664. Written for soprano and continuo, the work laments betrayal and abandonment but ultimately asserts emotional agency. Strozzi’s music stretches harmony and time, making sorrow audible and resistance palpable.",
+            "instrumentation": [
+                "Soprano",
+                "Continuo (Theorbo/Harpsichord/Cello/Viola da Gamba)"
+            ],
+            "references": [],
+            "period": "Baroque",
+            "genre": "Vocal",
+            "subGenre": "Chamber Cantata",
+            "style": "tonal",
+            "sections": [],
+            "sources": [
+                "Strozzi Editions",
+                "Baroque Vocal Repertoire"
+            ],
+            "rawContent": "VOCAL · CHAMBER CANTATA\n\n~6–8 MINUTES\n\nInstrumentation Summary\n\nSoprano & Continuo (typically Theorbo, Harpsichord, Viola da Gamba or Cello)\n\nMood and Style\n\nLamenting · Resilient · Intimate"
+        },
+        "insight": "A piercing solo lament that transforms helplessness into power. Strozzi’s vocal line writhes with grief, but never yields. A defiant early cry for agency, it remains strikingly relevant in programs about resistance and emotional survival."
+    },
+    {
+        "work": {
+            "title": "Lamia",
+            "composer": {
+                "name": "Dorothy Howell",
+                "birthDate": "1898",
+                "deathDate": "1982",
+                "birthLocation": "Birmingham, UK",
+                "deathLocation": "UK",
+                "longDescription": "Dorothy Howell was an English composer and pianist whose career was launched by the success of her tone poem Lamia, premiered at the Proms in 1919. Her music, richly Romantic and vividly orchestrated, drew early comparisons to Richard Strauss. Though later overshadowed, she left behind a legacy of orchestral and chamber works full of drama, color, and craftsmanship.",
+                "shortDescription": "British composer of vivid, Romantic orchestral music, nicknamed 'the English Strauss.'",
+                "imageURL": "https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/1e4ff985-8742-456e-ccab-70ed595b4900/public",
+                "tags": [
+                    "Late Romantic",
+                    "British",
+                    "Symphonic Poem"
+                ],
+                "refrences": [],
+                "works": [],
+                "themes": [
+                    "Myth",
+                    "Tragedy",
+                    "Romanticism"
+                ],
+                "representativeWorks": [
+                    "Lamia (1918)",
+                    "Piano Concerto in D minor"
+                ],
+                "gender": "female",
+                "sources": [
+                    "BBC Proms Archive",
+                    "Royal Academy of Music"
+                ],
+                "nationality": "British"
+            },
+            "location": "London, UK",
+            "publicationYear": "1918",
+            "duration": "~13 MINUTES",
+            "shortDescription": "A vivid, mythic tone poem blending Romantic sweep with orchestral color and drama.",
+            "longDescription": "Composed when Dorothy Howell was just 20, Lamia is a lush symphonic poem inspired by Keats’s poem of the same name. The work impressed audiences and critics alike when premiered at the Proms in 1919, earning Howell the nickname 'the English Strauss.' Its dramatic arcs and colorful instrumentation mark it as a standout in early 20th-century British orchestral music.",
+            "instrumentation": [
+                "Flutes",
+                "Oboes",
+                "Clarinets",
+                "Bassoons",
+                "Horns",
+                "Trumpets",
+                "Trombones",
+                "Tuba",
+                "Timpani",
+                "Percussion",
+                "Harp",
+                "Strings"
+            ],
+            "references": [],
+            "period": "Late Romantic / Early 20th Century",
+            "genre": "Orchestral",
+            "subGenre": "Symphonic Poem",
+            "style": "tonal",
+            "sections": [],
+            "sources": [
+                "BBC Proms Archive",
+                "Howell Manuscripts"
+            ],
+            "rawContent": "ORCHESTRAL · SYMPHONIC POEM\n\n~13 MINUTES\n\nInstrumentation Summary\n\nFull Orchestra: Winds, Brass, Percussion, Harp, Strings\n\nMood and Style\n\nDramatic · Lush · Mythic"
+        },
+        "insight": "Composed when Howell was just 20, Lamia is a vivid, richly scored tone poem inspired by Keats’s tragic tale. Premiered at the Proms to great acclaim, it blends sweeping Romanticism with a striking orchestral imagination — earning Howell the nickname “the English Strauss.”"
+    }
+]

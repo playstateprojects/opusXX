@@ -6,6 +6,7 @@
 	import { cardStore } from '$lib/stores/cardStore.js';
 	import { WorkCard } from '$lib/zodDefinitions.js';
 	import ShareIcon from '$lib/ShareIcon.svelte';
+	import lib2 from '$lib/lib2.json';
 
 	onMount(() => {
 		let libCards: WorkCard[] = [];
@@ -21,10 +22,13 @@
 <div class="flex w-full flex-col items-center justify-center space-y-4 px-16 pb-0 pt-16">
 	<h1 class="text-2xl">My Library</h1>
 	{#each lib as item, idx}
-		<div
+		<button
+			onclick={() => {
+				cardStore.set(lib2);
+			}}
 			class="{idx === 0
 				? 'bg-gray-300'
-				: ''} flex h-28 items-center justify-between rounded-lg border-2 border-black shadow-[0_2px_0_0_rgba(156,163,175)] transition hover:shadow"
+				: ''} flex h-28 w-full items-center justify-between rounded-lg border-2 border-black shadow-[0_2px_0_0_rgba(156,163,175)] transition hover:shadow"
 		>
 			<!-- Image Placeholder -->
 			<div class="h-28 flex-shrink-0 overflow-hidden rounded bg-gray-200 p-0">
@@ -32,10 +36,10 @@
 			</div>
 
 			<!-- Text Content -->
-			<div class="max-h-28 flex-1 overflow-clip px-4 py-4">
+			<div class="max-h-28 w-full flex-1 overflow-clip px-4 py-4">
 				<h3 class="text-sm font-semibold text-gray-900">{item.title}</h3>
-				<p class="text-sm text-gray-600">
-					Emotionally potent works that speak to societal rupture, protest, and transformation.
+				<p class="flex w-full text-sm text-gray-600">
+					{item.description}
 				</p>
 			</div>
 
@@ -43,6 +47,6 @@
 			<div class="flex h-full w-16 flex-shrink-0 flex-col items-start justify-start pt-4">
 				<XxButton excludeIcon><ShareIcon /></XxButton>
 			</div>
-		</div>
+		</button>
 	{/each}
 </div>
