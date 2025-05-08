@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { GenreSchema } from "./zodAirtableTypes";
 
 let Composer: z.ZodType<any>;
 let Work: z.ZodType<any>;
@@ -21,7 +20,7 @@ const ComposerSex = z.enum([
     'Other',
 ])
 const periods = z.enum([
-    ' Medieval',
+    'Medieval',
     'Renaissance',
     'Baroque',
     'Classical',
@@ -274,6 +273,23 @@ const Genres = z.array(z.object({
     id: z.string().optional()
 }))
 
+const CTA = z.object({
+    link: z.string(),
+    label: z.string()
+})
+
+const Spotlight = z.object({
+    title: z.string(),
+    image: z.string(),
+    subtitle: z.string(),
+    content: z.string(),
+    date: z.string().optional(),
+    logo: z.string().optional(),
+    colour: z.string(),
+    type: z.string().optional(),
+    cta: CTA
+})
+
 type Composer = z.infer<typeof Composer>
 type Work = z.infer<typeof Work>
 type WorkCard = z.infer<typeof WorkCard>
@@ -281,7 +297,8 @@ type WorkList = z.infer<typeof WorkList>
 type Reference = z.infer<typeof Reference>
 type ComposerList = z.infer<typeof ComposerList>
 type Genres = z.infer<typeof Genres>
+type CTA = z.infer<typeof CTA>
+type Spotlight = z.infer<typeof Spotlight>
 
 
-
-export { Reference, Work, Composer, ComposerList, Source, Genres, WorkList, WorkCard }
+export { Reference, Work, Composer, ComposerList, Source, Genres, WorkList, WorkCard, CTA, Spotlight }

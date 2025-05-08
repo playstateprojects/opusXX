@@ -56,6 +56,11 @@ const config = {
 					"premiere": "#FF5733"
 
 				},
+				xx: {
+					red: '#FF5733',
+					peach: '#F47C7C',
+					yellow: '#E5FF00',
+				},
 				period: {
 					"romantic": '#F47C7C',
 					"late_romantic": '#F47C7C',
