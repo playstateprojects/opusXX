@@ -102,7 +102,11 @@
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>
 				</XxButton>
-				<XxButton size="sm" excludeIcon link="mailto:?subject=Meet your next standout composer">
+				<XxButton
+					size="sm"
+					excludeIcon
+					link="mailto:?subject=Meet your next standout composer&from=hello@opusxx.com"
+				>
 					<span class="flex items-center justify-center"
 						>SHARE <ShareIcon width={14} height={14} /></span
 					>

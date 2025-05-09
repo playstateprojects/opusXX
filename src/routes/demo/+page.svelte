@@ -74,11 +74,11 @@
 					cardStore.set(demo4);
 					messages.set([
 						{
-							content: `Three trailblazing women:
-🎻 Maddalena Laura Sirmen – 18th c. virtuoso violinist & composer, rivaled Tartini.
-🌊 Grace Williams – Wales’ symphonic voice, deeply lyrical, richly orchestrated.
-🌌 Victoria Borisova-Ollas – Modern mystic, blending texture, drama & imagination.
-A programme with power, poetry & legacy.`,
+							content: `Three composers who reshaped musical boundaries in their own time — and ours.
+
+Maddalena Laura Sirmen – An 18th-century violinist-composer who broke into the male-dominated quartet form with elegance and authority.
+Grace Williams – The first Welsh woman to have a symphony performed publicly and a major voice in 20th-century British music.
+Alice Shields – A pioneer in electronic opera, Apocalypse (1994) fuses myth, voice, and technology into something raw and otherworldly.`,
 							role: AiRole.System,
 							time: new Date()
 						}
