@@ -49,7 +49,7 @@ Amy Beach`,
 			colour: 'xx-red',
 			type: 'Publisher spotlight',
 			cta: {
-				link: '#',
+				link: 'https://www.universaledition.com/en/Beyond-All-Happiness-and-Joy/P0314368',
 				label: 'more'
 			}
 		},
