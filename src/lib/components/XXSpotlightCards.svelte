@@ -32,7 +32,7 @@ Amy Beach`,
 			colour: 'xx-red',
 			type: 'WORLD PREMIERE',
 			cta: {
-				link: '#',
+				link: 'https://www.boosey.com/licensing/news/Unsuk-Chin-_Dark-Side-of-the-Moon_-opera-premiere-in-Hamburg/102590',
 				label: 'more'
 			}
 		},
