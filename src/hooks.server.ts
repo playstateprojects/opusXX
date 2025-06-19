@@ -40,8 +40,6 @@ export const handle: Handle = async ({ event, resolve }) => {
     // Check if the request is for the waitlist page
     const isWaitlistPage = event.url.pathname.includes('/waitlist');
 
-    // Debug the URL path to ensure we're correctly identifying the waitlist page
-    console.log('URL path:', event.url.pathname, 'isWaitlistPage:', isWaitlistPage);
 
 
     return response;

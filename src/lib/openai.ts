@@ -2,7 +2,7 @@ import { OPENAI_API_KEY } from '$env/static/private';
 import { DEEPSEEK_API_KEY } from '$env/static/private';
 import OpenAI from 'openai';
 import type { AiMessage } from './types';
-import type { ThreadMessage } from 'openai/resources/beta/threads/messages';
+// import type { ThreadMessage } from 'openai/resources/beta/threads/messages';
 
 import { zodResponseFormat } from "openai/helpers/zod";
 import { Composer, ComposerList, WorkList } from './zodDefinitions';
@@ -14,7 +14,10 @@ let openai: OpenAI;
 if (!useDeepseek) {
     openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 } else {
-    aiModel = "deepseek-chat"
+    aiModel = "deepseek-chat";
+    if (!DEEPSEEK_API_KEY) {
+        throw new Error('DEEPSEEK_API_KEY is required when useDeepseek is true');
+    }
     openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: DEEPSEEK_API_KEY });
 }
 
@@ -33,7 +36,10 @@ const getEmbedding = async (text: string) => {
 const chat = async (messages: AiMessage[]) => {
     const response = await openai.chat.completions.create({
         model: aiModel,
-        messages: messages
+        messages: messages,
+        response_format: {
+            'type': 'json_object'
+        }
     });
     if (response && response.choices[0].message) {
         return response.choices[0].message
@@ -41,61 +47,61 @@ const chat = async (messages: AiMessage[]) => {
         return { error: true }
     }
 }
-const assistant = async (messages: AiMessage[], assistantId?: string) => {
-    try {
-        // Create a thread with initial messages if provided
-        const { threadId, error: threadError } = await createThread(messages.slice(0, -1));
-        if (threadError) {
-            return { error: threadError };
-        }
+// const assistant = async (messages: AiMessage[], assistantId?: string) => {
+//     try {
+//         // Create a thread with initial messages if provided
+//         const { threadId, error: threadError } = await createThread(messages.slice(0, -1));
+//         if (threadError) {
+//             return { error: threadError };
+//         }
 
-        // Add the most recent message to the thread
-        const lastMessage = messages[messages.length - 1];
-        if (lastMessage.role === 'user') {
-            const { error: messageError } = await addMessage(threadId, lastMessage.content as string);
-            if (messageError) {
-                return { error: messageError };
-            }
-        }
+//         // Add the most recent message to the thread
+//         const lastMessage = messages[messages.length - 1];
+//         if (lastMessage.role === 'user') {
+//             const { error: messageError } = await addMessage(threadId, lastMessage.content as string);
+//             if (messageError) {
+//                 return { error: messageError };
+//             }
+//         }
 
-        // Run the assistant and wait for completion
-        const { runId, error: runError } = await runAssistant(
-            threadId,
-            assistantId || process.env.DEFAULT_ASSISTANT_ID || ''
-        );
-        if (runError) {
-            return { error: runError };
-        }
+//         // Run the assistant and wait for completion
+//         const { runId, error: runError } = await runAssistant(
+//             threadId,
+//             assistantId || process.env.DEFAULT_ASSISTANT_ID || ''
+//         );
+//         if (runError) {
+//             return { error: runError };
+//         }
 
-        const { error: waitError } = await waitForRun(threadId, runId);
-        if (waitError) {
-            return { error: waitError };
-        }
+//         const { error: waitError } = await waitForRun(threadId, runId);
+//         if (waitError) {
+//             return { error: waitError };
+//         }
 
-        // Get the assistant's response
-        const { messages: threadMessages, error: messagesError } = await getMessages(threadId);
-        if (messagesError) {
-            return { error: messagesError };
-        }
+//         // Get the assistant's response
+//         const { messages: threadMessages, error: messagesError } = await getMessages(threadId);
+//         if (messagesError) {
+//             return { error: messagesError };
+//         }
 
-        // Find the latest assistant message
-        const assistantResponse = threadMessages.find(m => m.role === 'assistant');
-        if (!assistantResponse) {
-            return { error: "No assistant response found" };
-        }
+//         // Find the latest assistant message
+//         const assistantResponse = threadMessages.find(m => m.role === 'assistant');
+//         if (!assistantResponse) {
+//             return { error: "No assistant response found" };
+//         }
 
-        // Convert to the format expected by your application
-        return {
-            role: 'assistant',
-            content: assistantResponse.content[0].type === 'text'
-                ? assistantResponse.content[0].text.value
-                : JSON.stringify(assistantResponse.content)
-        };
-    } catch (error) {
-        console.error("Error in assistant function:", error);
-        return { error: "An unexpected error occurred" };
-    }
-};
+//         // Convert to the format expected by your application
+//         return {
+//             role: 'assistant',
+//             content: assistantResponse.content[0].type === 'text'
+//                 ? assistantResponse.content[0].text.value
+//                 : JSON.stringify(assistantResponse.content)
+//         };
+//     } catch (error) {
+//         console.error("Error in assistant function:", error);
+//         return { error: "An unexpected error occurred" };
+//     }
+// };
 
 const extractComposer = async (text: string): Promise<{ data?: Composer; error?: string }> => {
 

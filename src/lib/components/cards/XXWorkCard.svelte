@@ -30,9 +30,8 @@
 		>
 			<button
 				class="flex w-full text-black bg-period-{workCard.work.period
-					.toLowerCase()
-					.trim()
-					.replace(' ', '_')} font-zwocorr"
+					? workCard.work.period.toLowerCase().trim().replace(' ', '_')
+					: 'romantic'} font-zwocorr"
 				onclick={() => (state.showBack = true)}
 			>
 				{#if workCard.work.composer.imageURL}
@@ -66,7 +65,9 @@
 					</div>
 					<h4 class="mt-4 font-bold">Instrumentation Summary</h4>
 					<p class="text-xs">
-						{workCard.work.instrumentation.join(', ')}
+						{workCard.work.instrumentation && Array.isArray(workCard.work.instrumentation)
+							? workCard.work.instrumentation.join(', ')
+							: ''}
 					</p>
 					{#each workCard.work.sections as section}
 						<section>
@@ -121,9 +122,8 @@
 		>
 			<button
 				class="flex w-full cursor-pointer bg-period-{workCard.work.period
-					.toLowerCase()
-					.trim()
-					.replace(' ', '_')}"
+					? workCard.work.period.toLowerCase().trim().replace(' ', '_')
+					: ''}"
 				onclick={() => (state.showBack = false)}
 			>
 				{#if workCard.work.composer.imageURL}

@@ -1,5 +1,5 @@
 import { AIRTABLE_TOKEN, AIRTABLE_BASE } from '$env/static/private';
-import type { Work as AirTableWork, Composer as AirtableComposer } from './zodAirtableTypes';
+import { AirtableResponseSchema, type Work as AirTableWork, type Composer as AirtableComposer } from './zodAirtableTypes';
 import type { Composer, Genres, Source, Work } from './zodDefinitions';
 import Airtable from 'airtable';
 
@@ -9,7 +9,7 @@ let subGenres: Genres = [];
 let styles: Genres = [];
 let periods: Genres = [];
 
-const composerByName = async (fieldValue: string) => {
+const composerByName = async (fieldValue: string): Promise<Composer[]> => {
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/Composer?filterByFormula=${encodeURIComponent(`{Name}='${fieldValue}'`)}`;
 
     const response = await fetch(url, {
@@ -18,7 +18,13 @@ const composerByName = async (fieldValue: string) => {
         },
     })
     const data = await response.json();
-    return data.records ?? [];
+    try {
+        const parsed = AirtableResponseSchema.parse(data);
+        return parsed.records.map(record => record.fields);
+    } catch (error) {
+        console.error('Validation error:', error);
+        throw new Error('Invalid data format from Airtable');
+    }
 }
 const getGenres = async () => {
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE}/Genre`;

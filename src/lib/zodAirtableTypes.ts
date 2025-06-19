@@ -100,6 +100,14 @@ export const ComposerSchema = z.object({
   'Long Description': z.string().optional(),
 })
 export type Composer = z.infer<typeof ComposerSchema>
+const AirtableRecordSchema = z.object({
+  id: z.string(),
+  createdTime: z.string().optional(),
+  fields: ComposerSchema,
+});
+export const AirtableResponseSchema = z.object({
+  records: z.array(AirtableRecordSchema),
+});
 
 export const SourcesSchema = z.object({
   'URL': z.string().optional(),

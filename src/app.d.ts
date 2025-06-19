@@ -16,6 +16,9 @@ declare global {
 					query: (data: any, options: any) => Promise<any>;
 					// Add other methods if VECTORIZE supports more
 				};
+				AI: {
+					autorag: (data: any) => { search: (params: { query: string }) => Promise<any> };
+				}
 			};
 		}
 		// interface Error {}

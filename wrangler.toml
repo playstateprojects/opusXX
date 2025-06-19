@@ -6,3 +6,6 @@ account_id = "40b5df9e0bd5d8641f20121cc488bcad"
 [[vectorize]]
 binding = "VECTORIZE"
 index_name = "opusxx-vectors"
+
+[ai]
+binding = "AI"
