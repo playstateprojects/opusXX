@@ -20,7 +20,10 @@
 	import type { WorkCard } from '$lib/zodDefinitions.js';
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
-	import { ComposerSchema } from '$lib/zodAirtableTypes';
+	import { ComposerSchema, type Composer } from '$lib/zodAirtableTypes';
+	import { getVectorQuery } from '$lib/utils/vectors';
+	import { z } from 'zod';
+	import { MoonSolid } from 'flowbite-svelte-icons';
 	const state = $state({
 		loading: false
 	});
@@ -339,8 +342,7 @@ Would you like to narrow the focus further — or maybe explore something slight
         [ ] No undefined or null values - omit empty fields`
 		};
 
-		console.log('Sending to AI:', newMessage);
-		let msgs = [...$messages, newMessage];
+		let msgs = [newMessage, ...$messages];
 
 		try {
 			const response = await fetch('/api/chat', {
@@ -418,8 +420,14 @@ Would you like to narrow the focus further — or maybe explore something slight
 			time: new Date()
 		};
 		messages.update((msg) => [...msg, newUserMessage]);
+		const vectorQuery = await getVectorQuery(
+			get(messages).filter((ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms)
+		);
+		console.log(vectorQuery);
+
 		let systemMessages: AiMessage[] | AiOption[] = [];
 		state.loading = true;
+
 		let vectors = await searchVectors(message);
 		const cards = await processVectors(vectors);
 		state.loading = false;

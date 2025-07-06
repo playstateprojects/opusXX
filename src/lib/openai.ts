@@ -34,13 +34,30 @@ const getEmbedding = async (text: string) => {
     return embedding
 }
 const chat = async (messages: AiMessage[]) => {
+    console.log("oaim", messages)
+    const response = await openai.chat.completions.create({
+        model: aiModel,
+        messages: messages
+
+    });
+    console.log("ch12", response)
+    if (response && response.choices[0].message) {
+        return response.choices[0].message
+    } else {
+        return { error: true }
+    }
+}
+const jsonChat = async (messages: AiMessage[]) => {
+    console.log("oaim", messages)
     const response = await openai.chat.completions.create({
         model: aiModel,
         messages: messages,
         response_format: {
             'type': 'json_object'
         }
+
     });
+    console.log("ch12", response)
     if (response && response.choices[0].message) {
         return response.choices[0].message
     } else {
@@ -179,4 +196,4 @@ const extractWorkList = async (text: string) => {
     }
 }
 
-export { getEmbedding, chat, extractComposer, extractComposerList, extractWorkList }
+export { getEmbedding, chat, extractComposer, extractComposerList, extractWorkList, jsonChat }

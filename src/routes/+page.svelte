@@ -11,7 +11,7 @@
 	let startMessages = [
 		{
 			content: 'What are you programming? Let’s find the perfect match.',
-			role: AiRole.System,
+			role: AiRole.Assistant,
 			time: new Date()
 		},
 		[
