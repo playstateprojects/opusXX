@@ -42,3 +42,14 @@ export interface CTA {
     link: string;
     label: string
 }
+
+export interface VectorMatch {
+    document_name: string,
+    fie_id: string,
+    composer_name: string
+    justification: string
+}
+export interface FormattedVectorResponse {
+    summary: string,
+    matches: VectorMatch[]
+}

@@ -5,7 +5,8 @@
 		AiOptionIcon,
 		type AiMessage,
 		type AiOption,
-		type ChatAction
+		type ChatAction,
+		type FormattedVectorResponse
 	} from '$lib/types.js';
 	import { derived, get } from 'svelte/store';
 	import ChatOption from './ChatOption.svelte';
@@ -21,7 +22,7 @@
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { ComposerSchema, type Composer } from '$lib/zodAirtableTypes';
-	import { getVectorQuery } from '$lib/utils/vectors';
+	import { getVectorQuery, processVectors } from '$lib/utils/vectors';
 	import { z } from 'zod';
 	import { MoonSolid } from 'flowbite-svelte-icons';
 	const state = $state({
@@ -227,7 +228,7 @@ Would you like to narrow the focus further — or maybe explore something slight
 			return []; // Return empty array instead of {} to match return type
 		}
 	};
-	const searchVectors = async (query: string) => {
+	const searchVectors = async (query: string): Promise<FormattedVectorResponse | null> => {
 		const response = await fetch('/api/vector/search', {
 			method: 'POST',
 			body: JSON.stringify({ query: query })
@@ -235,7 +236,6 @@ Would you like to narrow the focus further — or maybe explore something slight
 		try {
 			const files = (await response.json()).result.data;
 
-			console.log('f', files);
 			if (Array.isArray(files)) {
 				files.forEach(async (file: any) => {
 					const trimmedStr = file.filename
@@ -245,11 +245,11 @@ Would you like to narrow the focus further — or maybe explore something slight
 					file.composerName = trimmedStr.replace(/_/g, ' ');
 				});
 			}
-			console.log(files);
+			console.log('ffffffiles', files);
 			return files;
 		} catch (err: any) {
 			console.log('an error occured', err);
-			return {};
+			return null;
 		}
 	};
 
@@ -293,126 +293,7 @@ Would you like to narrow the focus further — or maybe explore something slight
 			...newMessages
 		]);
 	};
-	const processVectors = async (vectorResults: any): Promise<WorkCard[]> => {
-		let newMessage: AiMessage = {
-			role: AiRole.System,
-			content: `You are a JSON data processing assistant. Your task is to:
-        
-        1. Receive vector search results
-        2. Select the top 3 most relevant matches
-        3. Return them in a SPECIFIC JSON structure
 
-        Input Data:
-        ${JSON.stringify(vectorResults, null, 2)}
-
-        Required Output Format:
-        {
-            "works": [
-                {
-                    "work": {
-                        "title": "String Quartet No. 14 in D minor",
-                        "composer": {
-                            "id": "beethoven-1770",
-                            "name": "Ludwig van Beethoven",
-                            "birthYear": 1770,
-                            "deathYear": 1827
-                        },
-                        // ... (all other fields from your original example)
-                    },
-                    "insight": "a brief overview of why you chose to include the work"
-                }
-                // Exactly 3 items
-            ]
-        }
-
-        Strict Rules:
-        - Only return this exact JSON structure, nothing else
-        - No additional text, explanations, or markdown
-        - All property names must be double-quoted
-        - Include no more than 3 items in the "works" array
-        - If a field is missing in source data, omit it entirely
-        - Never use single quotes or unquoted properties
-        - The response must parse with JSON.parse() without errors
-
-        Validation Checklist Before Responding:
-        [ ] Top-level object has only "works" property
-        [ ] No trailing commas
-        [ ] No comments or non-JSON text
-        [ ] All strings are double-quoted
-        [ ] No undefined or null values - omit empty fields`
-		};
-
-		let msgs = [newMessage, ...$messages];
-
-		try {
-			const response = await fetch('/api/chat', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ messages: msgs })
-			});
-
-			if (!response.ok) {
-				throw new Error(`API request failed with status ${response.status}`);
-			}
-
-			let res = await response.json();
-			console.log('AI Raw Response:', res.content);
-
-			// Robust JSON extraction that handles:
-			// 1. Raw JSON
-			// 2. Markdown code blocks
-			// 3. Accidental text before/after
-			const extractJSON = (str: string) => {
-				// Handle code blocks
-				const codeBlockMatch = str.match(/```(?:json)?\n([\s\S]*?)\n```/);
-				if (codeBlockMatch) return codeBlockMatch[1];
-
-				// Handle potential wrapped JSON
-				const jsonMatch = str.match(/\{[\s\S]*\}/);
-				return jsonMatch ? jsonMatch[0] : str;
-			};
-
-			const jsonString = extractJSON(res.content);
-			console.log('Extracted JSON:', jsonString);
-
-			// Parse with reviver to ensure strict compliance
-			const parsed = JSON.parse(jsonString, (key, value) => {
-				if (typeof value === 'string') {
-					return value.trim();
-				}
-				return value;
-			});
-
-			// Normalize to our expected structure
-			let worksArray = [];
-			if (Array.isArray(parsed)) {
-				// If we got bare array, wrap it
-				worksArray = parsed;
-			} else if (parsed && parsed.works) {
-				// If we got correct structure
-				worksArray = parsed.works;
-			} else if (parsed && parsed.work) {
-				// If we got single work
-				worksArray = [parsed];
-			} else {
-				throw new Error('Unexpected response structure');
-			}
-
-			// Validate we got proper WorkCard objects
-			const validatedCards = worksArray.map((item: any) => {
-				if (!item.work || !item.work.title) {
-					throw new Error('Missing required work fields');
-				}
-				return item as WorkCard;
-			});
-
-			return validatedCards;
-		} catch (err) {
-			console.error('Vector processing error:', err);
-			// Consider adding retry logic here if appropriate
-			return [];
-		}
-	};
 	const onSubmit = async (message: string) => {
 		const newUserMessage: AiMessage = {
 			role: AiRole.User,
@@ -420,16 +301,20 @@ Would you like to narrow the focus further — or maybe explore something slight
 			time: new Date()
 		};
 		messages.update((msg) => [...msg, newUserMessage]);
-		const vectorQuery = await getVectorQuery(
-			get(messages).filter((ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms)
+		state.loading = true;
+		let filteredMessages = get(messages).filter(
+			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
-		console.log(vectorQuery);
+		const vectorQuery = await getVectorQuery(filteredMessages);
+		console.log('vq', vectorQuery);
 
 		let systemMessages: AiMessage[] | AiOption[] = [];
-		state.loading = true;
 
-		let vectors = await searchVectors(message);
-		const cards = await processVectors(vectors);
+		let vectors = await searchVectors(vectorQuery);
+		console.log(vectors);
+		// vectors.forEach((element) => {});
+		const cards = await processVectors(vectors, filteredMessages);
+		console.log('cards', cards);
 		state.loading = false;
 		cardStore.set(cards);
 		console.log('set cards', cards);
