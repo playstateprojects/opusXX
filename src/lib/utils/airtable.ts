@@ -1,3 +1,4 @@
+import ComposerCard from "$lib/components/cards/ComposerCard.svelte"
 import { Composer } from "$lib/zodDefinitions"
 
 const getComposerByName = async (composerName: string): Promise<Composer> => {
@@ -9,5 +10,6 @@ const getComposerByName = async (composerName: string): Promise<Composer> => {
     console.log(data[0])
     return data[0] as Composer
 }
+
 
 export { getComposerByName }

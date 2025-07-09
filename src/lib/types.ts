@@ -53,3 +53,13 @@ export interface FormattedVectorResponse {
     summary: string,
     matches: VectorMatch[]
 }
+
+export interface CardComposer {
+    imageURL: string,
+    name: string,
+    birthDate: string,
+    deathDate: string,
+    shortDescription: string,
+    longDescription: string,
+    tags?: string[]
+}

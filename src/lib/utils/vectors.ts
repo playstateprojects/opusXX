@@ -1,5 +1,5 @@
-import { AiMessage, AiOption, AiRole, VectorMatch } from "$lib/types";
-import { WorkCard } from "$lib/zodDefinitions";
+import { AiMessage, AiOption, AiRole, CardComposer, VectorMatch } from "$lib/types";
+import { Composer, WorkCard } from "$lib/zodDefinitions";
 import { getComposerByName } from "./airtable";
 
 const vectorOptimiserPromt = `You are a search query optimizer for a vector database containing only classical music by female composers.
@@ -67,6 +67,7 @@ Your output must strictly follow the structure below:
 "document_name": "<exact filename of the input document, including .md extension>",
 "file_id": "<exact file_id from the supplied information>",
 "composer_name": "<name of the composer>",
+"work_title": "<title of the work>",
 "justification": "<short reason why this document was selected — e.g., similar instrumentation, electronic elements, thematic overlap>",
 "content": "<verbatim full content of the selected document>"
 }
@@ -136,34 +137,32 @@ Your output must always be valid JSON and match this schema exactly.`
     let worksArray: WorkCard[] = []
 
     if (Array.isArray(parsed.matches)) {
-      parsed.matches.forEach(async (match: VectorMatch) => {
+      for (const match of parsed.matches) {
         if (!match.composer_name) {
           throw new Error('Match is missing a composer name');
         }
         console.log(match.composer_name);
-        let composerData = await getComposerByName(match.composer_name);
-        console.log("compD", composerData)
-        let workCard: WorkCard = {
+        const composerData = await getComposerByName(match.composer_name);
+        console.log("compD", composerData);
+        const workComposer: CardComposer = {
+          name: composerData.Name ?? match.composer_name,
+          birthDate: composerData["Date of Birth"],
+          deathDate: composerData["Date of Death"] ?? '',
+          imageURL: composerData["Profile Image"] ? composerData["Profile Image"][0].url : '',
+          shortDescription: composerData['Short Description'],
+          longDescription: composerData['Long Description'],
+        }
+        const workCard: WorkCard = {
           insight: match.justification,
           work: {
-            title: "demo title",
-            composer: composerData
+            title: match.work_title ?? "demo title " + composerData.name,
+            composer: workComposer
           }
-
-        }
-        worksArray.push(workCard)
-      })
+        };
+        worksArray.push(workCard);
+      }
       // If we got bare array, wrap it
-    } else if (parsed && parsed.works) {
-      // If we got correct structure
-      worksArray = parsed.works;
-    } else if (parsed && parsed.work) {
-      // If we got single work
-      worksArray = [parsed];
-    } else {
-      throw new Error('Unexpected response structure');
     }
-    console.log(worksArray)
     // Validate we got proper WorkCard objects
     const validatedCards = worksArray.map((item: any) => {
       if (!item.work || !item.work.title) {
