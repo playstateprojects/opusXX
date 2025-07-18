@@ -8,6 +8,7 @@
 	import { cardStore } from '$lib/stores/cardStore.js';
 	import demo4 from '$lib/demo4.json';
 	import { onMount } from 'svelte';
+	import { getWorksByComposerId } from '$lib/utils/supabase';
 	let pageNumber = 1;
 	let startMessages = [
 		{
@@ -47,6 +48,9 @@
 	]);
 	onMount(() => {
 		cardStore.set([]);
+		getWorksByComposerId('3').then((res: any) => {
+			console.log(res);
+		});
 	});
 </script>
 
