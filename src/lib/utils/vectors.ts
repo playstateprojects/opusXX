@@ -1,6 +1,6 @@
 import { AiMessage, AiOption, AiRole, CardComposer, VectorMatch } from "$lib/types";
 import { Composer, WorkCard } from "$lib/zodDefinitions";
-import { getComposerByName } from "./airtable";
+import { getComposerByName } from "./supabase";
 
 const vectorOptimiserPromt = `You are a search query optimizer for a vector database containing only classical music by female composers.
 Your task is to rewrite user queries into dense, high-recall search term lists optimized for this domain.
@@ -52,7 +52,7 @@ const getVectorQuery = async (messages: AiMessage[]): Promise<string> => {
   const query = JSON.parse(chatResponse.content).query;
   return query;
 };
-const processVectors = async (vectorResults: any, messages: AiMessage[]): Promise<WorkCard[]> => {
+const processVectors = async (vectorResults: any, messages: AiMessage[]): Promise<{ cards: WorkCard[], overview: string }> => {
   const systemMessage: AiMessage = {
     role: AiRole.System,
     content: `You are a classical music programming assistant specialized in female composers.Your task is to analyze a user query and a set of matched documents, then respond with a structured JSON object that includes both the relevant source material and a concise explanation of why each document was selected.
@@ -61,7 +61,7 @@ You must always return **up to five documents**. If none are strong matches, ret
 Your output must strictly follow the structure below:
 
 {
-"summary": "<brief explanation of how the documents relate to the query, even if not ideal matches>",
+"overview": "<A brief overview of the selection of works to be shared with the user>",
 "matches": [
 {
 "document_name": "<exact filename of the input document, including .md extension>",
@@ -143,23 +143,31 @@ Your output must always be valid JSON and match this schema exactly.`
         }
         console.log(match.composer_name);
         const composerData = await getComposerByName(match.composer_name);
-        console.log("compD", composerData);
-        const workComposer: CardComposer = {
-          name: composerData.Name ?? match.composer_name,
-          birthDate: composerData["Date of Birth"],
-          deathDate: composerData["Date of Death"] ?? '',
-          imageURL: composerData["Profile Image"] ? composerData["Profile Image"][0].url : '',
-          shortDescription: composerData['Short Description'],
-          longDescription: composerData['Long Description'],
-        }
-        const workCard: WorkCard = {
-          insight: match.justification,
-          work: {
-            title: match.work_title ?? "demo title " + composerData.name,
-            composer: workComposer
+        console.log("cdddd", composerData)
+        // console.log("cdddd", composerData.profile_images ? [0])
+        if (composerData) {
+          const workComposer: CardComposer = {
+            name: composerData.Name ?? match.composer_name,
+            birthDate: composerData["Date of Birth"],
+            deathDate: composerData["Date of Death"] ?? '',
+            imageURL: composerData["imageURL"] ? composerData["imageURL"] : 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public',
+            profileImages: composerData["profile_images"],
+            shortDescription: composerData['Short Description'],
+            longDescription: composerData['Long Description'],
           }
-        };
-        worksArray.push(workCard);
+          console.log(workComposer)
+          const workCard: WorkCard = {
+            insight: match.justification,
+            work: {
+              title: match.work_title ?? "demo title " + composerData.name,
+              composer: workComposer
+            }
+          };
+          worksArray.push(workCard);
+        } else {
+          console.log("composer " + match.composer_name + " not found")
+        }
+
       }
       // If we got bare array, wrap it
     }
@@ -171,11 +179,11 @@ Your output must always be valid JSON and match this schema exactly.`
       return item as WorkCard;
     });
 
-    return validatedCards;
+    return { cards: validatedCards, overview: parsed.overview };
   } catch (err) {
     console.error('Vector processing error:', err);
     // Consider adding retry logic here if appropriate
-    return [];
+    return { cards: [], overview: 'I was unable to find any works matching you query, please could you try giving me an alternative.' };
   }
 };
 

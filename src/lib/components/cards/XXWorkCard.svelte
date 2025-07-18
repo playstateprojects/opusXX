@@ -34,16 +34,14 @@
 					: 'romantic'} font-zwocorr"
 				onclick={() => (state.showBack = true)}
 			>
-				{#if workCard.work.composer.imageURL}
-					<img
-						src={workCard.work.composer.imageURL.replace(
-							'public',
-							'h=800,w=400,fit=cover,gravity=0.5x0.35'
-						)}
-						alt=""
-						class="mb-5 aspect-[0.9] h-full w-24 object-cover"
-					/>
-				{/if}
+				<img
+					src={workCard.work.composer.imageURL.replace(
+						'public',
+						'h=800,w=400,fit=cover,gravity=0.5x0.35'
+					)}
+					alt=""
+					class="mb-5 aspect-[0.9] h-full w-24 object-cover"
+				/>
 				<div class="flex w-full flex-col items-start justify-center p-2">
 					<span class="text-left font-bold">{workCard.work.composer.name}</span>
 					<span class="text-xs">{workCard.work.period}</span>

@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 const PUBLIC_SUPABASE_URL = "https://dxnkydtgbuyfthykwgey.supabase.co";
 const PUBLIC_SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log("supa", PUBLIC_SUPABASE_URL)
+
 export const supabase = createClient(
     PUBLIC_SUPABASE_URL,
     PUBLIC_SUPABASE_ANON_KEY

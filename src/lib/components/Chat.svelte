@@ -1,11 +1,9 @@
 <script lang="ts">
 	import {
-		ButtonSizes,
 		AiRole,
 		AiOptionIcon,
 		type AiMessage,
 		type AiOption,
-		type ChatAction,
 		type FormattedVectorResponse
 	} from '$lib/types.js';
 	import { derived, get } from 'svelte/store';
@@ -24,7 +22,7 @@
 	import { ComposerSchema, type Composer } from '$lib/zodAirtableTypes';
 	import { getVectorQuery, processVectors } from '$lib/utils/vectors';
 	import { z } from 'zod';
-	import { MoonSolid } from 'flowbite-svelte-icons';
+	import { getComposerByName } from '$lib/utils/supabase';
 	const state = $state({
 		loading: false
 	});
@@ -254,6 +252,9 @@ Would you like to narrow the focus further — or maybe explore something slight
 	};
 
 	const optionSelected = async (content: string) => {
+		console.log('debug');
+
+		getComposerByName('Amy Beach');
 		const now = new Date();
 
 		let newMessages: (AiMessage | AiOption[])[] = [
@@ -313,8 +314,9 @@ Would you like to narrow the focus further — or maybe explore something slight
 		let vectors = await searchVectors(vectorQuery);
 		console.log(vectors);
 		// vectors.forEach((element) => {});
-		const cards = await processVectors(vectors, filteredMessages);
+		const { cards, overview } = await processVectors(vectors, filteredMessages);
 		console.log('cards', cards);
+		systemMessages.push({ role: AiRole.Assistant, content: overview });
 		state.loading = false;
 		cardStore.set(cards);
 		console.log('set cards', cards);

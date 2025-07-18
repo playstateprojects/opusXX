@@ -44,7 +44,7 @@
 	"dependencies": {
 		"@cloudflare/workers-types": "^4.20241218.0",
 		"@supabase/auth-helpers-sveltekit": "^0.13.0",
-		"@supabase/supabase-js": "^2.47.7",
+		"@supabase/supabase-js": "^2.50.5",
 		"@sveltejs/adapter-auto": "^4.0.0",
 		"@sveltejs/adapter-cloudflare": "^5.0.1",
 		"@sveltejs/kit": "^2.16.1",

@@ -56,6 +56,7 @@ export interface FormattedVectorResponse {
 
 export interface CardComposer {
     imageURL: string,
+    profileImages: { url: string }[],
     name: string,
     birthDate: string,
     deathDate: string,

@@ -204,6 +204,10 @@ Composer = z.object({
     refrences: z.array(Reference),
     works: z.lazy(() => Work),
     gender: z.enum(['male', 'female', 'other']),
+    profile_images: z.array(z.object({
+        cloudflare_image_url
+            : z.string()
+    })).optional(),
     sources: z.array(z.string()).optional(),
     'Notes': z.string().optional(),
     'Sex': z.array(ComposerSex).optional(),
