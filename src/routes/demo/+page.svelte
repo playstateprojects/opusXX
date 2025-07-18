@@ -48,8 +48,8 @@
 	]);
 	onMount(() => {
 		cardStore.set([]);
-		getWorksByComposerId('3').then((res: any) => {
-			console.log(res);
+		getWorksByComposerId(410).then((res: any) => {
+			console.log('xxxxxx', res);
 		});
 	});
 </script>

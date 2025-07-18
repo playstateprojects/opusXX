@@ -36,7 +36,7 @@ const parseSupabaseComposers = (data: any[]): Composer[] => {
   return data.map(item => parseRawComposerToComposer(item));
 }
 
-const getWorksByComposerId = async (composerId: string): Promise<Work[]> => {
+const getWorksByComposerId = async (composerId: number): Promise<Work[]> => {
   const { data, error } = await supabase
     .from('works')
     .select(`
@@ -46,7 +46,7 @@ const getWorksByComposerId = async (composerId: string): Promise<Work[]> => {
         profile_images (*)
       )
     `)
-    .eq('composer_id', composerId);
+    .eq('composer', composerId);
 
   if (error) {
     console.error('Error fetching works by composer ID:', error);
@@ -57,6 +57,7 @@ const getWorksByComposerId = async (composerId: string): Promise<Work[]> => {
     console.log('No works found for composer ID:', composerId);
     return [];
   }
+  console.log(data)
 
   // Handle both single object and array results
   const worksData = Array.isArray(data) ? data : [data];

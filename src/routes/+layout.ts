@@ -30,6 +30,18 @@ export const load: Load = async ({ fetch, data, depends }) => {
     data: { session },
   } = await supabase.auth.getSession();
 
-  userStore.set(session?.user || null);
-  return { supabase, session };
+  // Use getUser() for secure user validation if we have a session
+  let user = null;
+  if (session) {
+    const { data: userData, error } = await supabase.auth.getUser();
+    if (!error) {
+      user = userData.user;
+    } else {
+      console.warn('Failed to validate user:', error);
+      user = session.user; // Fallback to session user if validation fails
+    }
+  }
+
+  userStore.set(user);
+  return { supabase, session, user };
 };

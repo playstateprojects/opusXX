@@ -86,7 +86,8 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
     const sources = safeParseJSON(composers.sources, []);
     const profileImages = composers.profile_images || [];
     const composerName = safeString(composers.name);
-    console.log(profileImages)
+    const fallbackImageUrl = composers.image_url || composers.imageURL || 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public';
+
     return {
         'Name': composerName,
         'Short Description': safeString(composers.short_description),
@@ -125,7 +126,7 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
 export function parseRawComposerToCardComposer(rawData: RawComposerData | any): CardComposer {
     const composers = rawData.composers || rawData;
     const profileImages = composers.profile_images || [];
-    const fallbackImageUrl = composers.image_url || composers.imageURL || '';
+    const fallbackImageUrl = composers.image_url || composers.imageURL || 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public';
 
     return {
         imageURL: profileImages[0]?.cloudflare_image_url ||
