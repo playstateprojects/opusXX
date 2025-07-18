@@ -86,7 +86,7 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
     const sources = safeParseJSON(composers.sources, []);
     const profileImages = composers.profile_images || [];
     const composerName = safeString(composers.name);
-
+    console.log(profileImages)
     return {
         'Name': composerName,
         'Short Description': safeString(composers.short_description),
@@ -98,9 +98,14 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
         'Death Location': safeString(composers.death_location) || undefined,
         'Active Locations': safeString(composers.active_locations),
         'Sex': [safeString(composers.gender) as 'Female' | 'Male' | 'Other'],
+        imageURL: profileImages[0]?.cloudflare_image_url ||
+            profileImages[0]?.original_image_url ||
+            fallbackImageUrl,
+        profileImages: profileImages.map((img: any) => ({
+            url: img.cloudflare_image_url || img.original_image_url || img.url || fallbackImageUrl
+        })),
         'sources': sources,
         'Work': work,
-        'Profile Image': profileImages[0].cloudflare_image_url,
         'Created By': {
             id: 'system',
             email: 'system@opusxx.com',

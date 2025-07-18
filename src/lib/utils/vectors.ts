@@ -150,7 +150,7 @@ Your output must always be valid JSON and match this schema exactly.`
             name: composerData.Name ?? match.composer_name,
             birthDate: composerData["Date of Birth"],
             deathDate: composerData["Date of Death"] ?? '',
-            imageURL: composerData["imageURL"] ? composerData["imageURL"] : 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public',
+            imageURL: composerData["imageURL"] || 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public',
             profileImages: composerData["profile_images"],
             shortDescription: composerData['Short Description'],
             longDescription: composerData['Long Description'],

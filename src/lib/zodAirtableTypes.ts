@@ -81,6 +81,7 @@ export const ComposerStatus = z.enum([
 export const ComposerSchema = z.object({
   'Name': z.string().optional(),
   'Profile Image': z.array(AirtableAttachmentSchema).optional(),
+  'imageURL': z.string().optional(),
   'Short Description': z.string().optional(),
   'Notes': z.string().optional(),
   'Sex': z.array(ComposerSex).optional(),

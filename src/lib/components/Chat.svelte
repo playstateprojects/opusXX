@@ -254,7 +254,6 @@ Would you like to narrow the focus further — or maybe explore something slight
 	const optionSelected = async (content: string) => {
 		console.log('debug');
 
-		getComposerByName('Amy Beach');
 		const now = new Date();
 
 		let newMessages: (AiMessage | AiOption[])[] = [

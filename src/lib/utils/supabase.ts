@@ -2,7 +2,7 @@ import { Composer } from "$lib/zodDefinitions"
 import { supabase } from '$lib/supabase'
 import { parseRawComposerToComposer } from "./composerParser";
 
-const getComposerByName = async (composerName: string): Promise<Composer> => {
+const getComposerByName = async (composerName: string): Promise<Composer | null> => {
   const { data, error } = await supabase
     .from('composer_names')
     .select(`
@@ -18,6 +18,10 @@ const getComposerByName = async (composerName: string): Promise<Composer> => {
 
   // Handle both single object and array results
   const composerData = Array.isArray(data) ? data[0] : data;
+  if (!composerData) {
+    console.log("no composer data");
+    return null;
+  }
   const composer = parseRawComposerToComposer(composerData);
   return composer;
 }

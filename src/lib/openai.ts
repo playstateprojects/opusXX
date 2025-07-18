@@ -34,7 +34,6 @@ const getEmbedding = async (text: string) => {
     return embedding
 }
 const chat = async (messages: AiMessage[]) => {
-    console.log("oaim", messages)
     const response = await openai.chat.completions.create({
         model: aiModel,
         messages: messages
@@ -48,7 +47,6 @@ const chat = async (messages: AiMessage[]) => {
     }
 }
 const jsonChat = async (messages: AiMessage[]) => {
-    console.log("oaim", messages)
     const response = await openai.chat.completions.create({
         model: aiModel,
         messages: messages,
@@ -57,7 +55,6 @@ const jsonChat = async (messages: AiMessage[]) => {
         }
 
     });
-    console.log("ch12", response)
     if (response && response.choices[0].message) {
         return response.choices[0].message
     } else {

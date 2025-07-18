@@ -81,7 +81,7 @@
 		<div class="grid gap-4 md:grid-cols-2">
 			<div class="space-y-1">
 				<div>
-					<h2 class="text-xs font-semibold">Instrumentation Summary</h2>
+					<h2 class="text-xs font-semibold">Instrumentation</h2>
 					<p class="text-gray-200">
 						Flute, Oboe, Clarinet, Bassoon, Horn, Trumpet, Trombone, Tuba, Timpani, Percussion,
 						Strings
