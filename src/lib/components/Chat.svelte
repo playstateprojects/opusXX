@@ -176,41 +176,7 @@ Would you like to narrow the focus further — or maybe explore something slight
 			cardStore.set(workCardsB);
 		}
 	};
-	const runDemo3 = (newMessages: (AiMessage | AiOption[])[], content: string) => {
-		const now = new Date();
-		if (['A piece that creates a particular atmosphere'].includes(content)) {
-			newMessages.push(
-				{
-					role: AiRole.System,
-					content: `Tell me about the atmosphere you'd like to evoke.`,
-					time: now
-				},
-				[
-					{ content: 'Calm & Meditative', icon: AiOptionIcon.theme },
-					{ content: 'Dramatic & Intense', icon: AiOptionIcon.theme },
-					{ content: 'Mystical & Ethereal', icon: AiOptionIcon.theme },
-					{ content: 'Majestic & Triumphant', icon: AiOptionIcon.theme },
-					{ content: 'Romantic & Lyrical', icon: AiOptionIcon.theme }
-				]
-			);
-		}
-		if (content.toLowerCase() == 'sensuousness') {
-			newMessages.push({
-				role: AiRole.System,
-				content:
-					'You’ve selected Sensuousness — music shaped by warmth, intimacy, and emotional nuance. These works invite deep listening and subtle reflection',
-				time: now
-			});
-			let workCards: WorkCard[] = [];
-			try {
-				workCards = [...demo3] as WorkCard[];
-			} catch (err) {
-				console.error(err);
-			}
-			cardStore.set(workCards);
-			actions.set([{ label: 'SHOW ME MORE' }, { label: 'REFINE SEARCH', action: refineSearch }]);
-		}
-	};
+
 	const searchComposers = async (composerName: string): Promise<Composer[]> => {
 		try {
 			const response = await fetch(`/api/base/composers?name=${encodeURIComponent(composerName)}`);
