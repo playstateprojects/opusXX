@@ -83,6 +83,7 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
 
     const tags = safeParseJSON(composers.tags, []);
     const work = safeParseJSON(composers.work, []);
+    const works = safeParseJSON(composers.works, []);
     const sources = safeParseJSON(composers.sources, []);
     const profileImages = composers.profile_images || [];
     const composerName = safeString(composers.name);
@@ -108,6 +109,7 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
         })),
         'sources': sources,
         'Work': work,
+        'works': works,
         'Created By': {
             id: 'system',
             email: 'system@opusxx.com',

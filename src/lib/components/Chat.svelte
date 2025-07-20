@@ -110,6 +110,76 @@
 		]);
 	};
 
+	async function semanticSearch(text: string): Promise<any[]> {
+		const res = await fetch('/api/vector/search/pinecone', {
+			method: 'POST',
+			body: JSON.stringify({ query: text, topK: 5 })
+		});
+		const matches = await res.json();
+		console.table(matches); // { id, score, metadata }
+		return Array.isArray(matches) ? matches : [];
+	}
+
+	const getResponseFormatter = async (vectors: any[], userQuery: string): Promise<string> => {
+		// vectorQuery is the untouched array from Pinecone / VECTORIZE
+		// userQuery is the user's original question
+
+		// 1. Build the per-document payload
+		const docs = await Promise.all(
+			vectors.map(async (v: any) => {
+				const key = v.metadata?.key; // path like "orchestral//construction-in-space.md"
+				if (!key) return null; // safety
+
+				const res = await fetch(`/api/r2/${encodeURIComponent(key)}`);
+				const body = res.ok ? await res.text() : '';
+
+				return {
+					document_name: key, // always present
+					file_id: v.metadata?.file_id ?? key,
+					composer_name: v.metadata?.composer ?? '',
+					work_title: v.metadata?.title ?? '',
+					content: body, // verbatim markdown
+					justification: '', // LLM fills this
+					...v.metadata // spread every other key
+				};
+			})
+		);
+
+		// 2. Remove any nulls
+		const matches = docs.filter(Boolean);
+
+		// 3. Build the prompt
+		const prompt = `You are a classical music programming assistant specialized in female composers.
+Your task is to analyze the user query and the matched documents below, then respond with a structured JSON object that includes both the relevant source material and a concise explanation of why each document was selected.
+
+User query: ${userQuery}
+
+Matched documents:
+${JSON.stringify(matches, null, 2)}
+
+Your output must strictly follow the structure below:
+
+{
+  "overview": "<A brief overview of the selection of works to be shared with the user>",
+  "matches": [
+    {
+      "document_name": "<exact filename of the input document, including .md extension>",
+      "file_id": "<exact file_id from the supplied information>",
+      "composer_name": "<name of the composer>",
+      "work_title": "<title of the work>",
+      "justification": "<short reason why this document was selected — e.g., similar instrumentation, electronic elements, thematic overlap>",
+      "content": "<verbatim full content of the selected document>",
+      "...": "any other keys supplied in metadata"
+    }
+    // up to all supplied documents
+  ]
+}
+
+Guidelines (same as before, omitted here for brevity).`;
+
+		return prompt;
+	};
+
 	const onSubmit = async (message: string) => {
 		const newUserMessage: AiMessage = {
 			role: AiRole.User,
@@ -121,9 +191,11 @@
 		let filteredMessages = get(messages).filter(
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
-		const vectorQuery = await getVectorQuery(filteredMessages);
+		// const vectorQuery = await getVectorQuery(filteredMessages);
+		const vectorQuery = await semanticSearch(message);
 		console.log('vq', vectorQuery);
-
+		const prompt = await getResponseFormatter(vectorQuery, message);
+		return;
 		let systemMessages: AiMessage[] | AiOption[] = [];
 
 		let vectors = await searchVectors(vectorQuery);

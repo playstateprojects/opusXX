@@ -3,12 +3,15 @@ compatibility_date = "2024-01-01"
 main = "node_modules/wrangler-proxy/dist/worker.js"
 account_id = "40b5df9e0bd5d8641f20121cc488bcad"
 
-[observability.logs]
-enabled = true
-
 [[vectorize]]
 binding = "VECTORIZE"
 index_name = "opusxx-vectors"
 
 [ai]
 binding = "AI"
+
+[[r2_buckets]]
+binding = 'R2'
+bucket_name = 'composer-data'
+preview_bucket_name = 'composer-data'
+experimental_remote = true

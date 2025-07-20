@@ -1,4 +1,5 @@
 import { SupabaseClient, Session, User } from '@supabase/supabase-js'
+import type { R2Bucket } from '@cloudflare/workers-types'
 
 declare global {
 	namespace App {
@@ -20,6 +21,7 @@ declare global {
 				AI: {
 					autorag: (data: any) => { search: (params: { query: string }) => Promise<any> };
 				}
+				R2: R2Bucket
 			};
 		}
 		// interface Error {}
