@@ -1,4 +1,7 @@
 // src/routes/api/r2/[...key]/+server.ts
+if (import.meta.env.DEV) {
+    import('dotenv').then(dotenv => dotenv.config());
+}
 import { R2Bucket } from '@cloudflare/workers-types';
 import { error, type RequestHandler } from '@sveltejs/kit';
 
