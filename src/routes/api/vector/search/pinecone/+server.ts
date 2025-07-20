@@ -17,7 +17,6 @@ async function pineconeQuery(vector: number[]) {
 
 export async function POST({ request }) {
     const { query, topK = 5 } = await request.json();
-
     // 1. Turn the string into the same vector space you indexed with
     const embeddingRes = await openai.embeddings.create({
         model: 'text-embedding-3-small', // or whatever you used when you upserted
