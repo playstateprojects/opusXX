@@ -27,7 +27,7 @@
 </script>
 
 <div id="chat-form" class="flex w-full flex-col">
-	<form on:submit={submitMessage}>
+	<form onsubmit={submitMessage}>
 		<Textarea
 			class="mb-4 w-full "
 			placeholder="Something else?"
