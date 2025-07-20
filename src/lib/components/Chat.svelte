@@ -53,145 +53,7 @@
 			return !Array.isArray(item) ? currentIndex : lastIndex;
 		}, -1);
 	});
-	const runDemo1 = async (newMessages: (AiMessage | AiOption[])[], content: string) => {
-		const now = new Date();
-		if (['A piece for a specific instrumentation'].includes(content)) {
-			newMessages.push(
-				{
-					role: AiRole.System,
-					content: 'Great! What instrumentation would fit your program?',
-					time: now
-				},
-				[
-					{ content: 'Chamber music' },
-					{ content: 'Choral' },
-					{ content: 'Opera' },
-					{ content: 'Orchestral' },
-					{ content: 'Solo' },
-					{ content: 'Vocal' }
-				]
-			);
-		}
-		if (content.toLowerCase().indexOf('orchestral') > -1) {
-			newMessages.push(
-				{
-					role: AiRole.System,
-					content: 'Would you like to explore works from a specific period?',
-					time: now
-				},
-				[
-					{ content: 'Medieval' },
-					{ content: 'Renaissance' },
-					{ content: 'Baroque' },
-					{ content: 'Romantic' },
-					{ content: '20th Century' },
-					{ content: 'Contemporary' }
-				]
-			);
-		}
-		if (['Romantic'].includes(content)) {
-			newMessages.push({
-				role: AiRole.System,
-				content: `Here are three orchestral works from the Romantic period that embody its emotional richness and lyrical character.
-Would you like to narrow the focus further — or maybe explore something slightly different?`,
-				time: now
-			});
-			let workCards: WorkCard[] = [];
-			try {
-				workCards = [...demo] as WorkCard[];
-			} catch (err) {
-				console.error(err);
-			}
-			cardStore.set(workCards);
-		}
-	};
-	const refineSearch = () => {
-		actions.set([]);
-	};
-	const runDemo2 = (newMessages: (AiMessage | AiOption[])[], content: string) => {
-		const now = new Date();
-		if (['A piece that matches a program theme'].includes(content)) {
-			newMessages.push(
-				{
-					role: AiRole.System,
-					content: `What theme would you like to explore? 
-						Here are a few suggestions to get you started.`,
-					time: now
-				},
-				[
-					{ content: 'Nature & Environment' },
-					{ content: 'Identity & Human Stories' },
-					{ content: 'Love & Loss' },
-					{ content: 'Divine Inspiration' },
-					{ content: 'Dreams & the Unconscious' }
-				]
-			);
-		}
-		if (content.toLowerCase() == 'movement and change') {
-			newMessages.push(
-				{
-					role: AiRole.System,
-					content: `“Movement & Change” is a strong, evocative theme—dynamic and wide open.
-						To sharpen its emotional or narrative focus, consider variations like:`,
-					time: now
-				},
-				[
-					{ content: 'Transformation & Inner Journey' },
-					{ content: 'Momentum & Physical Motion' },
-					{ content: `Nature’s Cycles & Evolution` },
-					{ content: 'Revolution & Social Change' }
-				]
-			);
-		}
-		if (content == 'Revolution & Social Change') {
-			newMessages.push({
-				role: AiRole.System,
-				content: `I’ve found some works that could be a great fit for you! 
-					Take a look and let me know what you think.`,
-				time: now
-			});
 
-			let workCards: WorkCard[] = [];
-			try {
-				workCards = [...demo2] as WorkCard[];
-			} catch (err) {
-				console.error(err);
-			}
-			cardStore.set(workCards);
-			actions.set([{ label: 'SHOW ME MORE' }, { label: 'REFINE SEARCH', action: refineSearch }]);
-		}
-		if (content.indexOf('vocal works with chamber') > -1) {
-			newMessages.push({
-				role: AiRole.System,
-				content: `I’ve gathered a few vocal chamber works that I think match your vision—
-				take a look and let me know what resonates.`,
-				time: now
-			});
-			let workCardsB: WorkCard[] = [];
-			try {
-				workCardsB = [...demo2b] as WorkCard[];
-			} catch (err) {
-				console.error(err);
-			}
-			cardStore.set(workCardsB);
-		}
-	};
-
-	const searchComposers = async (composerName: string): Promise<Composer[]> => {
-		try {
-			const response = await fetch(`/api/base/composers?name=${encodeURIComponent(composerName)}`);
-
-			if (!response.ok) {
-				throw new Error(`API error: ${response.status}`);
-			}
-
-			const data = await response.json();
-			return z.array(ComposerSchema).parse(data); // Full validation
-		} catch (err) {
-			console.error('Error fetching composers:', err);
-			return []; // Return empty array instead of {} to match return type
-		}
-	};
 	const searchVectors = async (query: string): Promise<FormattedVectorResponse | null> => {
 		const response = await fetch('/api/vector/search', {
 			method: 'POST',
@@ -209,8 +71,8 @@ Would you like to narrow the focus further — or maybe explore something slight
 					file.composerName = trimmedStr.replace(/_/g, ' ');
 				});
 			}
-			console.log('ffffffiles', files);
-			return files;
+
+			return { summary: '', matches: files };
 		} catch (err: any) {
 			console.log('an error occured', err);
 			return null;
@@ -240,18 +102,6 @@ Would you like to narrow the focus further — or maybe explore something slight
 		state.loading = false;
 		newMessages = [];
 
-		runDemo1(newMessages, content);
-		// runDemo2(newMessages, content);
-		// runDemo3(newMessages, content);
-		// //-----debug---------
-		// let workCards: WorkCard[] = [];
-		// try {
-		// 	workCards = [...demo] as WorkCard[];
-		// } catch (err) {
-		// 	console.error(err);
-		// }
-		//cardStore.set(workCards);
-		// //-----debug---------
 		messages.update((msg) => [
 			...msg.filter((opt) => {
 				return !Array.isArray(opt);
@@ -277,9 +127,17 @@ Would you like to narrow the focus further — or maybe explore something slight
 		let systemMessages: AiMessage[] | AiOption[] = [];
 
 		let vectors = await searchVectors(vectorQuery);
-		console.log(vectors);
+		console.log('vects', vectors);
+		vectors?.matches?.forEach((file: any) => {
+			if (file.composer_name) {
+				console.log('composer fould');
+				getComposerByName(file.composer_name).then((composer: Composer) => {
+					console.log('comp found', composer);
+				});
+			}
+		});
 		// vectors.forEach((element) => {});
-		const { cards, overview } = await processVectors(vectors, filteredMessages);
+		const { cards, overview } = await processVectors(vectors?.matches, filteredMessages);
 		console.log('cards', cards);
 		systemMessages.push({ role: AiRole.Assistant, content: overview });
 		state.loading = false;

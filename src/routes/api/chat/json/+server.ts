@@ -1,12 +1,20 @@
+import { jsonChat } from '$lib/utils/cfAi';
 import { json } from '@sveltejs/kit';
-import { jsonChat } from '$lib/openai.js';
+// import { jsonChat } from '$lib/openai.js';
 
-export async function POST({ request }) {
+export async function POST({ request, platform }) {
     const body = await request.json();
 
     try {
 
-        const data = await jsonChat(body.messages)
+        // const data = await jsonChat(body.messages)
+        let data;
+        if (body.schema) {
+            data = await jsonChat(body.messages, platform?.env, body.schema)
+        } else {
+            data = await jsonChat(body.messages, platform?.env)
+        }
+
         console.log(data)
 
 

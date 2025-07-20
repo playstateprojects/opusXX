@@ -87,9 +87,10 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
     const profileImages = composers.profile_images || [];
     const composerName = safeString(composers.name);
     const fallbackImageUrl = composers.image_url || composers.imageURL || 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public';
-
+    console.log(composers);
     return {
         'Name': composerName,
+        'id': composers.id,
         'Short Description': safeString(composers.short_description),
         'Long Description': safeString(composers.long_description),
         'Notes': safeString(composers.notes),

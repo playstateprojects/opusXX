@@ -9,7 +9,8 @@ const getComposerByName = async (composerName: string): Promise<Composer | null>
     *,
     composers (
       *,
-      profile_images (*)
+      profile_images (*),
+      works(*)
     )
   `)
     .ilike('name', `%${composerName}%`);

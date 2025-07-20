@@ -36,8 +36,8 @@
 			>
 				<img
 					src={workCard.work.composer.imageURL.replace(
-						'public',
-						'h=800,w=400,fit=cover,gravity=0.5x0.35'
+						/public|wideprofile/,
+						'h=800,w=400,fit=cover,gravity=0.2x0.35'
 					)}
 					alt=""
 					class="mb-5 aspect-[0.9] h-full w-24 object-cover"
@@ -127,8 +127,8 @@
 				{#if workCard.work.composer.imageURL}
 					<img
 						src={workCard.work.composer.imageURL.replace(
-							'public',
-							'w=800,h=500,fit=cover,gravity=0.5x0.35'
+							/public|wideprofile/,
+							'h=120,w=300,fit=cover,gravity=05x0.35'
 						)}
 						alt=""
 						class="mb-2 aspect-[2.2] w-24 w-full object-cover"

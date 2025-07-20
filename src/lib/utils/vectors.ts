@@ -1,5 +1,6 @@
 import { AiMessage, AiOption, AiRole, CardComposer, VectorMatch } from "$lib/types";
 import { Composer, WorkCard } from "$lib/zodDefinitions";
+import { extractJSON } from "./stringUtils";
 import { getComposerByName } from "./supabase";
 
 const vectorOptimiserPromt = `You are a search query optimizer for a vector database containing only classical music by female composers.
@@ -48,8 +49,8 @@ const getVectorQuery = async (messages: AiMessage[]): Promise<string> => {
 
   const chatResponse = await response.json();
 
-  console.log("resssss", chatResponse.content);
-  const query = JSON.parse(chatResponse.content).query;
+  console.log("resssss", chatResponse);
+  const query = chatResponse.query;
   return query;
 };
 const processVectors = async (vectorResults: any, messages: AiMessage[]): Promise<{ cards: WorkCard[], overview: string }> => {
@@ -96,11 +97,29 @@ Your output must always be valid JSON and match this schema exactly.`
   };
   let msgs = [systemMessage, ...messages, vectorMessage];
   console.log('msgs', msgs);
+  const schema = {
+    type: "object",
+    properties:
+    {
+      "overview": { type: "string" },
+      "matches": {
+        "type": "array",
+        "items": {
+          "document_name": { type: "string" },
+          "file_id": { type: "string" },
+          "composer_name": { type: "string" },
+          "work_title": { type: "string" },
+          "justification": { type: "string" },
+          "content": { type: "string" }
+        }
+      }
+    }
+  }
   try {
     const response = await fetch('/api/chat/json', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: msgs })
+      body: JSON.stringify({ messages: msgs, schema: schema })
     });
 
     if (!response.ok) {
@@ -108,32 +127,12 @@ Your output must always be valid JSON and match this schema exactly.`
     }
 
     let res = await response.json();
-    console.log('AI Raw Response:', res.content);
+    console.log('AI Raw Response:', res);
 
-    // Robust JSON extraction that handles:
-    // 1. Raw JSON
-    // 2. Markdown code blocks
-    // 3. Accidental text before/after
-    const extractJSON = (str: string) => {
-      // Handle code blocks
-      const codeBlockMatch = str.match(/```(?:json)?\n([\s\S]*?)\n```/);
-      if (codeBlockMatch) return codeBlockMatch[1];
 
-      // Handle potential wrapped JSON
-      const jsonMatch = str.match(/\{[\s\S]*\}/);
-      return jsonMatch ? jsonMatch[0] : str;
-    };
 
-    const jsonString = extractJSON(res.content);
-    console.log('Extracted JSON:', jsonString);
+    const parsed = res;
 
-    // Parse with reviver to ensure strict compliance
-    const parsed = JSON.parse(jsonString, (key, value) => {
-      if (typeof value === 'string') {
-        return value.trim();
-      }
-      return value;
-    });
     let worksArray: WorkCard[] = []
 
     if (Array.isArray(parsed.matches)) {
@@ -141,9 +140,21 @@ Your output must always be valid JSON and match this schema exactly.`
         if (!match.composer_name) {
           throw new Error('Match is missing a composer name');
         }
-        console.log(match.composer_name);
         const composerData = await getComposerByName(match.composer_name);
-        console.log("cdddd", composerData)
+        console.log("cddddy", composerData)
+        if (composerData.works) {
+          console.log("cddddx", composerData.works)
+          const selectedWork = composerData.works?.find((wrk: any) => {
+            console.log("wrk", wrk)
+            return wrk.name == match.name
+          })
+          console.log("----------->", selectedWork)
+        } else {
+          console.log("no works")
+        }
+
+
+
         // console.log("cdddd", composerData.profile_images ? [0])
         if (composerData) {
           const workComposer: CardComposer = {
@@ -155,7 +166,6 @@ Your output must always be valid JSON and match this schema exactly.`
             shortDescription: composerData['Short Description'],
             longDescription: composerData['Long Description'],
           }
-          console.log(workComposer)
           const workCard: WorkCard = {
             insight: match.justification,
             work: {

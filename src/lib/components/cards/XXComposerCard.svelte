@@ -9,10 +9,9 @@
 <span class="text-xs"
 	>{composer.birthDate} {composer.deathDate ? ' - ' : ''}{composer.deathDate}</span
 >
-
 <span class=" text-xs uppercase italic text-gray-400">{composer.nationality}</span>
 {#if composer.tags}
-	<span class="my-1 text-xs italic">{composer.tags.join(' · ')}</span>
+	<span class="my-1 text-xs italic">{composer.tags.join(' · ')}</span>ss
 {/if}
 {#if composer.representativeWorks}
 	<section>

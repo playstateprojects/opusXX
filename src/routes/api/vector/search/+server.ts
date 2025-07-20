@@ -29,7 +29,7 @@ export async function POST({ request, platform }: RequestEvent) {
                 status: 500,
             });
         }
-
+        console.log("body", body)
         const result = await platform.env.AI.autorag("dawn-frog-0b30").search({
             query: body.query,
         });
