@@ -1,4 +1,4 @@
-name = "opusxx-worker"
+name = "opusxx"
 compatibility_date = "2024-01-01"
 main = "node_modules/wrangler-proxy/dist/worker.js"
 account_id = "40b5df9e0bd5d8641f20121cc488bcad"
