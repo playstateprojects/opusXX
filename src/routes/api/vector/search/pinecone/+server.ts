@@ -1,9 +1,19 @@
 import { json } from '@sveltejs/kit';
-import { Pinecone } from '@pinecone-database/pinecone';
 import OpenAI from 'openai';
 
-const pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY! });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+async function pineconeQuery(vector: number[]) {
+    const url = `https://opusxx-a805eee.svc.aped-4627-b74a.pinecone.io/query`;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Api-Key': process.env.PINECONE_API_KEY!,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ vector, topK: 8, includeMetadata: true })
+    }).then(r => r.json());
+}
 
 export async function POST({ request }) {
     const { query, topK = 5 } = await request.json();
@@ -16,12 +26,9 @@ export async function POST({ request }) {
     const xq = embeddingRes.data[0].embedding;
 
     // 2. Query the index
-    const index = pc.Index(process.env.PINECONE_INDEX!);
-    const res = await index.query({
-        vector: xq,
-        topK,
-        includeMetadata: true
-    });
+
+    const res = await pineconeQuery(xq);
+
 
     // 3. Send back the matches
     return json(res.matches);

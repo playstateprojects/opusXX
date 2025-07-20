@@ -45,7 +45,6 @@
 		"wrangler": "^4.25.0"
 	},
 	"dependencies": {
-		"@pinecone-database/pinecone": "^6.1.1",
 		"@supabase/auth-helpers-sveltekit": "^0.13.0",
 		"@supabase/supabase-js": "^2.50.5",
 		"@sveltejs/adapter-auto": "^4.0.0",
@@ -55,7 +54,6 @@
 		"cheerio": "^1.0.0",
 		"openai": "^4.77.0",
 		"pdf-lib": "^1.17.1",
-		"pinecone": "^0.1.0",
 		"turndown": "^7.2.0",
 		"turndown-plugin-gfm": "^1.0.2",
 		"wrangler-proxy": "^2.2.7",
