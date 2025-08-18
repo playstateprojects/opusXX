@@ -12,17 +12,14 @@
 	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
 	import { cardStore } from '$lib/stores/cardStore.js';
-	import demo from '$lib/demo1.json';
-	import demo2 from '$lib/demo2.json';
-	import demo2b from '$lib/demo2b.json';
-	import demo3 from '$lib/demo3.json';
 	import type { WorkCard } from '$lib/zodDefinitions.js';
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { ComposerSchema, type Composer } from '$lib/zodAirtableTypes';
 	import { getVectorQuery, processVectors } from '$lib/utils/vectors';
 	import { z } from 'zod';
-	import { getComposerByName } from '$lib/utils/supabase';
+	import { getComposerById, getComposerByName, getWorkById } from '$lib/utils/supabase';
+	import { formatComposerProfile } from '$lib/utils/composerParser';
 	const state = $state({
 		loading: false
 	});
@@ -60,7 +57,8 @@
 			body: JSON.stringify({ query: query })
 		});
 		try {
-			const files = (await response.json()).result.data;
+			const result = await response.json();
+			const files = result?.result?.data || [];
 
 			if (Array.isArray(files)) {
 				files.forEach(async (file: any) => {
@@ -123,36 +121,82 @@
 	const getResponseFormatter = async (vectors: any[], userQuery: string): Promise<string> => {
 		// vectorQuery is the untouched array from Pinecone / VECTORIZE
 		// userQuery is the user's original question
+		console.log('here 1', vectors[0].metadata.work_id);
+		console.log('here 2', vectors[0].metadata.composer_id);
+		if (!vectors || !Array.isArray(vectors) || vectors.length === 0) {
+			console.warn('No vectors found for the query:', userQuery);
+			return `No relevant documents found for your query: "${userQuery}". Please try a different search term.`;
+		}
 
 		// 1. Build the per-document payload
 		const docs = await Promise.all(
 			vectors.map(async (v: any) => {
-				const key = v.metadata?.key; // path like "orchestral//construction-in-space.md"
-				if (!key) return null; // safety
+				try {
+					const work = getWorkById.metadata?.work_id; // path like "orchestral//construction-in-space.md"
+					const composer = getComposerById(v.metadata?.composer_id);
+					console.log('---', v.metadata);
+					if (!work || !composer) {
+						console.warn('Missing key or composer in metadata:', v.metadata);
+						return null;
+					}
 
-				const res = await fetch(`/api/r2/${encodeURIComponent(key)}`);
-				const body = res.ok ? await res.text() : '';
+					console.log('Processing composer:', composer, 'with work:', work);
 
-				return {
-					document_name: key, // always present
-					file_id: v.metadata?.file_id ?? key,
-					composer_name: v.metadata?.composer ?? '',
-					work_title: v.metadata?.title ?? '',
-					content: body, // verbatim markdown
-					justification: '', // LLM fills this
-					...v.metadata // spread every other key
-				};
+					// Fetch R2 content
+					// const res = await fetch(
+					// 	`https://pub-539c6d3bc0a54802abd707a67ef64adc.r2.dev/${encodeURIComponent(key)}`
+					// );
+					// if (!res.ok) {
+					// 	console.error('Failed to fetch R2 content:', res.status);
+					// 	return null;
+					// }
+					// const body = await res.text();
+
+					// Fetch composer data
+					const data = await getComposerByName(composer);
+					if (!data) {
+						console.warn('No composer data found for:', composer);
+						return null;
+					}
+
+					// Create a proper composer object for formatting
+					const composerObj = {
+						Name: data.Name || composer,
+						'Long Description': data['Long Description'] || '',
+						'Birth Date': data['Date of Birth'] || '',
+						'Death Date': data['Date of Death'] || '',
+						works: data.works || []
+					};
+
+					const profile = formatComposerProfile(composerObj);
+					console.log('profile 1', profile);
+					return {
+						document_name: key,
+						file_id: v.metadata?.file_id ?? key,
+						composer_name: composer,
+						work_title: v.metadata?.title ?? '',
+						content: body, // Use the actual R2 content instead of profile
+						composer_profile: profile,
+						justification: '',
+						score: v.score || 0,
+						...v.metadata
+					};
+				} catch (error) {
+					console.error('Error processing vector:', error);
+					return null;
+				}
 			})
 		);
 
-		// 2. Remove any nulls
-		const matches = docs.filter(Boolean);
+		// 2. Remove any nulls and log the results
+		const matches = docs.filter((doc) => doc !== null);
+		console.log('Processed matches:', matches.length, matches);
 
 		// 3. Build the prompt
 		const prompt = `You are a classical music programming assistant specialized in female composers.
-Your task is to analyze the user query and the matched documents below, then respond with a structured JSON object that includes both the relevant source material and a concise explanation of why each document was selected.
+	Your task is to analyze my query and the matched documents below, then respond directly to the user with a structured JSON object that includes a concise explanation of why each document was selected.
 
-User query: ${userQuery}
+My query: ${userQuery}
 
 Matched documents:
 ${JSON.stringify(matches, null, 2)}
@@ -168,15 +212,13 @@ Your output must strictly follow the structure below:
       "composer_name": "<name of the composer>",
       "work_title": "<title of the work>",
       "justification": "<short reason why this document was selected — e.g., similar instrumentation, electronic elements, thematic overlap>",
-      "content": "<verbatim full content of the selected document>",
       "...": "any other keys supplied in metadata"
     }
-    // up to all supplied documents
   ]
 }
 
 Guidelines (same as before, omitted here for brevity).`;
-
+		console.log('prmpt', prompt);
 		return prompt;
 	};
 
@@ -195,12 +237,30 @@ Guidelines (same as before, omitted here for brevity).`;
 		const vectorQuery = await semanticSearch(message);
 		console.log('vq', vectorQuery);
 		const prompt = await getResponseFormatter(vectorQuery, message);
+		const promptMessage: AiMessage = {
+			role: AiRole.User,
+			content: prompt,
+			time: new Date()
+		};
+		const response = await fetch('/api/chat/json', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ messages: [promptMessage] })
+		});
+
+		if (!response.ok) {
+			throw new Error(`API request failed with status ${response.status}`);
+		}
+
+		let res = await response.json();
+		console.log(res);
 		return;
 		let systemMessages: AiMessage[] | AiOption[] = [];
 
 		let vectors = await searchVectors(vectorQuery);
 		console.log('vects', vectors);
-		vectors?.matches?.forEach((file: any) => {
+		const vectorResults = vectors?.matches || [];
+		vectorResults?.forEach((file: any) => {
 			if (file.composer_name) {
 				console.log('composer fould');
 				getComposerByName(file.composer_name).then((composer: Composer) => {
@@ -208,8 +268,7 @@ Guidelines (same as before, omitted here for brevity).`;
 				});
 			}
 		});
-		// vectors.forEach((element) => {});
-		const { cards, overview } = await processVectors(vectors?.matches, filteredMessages);
+		const { cards, overview } = await processVectors(vectorResults, filteredMessages);
 		console.log('cards', cards);
 		systemMessages.push({ role: AiRole.Assistant, content: overview });
 		state.loading = false;

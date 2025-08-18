@@ -1,4 +1,4 @@
-import { jsonChat } from '$lib/utils/cfAi';
+import { jsonChat } from '$lib/openai';
 import { json } from '@sveltejs/kit';
 // import { jsonChat } from '$lib/openai.js';
 

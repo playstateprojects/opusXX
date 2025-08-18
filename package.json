@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "dotenv -e .env -- concurrently \"vite dev --host\" \"wrangler dev --x-remote-bindings\"",
+		"dev": "dotenv -e .env -- concurrently \"vite dev --host\" \"wrangler pages dev --remote\"",
 		"zod:generate": "airtable-typegen app9MlOaWtP5OP5AL -z -o ./src/lib/zodAirtableTypes.ts",
 		"build": "vite build",
 		"preview": "vite preview",

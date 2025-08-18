@@ -16,7 +16,7 @@ export async function GET({ url }) {
         console.log("dd", data)
 
 
-        return json(data);
+        return json(data[0]);
     } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,

@@ -11,7 +11,6 @@ index_name = "opusxx-vectors"
 binding = "AI"
 
 [[r2_buckets]]
-binding = 'R2'
-bucket_name = 'composer-data'
-preview_bucket_name = 'composer-data'
-experimental_remote = true
+binding = "R2"
+bucket_name = "composer-data"
+preview_bucket_name = "composer-data"

@@ -146,3 +146,32 @@ export function parseRawComposerToCardComposer(rawData: RawComposerData | any): 
         tags: safeParseJSON(composers.tags, [])
     };
 }
+
+export function formatComposerProfile(composer: {
+    Name: string;
+    'Long Description': string;
+    'Birth Date': string;
+    'Death Date': string;
+    works: Array<{
+        name: string;
+        publication_year: string;
+        long_description: string;
+    }>;
+}): string {
+    console.log("cmpo", composer)
+    const worksSection = (composer.works ?? '')
+        .map(
+            (w) =>
+                `- **${w.name}** (${w.publication_year})  \n  ${w.long_description}`
+        )
+        .join("\n");
+
+    return `**${composer.Name}**
+
+        ${composer['Long Description']}
+
+        **born:** ${composer['Birth Date']} — **died:** ${composer['Death Date'] || "—"}
+
+        ## Works
+        ${worksSection}`;
+}

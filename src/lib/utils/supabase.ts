@@ -1,6 +1,7 @@
 import { Composer, Work } from "$lib/zodDefinitions"
 import { supabase } from '$lib/supabase'
 import { parseRawComposerToComposer } from "./composerParser";
+import { parseRawWork } from "./workParser";
 
 const getComposerByName = async (composerName: string): Promise<Composer | null> => {
   const { data, error } = await supabase
@@ -14,6 +15,28 @@ const getComposerByName = async (composerName: string): Promise<Composer | null>
     )
   `)
     .ilike('name', `%${composerName}%`);
+
+  if (error) console.error(error);
+
+  // Handle both single object and array results
+  const composerData = Array.isArray(data) ? data[0] : data;
+  if (!composerData) {
+    console.log("no composer data");
+    return null;
+  }
+  const composer = parseRawComposerToComposer(composerData);
+  return composer;
+}
+const getComposerById = async (composerId: number): Promise<Composer | null> => {
+  const { data, error } = await supabase
+    .from('composers')
+    .select(`
+    *,
+      profile_images (*),
+      works(*)
+    )
+  `)
+    .eq('id', composerId);
 
   if (error) console.error(error);
 
@@ -86,5 +109,35 @@ const getWorksByComposerId = async (composerId: number): Promise<Work[]> => {
     rawContent: work.raw_content || ''
   }));
 };
+const getWorkById = async (workId: number): Promise<Work[]> => {
+  const { data, error } = await supabase
+    .from('works')
+    .select(`
+      *,
+      composers (
+        *,
+        profile_images (*)
+      )
+    `)
+    .eq('id', workId);
 
-export { getComposerByName, parseSupabaseComposer, parseSupabaseComposers, getWorksByComposerId }
+  if (error) {
+    console.error('Error fetching works by composer ID:', error);
+    return [];
+  }
+
+  if (!data) {
+    console.log('No works found for composer ID:', composerId);
+    return [];
+  }
+  console.log(data)
+
+  // Handle both single object and array results
+  const worksData = Array.isArray(data) ? data : [data];
+
+  // Parse each work using the existing parser
+  return parseRawWork(worksData);
+}));
+};
+
+export { getComposerByName, parseSupabaseComposer, parseSupabaseComposers, getWorksByComposerId, getComposerById getWorkById }

@@ -1,7 +1,4 @@
-// src/routes/api/r2/[...key]/+server.ts
-if (import.meta.env.DEV) {
-    import('dotenv').then(dotenv => dotenv.config());
-}
+
 import { R2Bucket } from '@cloudflare/workers-types';
 import { error, type RequestHandler } from '@sveltejs/kit';
 
@@ -14,6 +11,7 @@ export const GET: RequestHandler = async ({ params, platform }) => {
     const r2 = platform?.env?.R2 as R2Bucket | undefined;
     if (!r2) throw error(500, 'R2 binding not found');
     console.log('Connected bucket ->', await r2.list({ limit: 5 }));
+    console.log("env keys:", Object.keys(platform?.env || {}));
     const object = await r2.get(key);  // just in case
     console.log("object", object)
     console.log("key", key)
