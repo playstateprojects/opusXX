@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check:watch` - Run Svelte type checking in watch mode
 
 ### Data Generation
-- `npm run zod:generate` - Generate Zod types from Airtable schema
+- Database types are defined in `src/lib/databaseTypes.ts` and `src/lib/types.ts`
 
 ## Project Architecture
 
@@ -37,14 +37,13 @@ This is a SvelteKit application deployed on Cloudflare Pages with the following 
 
 ### External APIs
 - **OpenAI/DeepSeek**: Chat completions with structured output using Zod schemas
-- **Airtable**: Data source with auto-generated TypeScript types
 
 ## Key Directories
 
 ### `/src/lib/`
 - `types.ts` - Core TypeScript interfaces and enums
+- `databaseTypes.ts` - PostgreSQL database schema types
 - `zodDefinitions.ts` - Zod schemas for structured AI responses
-- `zodAirtableTypes.ts` - Auto-generated Airtable types
 - `openai.ts` - AI chat functions with schema validation
 - `supabase.ts` - Supabase client configuration
 

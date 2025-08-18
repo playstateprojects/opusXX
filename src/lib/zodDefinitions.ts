@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-let Composer: z.ZodType<any>;
-let Work: z.ZodType<any>;
-
-export const AirtableCollaboratorSchema = z.object({
+export const CollaboratorSchema = z.object({
     id: z.string(),
     email: z.string(),
     name: z.string(),
@@ -189,7 +186,7 @@ const Media = z.object({
     info: z.string(),
     tags: z.array(z.string()).optional()
 })
-Composer = z.object({
+const ComposerExtractSchema = z.object({
     name: z.string(),
     birthDate: z.string(),
     deathDate: z.string().optional(),
@@ -202,34 +199,21 @@ Composer = z.object({
     links: z.array(z.string()).optional(),
     tags: z.array(z.string()),
     refrences: z.array(Reference),
-    works: z.lazy(() => Work),
     gender: z.enum(['male', 'female', 'other']),
-    profile_images: z.array(z.object({
-        cloudflare_image_url
-            : z.string()
-    })).optional(),
     sources: z.array(z.string()).optional(),
-    'Notes': z.string().optional(),
-    'Sex': z.array(ComposerSex).optional(),
-    'Active Locations': z.string().optional(),
-    'Work': z.array(z.string()).optional(),
-    'Alernate Names': z.array(z.string()).optional(),
-    loading: z.boolean().optional(),
     nationality: z.string().optional(),
     sections: z.array(CardSection).optional(),
     representativeWorks: z.string().optional(),
-
 })
-Work = z.object({
+
+const WorkExtractSchema = z.object({
     title: z.string(),
-    composer: z.lazy(() => Composer),
     location: z.string(),
     publicationYear: z.string().optional(),
     duration: z.string().optional(),
     shortDescription: z.string(),
     longDescription: z.string(),
     publisher: z.string().optional(),
-
     media: z.array(z.string()).optional(),
     links: z.array(z.string()).optional(),
     instrumentation: z.array(z.string()).optional(),
@@ -265,11 +249,11 @@ const ComposerList = z.object({
 })
 
 const WorkList = z.object({
-    works: z.array(Work)
+    works: z.array(WorkExtractSchema)
 });
 
 const WorkCard = z.object({
-    work: Work,
+    work: WorkExtractSchema,
     insight: z.string()
 })
 
@@ -295,8 +279,8 @@ const Spotlight = z.object({
     cta: CTA
 })
 
-type Composer = z.infer<typeof Composer>
-type Work = z.infer<typeof Work>
+type ComposerExtract = z.infer<typeof ComposerExtractSchema>
+type WorkExtract = z.infer<typeof WorkExtractSchema>
 type WorkCard = z.infer<typeof WorkCard>
 type WorkList = z.infer<typeof WorkList>
 type Reference = z.infer<typeof Reference>
@@ -306,4 +290,17 @@ type CTA = z.infer<typeof CTA>
 type Spotlight = z.infer<typeof Spotlight>
 
 
-export { Reference, Work, Composer, ComposerList, Source, Genres, WorkList, WorkCard, CTA, Spotlight }
+export { 
+    Reference, 
+    WorkExtractSchema, 
+    WorkExtract,
+    ComposerExtractSchema, 
+    ComposerExtract, 
+    ComposerList, 
+    Source, 
+    Genres, 
+    WorkList, 
+    WorkCard, 
+    CTA, 
+    Spotlight 
+}

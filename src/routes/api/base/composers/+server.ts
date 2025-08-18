@@ -1,4 +1,4 @@
-import { composerByName } from '$lib/airtable.js';
+import { getComposerByName } from '$lib/utils/supabase.js';
 import { json } from '@sveltejs/kit';
 
 
@@ -12,11 +12,11 @@ export async function GET({ url }) {
     }
     try {
 
-        const data = await composerByName(name)
+        const data = await getComposerByName(name)
         console.log("dd", data)
 
 
-        return json(data[0]);
+        return json(data);
     } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), {
             status: 500,

@@ -15,7 +15,8 @@
 	import type { WorkCard } from '$lib/zodDefinitions.js';
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
-	import { ComposerSchema, type Composer } from '$lib/zodAirtableTypes';
+	import { ComposerDatabaseSchema } from '$lib/databaseTypes';
+	import type { Composer } from '$lib/types';
 	import { getVectorQuery, processVectors } from '$lib/utils/vectors';
 	import { z } from 'zod';
 	import { getComposerById, getComposerByName, getWorkById } from '$lib/utils/supabase';
@@ -119,61 +120,32 @@
 	}
 
 	const getResponseFormatter = async (vectors: any[], userQuery: string): Promise<string> => {
-		// vectorQuery is the untouched array from Pinecone / VECTORIZE
-		// userQuery is the user's original question
-		console.log('here 1', vectors[0].metadata.work_id);
-		console.log('here 2', vectors[0].metadata.composer_id);
 		if (!vectors || !Array.isArray(vectors) || vectors.length === 0) {
 			console.warn('No vectors found for the query:', userQuery);
 			return `No relevant documents found for your query: "${userQuery}". Please try a different search term.`;
 		}
 
-		// 1. Build the per-document payload
 		const docs = await Promise.all(
 			vectors.map(async (v: any) => {
 				try {
-					const work = await getWorkById(v.metadata?.work_id); // path like "orchestral//construction-in-space.md"
+					const work = await getWorkById(v.metadata?.work_id);
 					const composer = await getComposerById(v.metadata?.composer_id);
-					console.log('---', v.metadata);
+					
 					if (!work || !composer) {
-						console.warn('Missing key or composer in metadata:', v.metadata);
+						console.warn('Missing work or composer in metadata:', v.metadata);
 						return null;
 					}
 
-					console.log('Processing composer:', composer, 'with work:', work);
-
-					// Fetch R2 content
-					// const res = await fetch(
-					// 	`https://pub-539c6d3bc0a54802abd707a67ef64adc.r2.dev/${encodeURIComponent(key)}`
-					// );
-					// if (!res.ok) {
-					// 	console.error('Failed to fetch R2 content:', res.status);
-					// 	return null;
-					// }
-					// const body = await res.text();
-
-					// Fetch composer data
-
-					// Create a proper composer object for formatting
-					// const composerObj = {
-					// 	Name: composer.Name |,
-					// 	'Long Description': composer['Long Description'] || '',
-					// 	'Birth Date': composer['Date of Birth'] || '',
-					// 	'Death Date': composer['Date of Death'] || '',
-					// 	works: composer.works || []
-					// };
-
 					const profile = formatComposerProfile(composer);
-					console.log('profile 1', profile);
+					
 					return {
-						// file_id: v.metadata?.file_id ?? key,
-						// composer_name: composer.Name || '',
-						// work_title: v.metadata?.title ?? '',
-						// content: body, // Use the actual R2 content instead of profile
-						// composer_profile: profile,
-						// justification: '',
-						// score: v.score || 0,
-						// ...v.metadata
+						file_id: v.metadata?.file_id || '',
+						composer_name: composer.Name || '',
+						work_title: work.title || v.metadata?.title || '',
+						content: work.content || '',
+						composer_profile: profile,
+						score: v.score || 0,
+						...v.metadata
 					};
 				} catch (error) {
 					console.error('Error processing vector:', error);
@@ -182,37 +154,39 @@
 			})
 		);
 
-		// 2. Remove any nulls and log the results
 		const matches = docs.filter((doc) => doc !== null);
-		console.log('Processed matches:', matches.length, matches);
+		console.log('Processed matches:', matches.length);
 
-		// 3. Build the prompt
 		const prompt = `You are a classical music programming assistant specialized in female composers.
-	Your task is to analyze my query and the matched documents below, then respond directly to the user with a structured JSON object that includes a concise explanation of why each document was selected.
+Your task is to analyze my query and the matched documents below, then respond directly to the user with a structured JSON object that includes a concise explanation of why each document was selected.
 
 My query: ${userQuery}
 
 Matched documents:
 ${JSON.stringify(matches, null, 2)}
 
-Your output must strictly follow the structure below:
+Your output must strictly follow this JSON structure:
 
 {
-  "overview": "<A brief overview of the selection of works to be shared with the user>",
+  "overview": "A brief overview of the selection of works to be shared with the user",
   "matches": [
     {
-      "document_name": "<exact filename of the input document, including .md extension>",
-      "file_id": "<exact file_id from the supplied information>",
-      "composer_name": "<name of the composer>",
-      "work_title": "<title of the work>",
-      "justification": "<short reason why this document was selected — e.g., similar instrumentation, electronic elements, thematic overlap>",
-      "...": "any other keys supplied in metadata"
+      "document_name": "exact filename of the input document, including .md extension",
+      "file_id": "exact file_id from the supplied information",
+      "composer_name": "name of the composer",
+      "work_title": "title of the work",
+      "justification": "short reason why this document was selected (e.g., similar instrumentation, electronic elements, thematic overlap)",
+      "score": "relevance score from vector search"
     }
   ]
 }
 
-Guidelines (same as before, omitted here for brevity).`;
-		console.log('prmpt', prompt);
+Guidelines:
+- Focus on relevance to the user's query
+- Highlight unique aspects of each work
+- Consider instrumentation, style, and thematic elements
+- Keep justifications concise but informative`;
+
 		return prompt;
 	};
 

@@ -5,7 +5,7 @@ import type { AiMessage } from './types';
 // import type { ThreadMessage } from 'openai/resources/beta/threads/messages';
 
 import { zodResponseFormat } from "openai/helpers/zod";
-import { Composer, ComposerList, WorkList } from './zodDefinitions';
+import { ComposerExtractSchema, ComposerList, WorkList } from './zodDefinitions';
 
 const useDeepseek = true;
 let aiModel = "gpt-4o-mini"
@@ -129,7 +129,7 @@ const extractComposer = async (text: string): Promise<{ data?: Composer; error?:
                 },
                 { role: "user", content: text }
             ],
-            response_format: zodResponseFormat(Composer, "composer")
+            response_format: zodResponseFormat(ComposerExtractSchema, "composer")
         });
 
         console.log("Composer response:", response);

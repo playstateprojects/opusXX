@@ -1,22 +1,32 @@
-import { createComposer, createSource } from "$lib/airtable.js";
 import { extractComposer } from "$lib/openai";
-import type { Composer } from "$lib/zodDefinitions.js";
+import type { ComposerExtract } from "$lib/zodDefinitions.js";
 import { json } from "@sveltejs/kit";
+import { createComposer } from "$lib/utils/supabase.js";
 
 export async function POST({ request }) {
     const body = await request.json();
     try {
-        const source = await createSource(body.source)
-        if (!source || source == '') {
-            return json({ error: 'no source' })
-        }
         const { data } = await extractComposer(body.text)
         if (data) {
-            const composer: Composer = data as Composer
-
-            composer.sources = [source]
-            const res = await createComposer(composer)
-            console.log("created c", res)
+            const composer: ComposerExtract = data as ComposerExtract
+            
+            // Convert extracted data to PostgreSQL format and create in database
+            const res = await createComposer({
+                name: composer.name,
+                birth_date: composer.birthDate,
+                death_date: composer.deathDate,
+                birth_location: composer.birthLocation,
+                death_location: composer.deathLocation,
+                long_description: composer.longDescription,
+                short_description: composer.shortDescription,
+                image_url: composer.imageURL,
+                gender: composer.gender,
+                nationality: composer.nationality,
+                sources: composer.sources ? JSON.stringify(composer.sources) : null,
+                tags: composer.tags ? JSON.stringify(composer.tags) : null,
+                references: composer.refrences ? JSON.stringify(composer.refrences) : null
+            })
+            console.log("created composer", res)
         }
 
         return json({ data: data });

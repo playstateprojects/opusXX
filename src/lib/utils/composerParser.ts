@@ -1,5 +1,4 @@
-import type { Composer } from '$lib/zodAirtableTypes';
-import type { CardComposer } from '$lib/types';
+import type { Composer, CardComposer } from '$lib/types';
 
 export interface RawComposerData {
     id: number;
@@ -90,38 +89,35 @@ export function parseRawComposerToComposer(rawData: RawComposerData | any): Comp
     const fallbackImageUrl = composers.image_url || composers.imageURL || 'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/public';
     console.log(composers);
     return {
-        'Name': composerName,
-        'id': composers.id,
-        'Short Description': safeString(composers.short_description),
-        'Long Description': safeString(composers.long_description),
-        'Notes': safeString(composers.notes),
-        'Date of Birth': safeString(composers.birth_date),
-        'Birth Location': safeString(composers.birth_location),
-        'Date of Death': safeString(composers.death_date) || undefined,
-        'Death Location': safeString(composers.death_location) || undefined,
-        'Active Locations': safeString(composers.active_locations),
-        'Sex': [safeString(composers.gender) as 'Female' | 'Male' | 'Other'],
-        imageURL: profileImages[0]?.cloudflare_image_url ||
+        id: composers.id,
+        name: composerName,
+        shortDescription: safeString(composers.short_description),
+        longDescription: safeString(composers.long_description),
+        notes: safeString(composers.notes),
+        birthDate: safeString(composers.birth_date),
+        birthLocation: safeString(composers.birth_location),
+        deathDate: safeString(composers.death_date) || undefined,
+        deathLocation: safeString(composers.death_location) || undefined,
+        activeLocations: safeString(composers.active_locations),
+        gender: safeString(composers.gender),
+        imageUrl: profileImages[0]?.cloudflare_image_url ||
             profileImages[0]?.original_image_url ||
             fallbackImageUrl,
         profileImages: profileImages.map((img: any) => ({
-            url: img.cloudflare_image_url || img.original_image_url || img.url || fallbackImageUrl
+            id: img.id,
+            composerId: img.composer_id,
+            cloudflareImageUrl: img.cloudflare_image_url,
+            originalImageUrl: img.original_image_url,
+            license: img.license,
+            attribution: img.attribution,
+            uploadStatus: img.upload_status
         })),
-        'sources': sources,
-        'Work': work,
-        'works': works,
-        'Created By': {
-            id: 'system',
-            email: 'system@opusxx.com',
-            name: 'System'
-        },
-        'Created': new Date(),
-        'Last Modified By': {
-            id: 'system',
-            email: 'system@opusxx.com',
-            name: 'System'
-        },
-        'Last Modified': new Date()
+        sources: sources,
+        tags: tags,
+        nationality: safeString(composers.nationality),
+        composerPeriod: safeString(composers.composer_period),
+        composerStyle: safeString(composers.composer_style),
+        works: works
     };
 }
 
@@ -148,29 +144,29 @@ export function parseRawComposerToCardComposer(rawData: RawComposerData | any): 
 }
 
 export function formatComposerProfile(composer: {
-    Name: string;
-    'Long Description': string;
-    'Birth Date': string;
-    'Death Date': string;
-    works: Array<{
+    name?: string;
+    longDescription?: string;
+    birthDate?: string;
+    deathDate?: string;
+    works?: Array<{
         name: string;
         publication_year: string;
         long_description: string;
     }>;
 }): string {
     console.log("cmpo", composer)
-    const worksSection = (composer.works ?? '')
+    const worksSection = (composer.works || [])
         .map(
             (w) =>
                 `- **${w.name}** (${w.publication_year})  \n  ${w.long_description}`
         )
         .join("\n");
 
-    return `**${composer.Name}**
+    return `**${composer.name || 'Unknown Composer'}**
 
-        ${composer['Long Description']}
+        ${composer.longDescription || 'No description available'}
 
-        **born:** ${composer['Birth Date']} — **died:** ${composer['Death Date'] || "—"}
+        **born:** ${composer.birthDate || '—'} — **died:** ${composer.deathDate || "—"}
 
         ## Works
         ${worksSection}`;
