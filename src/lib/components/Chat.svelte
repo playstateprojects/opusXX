@@ -132,8 +132,8 @@
 		const docs = await Promise.all(
 			vectors.map(async (v: any) => {
 				try {
-					const work = getWorkById.metadata?.work_id; // path like "orchestral//construction-in-space.md"
-					const composer = getComposerById(v.metadata?.composer_id);
+					const work = await getWorkById(v.metadata?.work_id); // path like "orchestral//construction-in-space.md"
+					const composer = await getComposerById(v.metadata?.composer_id);
 					console.log('---', v.metadata);
 					if (!work || !composer) {
 						console.warn('Missing key or composer in metadata:', v.metadata);
@@ -153,33 +153,27 @@
 					// const body = await res.text();
 
 					// Fetch composer data
-					const data = await getComposerByName(composer);
-					if (!data) {
-						console.warn('No composer data found for:', composer);
-						return null;
-					}
 
 					// Create a proper composer object for formatting
-					const composerObj = {
-						Name: data.Name || composer,
-						'Long Description': data['Long Description'] || '',
-						'Birth Date': data['Date of Birth'] || '',
-						'Death Date': data['Date of Death'] || '',
-						works: data.works || []
-					};
+					// const composerObj = {
+					// 	Name: composer.Name |,
+					// 	'Long Description': composer['Long Description'] || '',
+					// 	'Birth Date': composer['Date of Birth'] || '',
+					// 	'Death Date': composer['Date of Death'] || '',
+					// 	works: composer.works || []
+					// };
 
-					const profile = formatComposerProfile(composerObj);
+					const profile = formatComposerProfile(composer);
 					console.log('profile 1', profile);
 					return {
-						document_name: key,
-						file_id: v.metadata?.file_id ?? key,
-						composer_name: composer,
-						work_title: v.metadata?.title ?? '',
-						content: body, // Use the actual R2 content instead of profile
-						composer_profile: profile,
-						justification: '',
-						score: v.score || 0,
-						...v.metadata
+						// file_id: v.metadata?.file_id ?? key,
+						// composer_name: composer.Name || '',
+						// work_title: v.metadata?.title ?? '',
+						// content: body, // Use the actual R2 content instead of profile
+						// composer_profile: profile,
+						// justification: '',
+						// score: v.score || 0,
+						// ...v.metadata
 					};
 				} catch (error) {
 					console.error('Error processing vector:', error);
@@ -255,31 +249,31 @@ Guidelines (same as before, omitted here for brevity).`;
 		let res = await response.json();
 		console.log(res);
 		return;
-		let systemMessages: AiMessage[] | AiOption[] = [];
+		// let systemMessages: AiMessage[] | AiOption[] = [];
 
-		let vectors = await searchVectors(vectorQuery);
-		console.log('vects', vectors);
-		const vectorResults = vectors?.matches || [];
-		vectorResults?.forEach((file: any) => {
-			if (file.composer_name) {
-				console.log('composer fould');
-				getComposerByName(file.composer_name).then((composer: Composer) => {
-					console.log('comp found', composer);
-				});
-			}
-		});
-		const { cards, overview } = await processVectors(vectorResults, filteredMessages);
-		console.log('cards', cards);
-		systemMessages.push({ role: AiRole.Assistant, content: overview });
-		state.loading = false;
-		cardStore.set(cards);
-		console.log('set cards', cards);
-		messages.update((msg: any) => [
-			...msg.filter((opt: any) => {
-				return !Array.isArray(opt);
-			}),
-			...systemMessages
-		]);
+		// let vectors = await searchVectors(vectorQuery);
+		// console.log('vects', vectors);
+		// const vectorResults = vectors?.matches || [];
+		// vectorResults?.forEach((file: any) => {
+		// 	if (file.composer_name) {
+		// 		console.log('composer fould');
+		// 		getComposerByName(file.composer_name).then((composer: Composer) => {
+		// 			console.log('comp found', composer);
+		// 		});
+		// 	}
+		// });
+		// const { cards, overview } = await processVectors(vectorResults, filteredMessages);
+		// console.log('cards', cards);
+		// systemMessages.push({ role: AiRole.Assistant, content: overview });
+		// state.loading = false;
+		// cardStore.set(cards);
+		// console.log('set cards', cards);
+		// messages.update((msg: any) => [
+		// 	...msg.filter((opt: any) => {
+		// 		return !Array.isArray(opt);
+		// 	}),
+		// 	...systemMessages
+		// ]);
 	};
 </script>
 

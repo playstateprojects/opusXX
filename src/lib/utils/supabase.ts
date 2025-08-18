@@ -109,7 +109,8 @@ const getWorksByComposerId = async (composerId: number): Promise<Work[]> => {
     rawContent: work.raw_content || ''
   }));
 };
-const getWorkById = async (workId: number): Promise<Work[]> => {
+
+const getWorkById = async (workId: number): Promise<Work> => {
   const { data, error } = await supabase
     .from('works')
     .select(`
@@ -127,7 +128,7 @@ const getWorkById = async (workId: number): Promise<Work[]> => {
   }
 
   if (!data) {
-    console.log('No works found for composer ID:', composerId);
+    console.log('No works found for composer ID:', workId);
     return [];
   }
   console.log(data)
@@ -137,7 +138,6 @@ const getWorkById = async (workId: number): Promise<Work[]> => {
 
   // Parse each work using the existing parser
   return parseRawWork(worksData);
-}));
 };
 
-export { getComposerByName, parseSupabaseComposer, parseSupabaseComposers, getWorksByComposerId, getComposerById getWorkById }
+export { getComposerByName, parseSupabaseComposer, parseSupabaseComposers, getWorksByComposerId, getComposerById, getWorkById }
