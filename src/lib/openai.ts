@@ -5,7 +5,7 @@ import type { AiMessage } from './types';
 // import type { ThreadMessage } from 'openai/resources/beta/threads/messages';
 
 import { zodResponseFormat } from "openai/helpers/zod";
-import { ComposerExtractSchema, ComposerList, WorkList } from './zodDefinitions';
+import { ComposerExtractSchema, ComposerList, WorkList } from './types';
 
 const useDeepseek = true;
 let aiModel = "gpt-4o-mini"

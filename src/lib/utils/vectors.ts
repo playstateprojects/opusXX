@@ -1,5 +1,5 @@
 import { AiMessage, AiOption, AiRole, CardComposer, VectorMatch } from "$lib/types";
-import { Composer, WorkCard } from "$lib/zodDefinitions";
+import { Composer, WorkCard } from "$lib/types";
 import { extractJSON } from "./stringUtils";
 import { getComposerByName } from "./supabase";
 

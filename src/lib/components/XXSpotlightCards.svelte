@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import SpotlightCard from './cards/SpotlightCard.svelte';
-	import { Spotlight } from '$lib/zodDefinitions.js';
+	import { Spotlight } from "$lib/types.js";
 	const spotlights: Spotlight[] = [
 		{
 			subtitle: 'Jacquot & Midori',

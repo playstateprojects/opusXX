@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { WorkList } from '$lib/zodDefinitions';
+	import { WorkList } from "$lib/types";
 	import { Button, Card, Input, Spinner } from 'flowbite-svelte';
 	import { zodResponseFormat } from 'openai/helpers/zod.mjs';
 	let chunk = `25 PLUS PIANO SOLO 

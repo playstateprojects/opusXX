@@ -1,6 +1,5 @@
-import { createComposer, createSource, createWork } from "$lib/airtable.js";
 import { extractWorkList } from "$lib/openai";
-import type { WorkList, Work } from "$lib/zodDefinitions.js";
+import type { WorkListType, WorkExtract } from "$lib/types.js";
 import { json } from "@sveltejs/kit";
 
 export async function POST({ request }) {

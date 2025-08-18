@@ -1,5 +1,5 @@
 // Export all utility functions
-export { parseRawComposerToComposer, parseRawComposerToCardComposer, parseRawComposerToComposerSafe } from './composerParser.js';
+export { parseRawComposerToComposer, parseRawComposerToCardComposer } from './composerParser.js';
 export type { RawComposerData } from './composerParser.js';
 
 // Import the functions directly

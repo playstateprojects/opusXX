@@ -4,7 +4,7 @@
 	import { gfm } from 'turndown-plugin-gfm';
 	let scraperUrl = $state('https://en.wikipedia.org/wiki/List_of_women_composers_by_birth_date');
 	import { load } from 'cheerio';
-	import type { Composer, ComposerList, Source } from '$lib/zodDefinitions';
+	import type { Composer, ComposerList, Source } from "$lib/types";
 	import composers from '$lib/composerList.json';
 	let loadingComposers = $state(composers.map(() => false));
 	let composerInfo = $state<Composer>();

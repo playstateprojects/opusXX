@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Composer } from '$lib/zodDefinitions';
+	import type { Composer } from "$lib/types";
 	let { composer } = $props<{
 		composer: Composer;
 	}>();

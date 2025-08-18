@@ -11,12 +11,11 @@
 	import XxButton from './XXButton.svelte';
 	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
-	import { cardStore } from '$lib/stores/cardStore.js';
-	import type { WorkCard } from '$lib/zodDefinitions.js';
+	import { addCard, cardStore } from '$lib/stores/cardStore.js';
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { ComposerDatabaseSchema } from '$lib/databaseTypes';
-	import type { Composer } from '$lib/types';
+	import type { Composer, Work, WorkCardType } from '$lib/types';
 	import { getVectorQuery, processVectors } from '$lib/utils/vectors';
 	import { z } from 'zod';
 	import { getComposerById, getComposerByName, getWorkById } from '$lib/utils/supabase';
@@ -115,9 +114,29 @@
 			body: JSON.stringify({ query: text, topK: 5 })
 		});
 		const matches = await res.json();
-		console.table(matches); // { id, score, metadata }
+		console.log('matches', matches);
 		return Array.isArray(matches) ? matches : [];
 	}
+
+	const loadWorks = async (vectors: { metadata?: { work_id: number } }[]): Promise<Work[]> => {
+		const works = vectors.map(async (vector) => {
+			try {
+				const workId = vector.metadata?.work_id;
+				if (!workId) {
+					console.warn('Vector missing work_id in metadata:', vector);
+					return null;
+				}
+				const work = await getWorkById(workId);
+				return work;
+			} catch (error) {
+				console.error('Error processing vector:', error);
+				return null;
+			}
+		});
+
+		const results = await Promise.all(works);
+		return results.filter((work: Work | null): work is Work => work !== null);
+	};
 
 	const getResponseFormatter = async (vectors: any[], userQuery: string): Promise<string> => {
 		if (!vectors || !Array.isArray(vectors) || vectors.length === 0) {
@@ -130,19 +149,19 @@
 				try {
 					const work = await getWorkById(v.metadata?.work_id);
 					const composer = await getComposerById(v.metadata?.composer_id);
-					
+
 					if (!work || !composer) {
 						console.warn('Missing work or composer in metadata:', v.metadata);
 						return null;
 					}
 
 					const profile = formatComposerProfile(composer);
-					
+
 					return {
 						file_id: v.metadata?.file_id || '',
-						composer_name: composer.Name || '',
-						work_title: work.title || v.metadata?.title || '',
-						content: work.content || '',
+						composer_name: composer.name || '',
+						work_title: work.name || v.metadata?.title || '',
+						content: work.longDescription || work.shortDescription || '',
 						composer_profile: profile,
 						score: v.score || 0,
 						...v.metadata
@@ -204,6 +223,17 @@ Guidelines:
 		// const vectorQuery = await getVectorQuery(filteredMessages);
 		const vectorQuery = await semanticSearch(message);
 		console.log('vq', vectorQuery);
+		await Promise.all(
+			vectorQuery.map(async (queryResult: any) => {
+				let work = await getWorkById(queryResult.metadata?.work_id);
+				if (work) {
+					addCard({ work: work, insight: '' });
+				}
+
+				console.log('added card', work);
+			})
+		);
+
 		const prompt = await getResponseFormatter(vectorQuery, message);
 		const promptMessage: AiMessage = {
 			role: AiRole.User,

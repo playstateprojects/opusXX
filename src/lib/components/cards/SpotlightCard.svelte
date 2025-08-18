@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CTA } from '$lib/zodDefinitions.js';
+	import type { CTA } from "$lib/types.js";
 	import XxButton from '$lib/components/XXButton.svelte';
 
 	let { image, title, subtitle, colour, type, cta, date, logo, content, children } = $props<{

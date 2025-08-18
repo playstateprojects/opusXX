@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { WorkCard } from '$lib/zodDefinitions';
+	import type { WorkCardType } from '$lib/types';
 	import XxButton from '$lib/components/XXButton.svelte';
 	import XxComposerCard from '$lib/components/cards/XXComposerCard.svelte';
 	import {
@@ -14,7 +14,7 @@
 		showBack: false
 	});
 	let { workCard } = $props<{
-		workCard?: WorkCard;
+		workCard?: WorkCardType;
 	}>();
 </script>
 
@@ -30,15 +30,16 @@
 		>
 			<button
 				class="flex w-full text-black bg-period-{workCard.work.period
-					? workCard.work.period.toLowerCase().trim().replace(' ', '_')
+					? workCard.work.period?.toLowerCase().trim().replace(' ', '_')
 					: 'romantic'} font-zwocorr"
 				onclick={() => (state.showBack = true)}
 			>
 				<img
-					src={workCard.work.composer.imageURL.replace(
+					src={workCard.work.composer.imageURL?.replace(
 						/public|wideprofile/,
 						'h=800,w=400,fit=cover,gravity=0.2x0.35'
-					)}
+					) ||
+						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=800,w=400,fit=cover,gravity=0.2x0.35'}
 					alt=""
 					class="mb-5 aspect-[0.9] h-full w-24 object-cover"
 				/>
@@ -55,8 +56,9 @@
 				</div>
 			</button>
 			<div class="flex flex-1 flex-col overflow-y-auto text-xs">
+				<!-- {JSON.stringify(workCard.work)} -->
 				<div class="flex flex-col p-4">
-					<h3 class="font-extrabold">{workCard.work.title}</h3>
+					<h3 class="font-extrabold">{workCard.work.name}x</h3>
 					<span class="text-xs italic">{workCard.work.publicationYear}</span>
 					<div class="mt-2 flex justify-between text-xs uppercase">
 						<span>{workCard.work.genre}</span><span>{workCard.work.duration}</span>
@@ -104,10 +106,11 @@
 				<XxButton
 					size="sm"
 					excludeIcon
-					link="mailto:?subject=Meet your next standout composer&from=hello@opusxx.com"
+					link={'https://base.opusxx.com/dashboard/#/nc/plvv803l38mvhyh/mnq7biac92brabu?rowId=' +
+						workCard.work.id}
 				>
 					<span class="flex items-center justify-center"
-						>SHARE <ShareIcon width={14} height={14} /></span
+						>EDIT <ShareIcon width={14} height={14} /></span
 					>
 				</XxButton>
 			</section>
@@ -124,16 +127,15 @@
 					: ''}"
 				onclick={() => (state.showBack = false)}
 			>
-				{#if workCard.work.composer.imageURL}
-					<img
-						src={workCard.work.composer.imageURL.replace(
-							/public|wideprofile/,
-							'h=120,w=300,fit=cover,gravity=05x0.35'
-						)}
-						alt=""
-						class="mb-2 aspect-[2.2] w-24 w-full object-cover"
-					/>
-				{/if}
+				<img
+					src={workCard.work.composer.imageURL?.replace(
+						/public|wideprofile/,
+						'h=120,w=300,fit=cover,gravity=05x0.35'
+					) ||
+						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=120,w=300,fit=cover,gravity=05x0.35'}
+					alt=""
+					class="mb-2 aspect-[2.2] w-24 w-full object-cover"
+				/>
 			</button>
 			<div class="flex h-full flex-col p-4">
 				<XxComposerCard composer={workCard.work.composer} />

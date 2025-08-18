@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	import lib1 from '$lib/lib1.json';
 	import { cardStore } from '$lib/stores/cardStore.js';
-	import { WorkCard } from '$lib/zodDefinitions.js';
+	import { WorkCard } from "$lib/types.js";
 	import ShareIcon from '$lib/ShareIcon.svelte';
 	import lib2 from '$lib/lib2.json';
 
