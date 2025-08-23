@@ -7,7 +7,7 @@ export const workDetail = writable<Work | null>(null);
 
 export function addCard(card: WorkCardType) {
     cardStore.update(cards => {
-        const newCards = [...cards, card];
+        const newCards = [card, ...cards];
         return newCards.length > maxCards ? newCards.slice(1) : newCards;
     });
 }
@@ -16,16 +16,21 @@ export function clearError() {
     cardStore.set([]);
 }
 
-export function updateCardInsight(workId: string | number | undefined, insight: string) {
-    console.log("update fired", workId)
+export function updateCardInsight(workId: string | number | undefined, insight: string, relevance: number) {
     cardStore.update(cards => {
-        return cards.map(card => {
+        const updatedCards = cards.map(card => {
             console.log(card)
             if (card.work.id == workId || card.work.name == workId?.toString()) {
-                console.log("found work")
-                return { ...card, insight };
+                return { ...card, insight, relevance };
             }
             return card;
+        });
+
+        // Sort cards by relevance score in descending order (highest relevance first)
+        return updatedCards.sort((a, b) => {
+            const aRelevance = a.relevance || 0;
+            const bRelevance = b.relevance || 0;
+            return bRelevance - aRelevance;
         });
     });
 }

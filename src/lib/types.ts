@@ -387,6 +387,7 @@ export const ComposerList = z.object({
 export interface WorkCardType {
     work: Work;
     insight: string;
+    relevance?: number
 }
 
 export const Genres = z.array(z.object({

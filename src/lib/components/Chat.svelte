@@ -120,7 +120,7 @@
 
 			// Update cards with insights using the store function
 			data.works.forEach((workInsight) => {
-				updateCardInsight(workInsight.workId, workInsight.insight);
+				updateCardInsight(workInsight.workId, workInsight.insight, workInsight.relevanceScore);
 			});
 
 			console.log('Updated cards with insights', data.works);
