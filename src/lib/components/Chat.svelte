@@ -14,16 +14,10 @@
 	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
 	import { addCard, cardStore, updateCardInsight } from '$lib/stores/cardStore.js';
-	// import type {
-	// 	InsightMakerRequest,
-	// 	InsightMakerResponse
-	// } from '../../routes/api/agents/insight-maker/+server.js';
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
-	import type { Composer, Work, WorkCardType } from '$lib/types';
 	import { getWorkById } from '$lib/utils/supabase';
 	import { flattenChat } from '$lib/utils/stringUtils';
-	// import { QueryMakerResponse } from '../../routes/api/agents/query-maker/+server';
 	const state = $state({
 		loading: false
 	});
@@ -54,32 +48,6 @@
 			return !Array.isArray(item) ? currentIndex : lastIndex;
 		}, -1);
 	});
-
-	const searchVectors = async (query: string): Promise<FormattedVectorResponse | null> => {
-		const response = await fetch('/api/vector/search', {
-			method: 'POST',
-			body: JSON.stringify({ query: query })
-		});
-		try {
-			const result = await response.json();
-			const files = result?.result?.data || [];
-
-			if (Array.isArray(files)) {
-				files.forEach(async (file: any) => {
-					const trimmedStr = file.filename
-						.split('.')[0]
-						.replace(/_(?:born|died|sometime)\d*.*$/i, '')
-						.trim();
-					file.composerName = trimmedStr.replace(/_/g, ' ');
-				});
-			}
-
-			return { summary: '', matches: files };
-		} catch (err: any) {
-			console.log('an error occured', err);
-			return null;
-		}
-	};
 
 	const optionSelected = async (content: string) => {
 		console.log('debug');
@@ -155,7 +123,7 @@
 				updateCardInsight(workInsight.workId, workInsight.insight);
 			});
 
-			console.log('Updated cards with insights');
+			console.log('Updated cards with insights', data.works);
 		} catch (error) {
 			console.error('Error updating card insights:', error);
 		}

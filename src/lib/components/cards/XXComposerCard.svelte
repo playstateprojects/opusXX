@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Composer } from "$lib/types";
+	import type { Composer } from '$lib/types';
 	let { composer } = $props<{
 		composer: Composer;
 	}>();
@@ -11,7 +11,7 @@
 >
 <span class=" text-xs uppercase italic text-gray-400">{composer.nationality}</span>
 {#if composer.tags}
-	<span class="my-1 text-xs italic">{composer.tags.join(' · ')}</span>ss
+	<span class="my-1 text-xs italic">{composer.tags.join(' · ')}</span>
 {/if}
 {#if composer.representativeWorks}
 	<section>

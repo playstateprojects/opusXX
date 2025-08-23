@@ -1,14 +1,11 @@
 // this endpoint accepts an array of works and intention string, returns insights with relevance scores
 
 import { jsonChat } from '$lib/server/openai';
-import { 
-    AiMessage, 
-    AiRole, 
-    type Work,
+import {
+    AiMessage,
+    AiRole,
     type InsightMakerRequest,
     type InsightMakerResponse,
-    type WorkInsight,
-    type ErrorResponse
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
@@ -37,7 +34,7 @@ INTENTION: `;
 export const POST: RequestHandler = async ({ request }) => {
     try {
         const body: InsightMakerRequest = await request.json();
-        
+
         // Validate input
         if (!body.works || !Array.isArray(body.works) || body.works.length === 0) {
             return new Response(JSON.stringify({ error: 'Works array is required and must not be empty' }), {

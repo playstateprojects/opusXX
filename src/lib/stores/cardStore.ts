@@ -17,9 +17,12 @@ export function clearError() {
 }
 
 export function updateCardInsight(workId: string | number | undefined, insight: string) {
+    console.log("update fired", workId)
     cardStore.update(cards => {
         return cards.map(card => {
-            if (card.work.id === workId || card.work.name === workId?.toString()) {
+            console.log(card)
+            if (card.work.id == workId || card.work.name == workId?.toString()) {
+                console.log("found work")
                 return { ...card, insight };
             }
             return card;
