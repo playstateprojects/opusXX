@@ -56,28 +56,47 @@
 				<div class="flex flex-col p-4">
 					<h3 class="font-extrabold">{workCard.work.name}</h3>
 					<span class="text-xs italic">{workCard.work.publicationYear}</span>
+					
 					<div class="mt-2 flex justify-between text-xs uppercase">
-						<span>{workCard.work.genre}</span><span>{workCard.work.duration}</span>
+						<span>{workCard.work.genre}</span>
+						<span>{workCard.work.duration}</span>
 					</div>
-					{#if workCard.work.scoring}
-						<h4 class="mb-1 mt-4 font-bold">Score</h4>
-						<p class="text-xs">
-							{workCard.work.scoring}.
-						</p>
+
+					{#if workCard.work.instrumentation || workCard.work.scoring}
+						<div class="mt-3">
+							<h4 class="mb-1 font-bold text-xs">Instrumentation</h4>
+							<p class="text-xs text-gray-300">
+								{workCard.work.instrumentation || workCard.work.scoring}
+							</p>
+						</div>
 					{/if}
+
+					{#if workCard.work.catalogNumber}
+						<div class="mt-2">
+							<span class="text-xs text-gray-400">Catalog: {workCard.work.catalogNumber}</span>
+						</div>
+					{/if}
+
 					{#if workCard.work.shortDescription}
-						<section>
-							<p class="mt-4 text-lg">
+						<div class="mt-3">
+							<p class="text-sm leading-relaxed">
 								{workCard.work.shortDescription}
 							</p>
-						</section>
+						</div>
 					{/if}
-					<section>
-						<h4 class="mt-4 font-bold">Insight</h4>
-						<p class="text-xs">
+
+					<div class="mt-4">
+						<h4 class="mb-1 font-bold text-xs">Insight</h4>
+						<p class="text-xs text-gray-300">
 							{workCard.insight}
 						</p>
-					</section>
+					</div>
+
+					{#if workCard.work.firstPerformance}
+						<div class="mt-2">
+							<span class="text-xs text-gray-400">Premiered: {workCard.work.firstPerformance}</span>
+						</div>
+					{/if}
 				</div>
 			</div>
 			<section>
@@ -126,7 +145,7 @@
 					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl ||
 						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=120,w=300,fit=cover,gravity=05x0.35'}
 					alt=""
-					class="mb-2 aspect-[2.2] w-24 w-full object-cover"
+					class="mb-2 aspect-[2.2] w-full object-cover"
 				/>
 			</button>
 			<div class="flex h-full flex-col p-4">

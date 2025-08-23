@@ -3,10 +3,11 @@
 		AiRole,
 		type AiMessage,
 		type AiOption,
-		type FormattedVectorResponse,
 		type InsightMakerRequest,
 		type InsightMakerResponse,
-		type QueryMakerResponse
+		type QueryMakerResponse,
+		type QuestionMakerResponse,
+		type ActionDecisionResponse
 	} from '$lib/types.js';
 	import { derived, get } from 'svelte/store';
 	import ChatOption from './ChatOption.svelte';
@@ -49,35 +50,88 @@
 		}, -1);
 	});
 
-	const optionSelected = async (content: string) => {
-		console.log('debug');
+	const performSearchWorkflow = async (intent?: string) => {
+		let filteredMessages = get(messages).filter(
+			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
+		);
 
+		const response = await fetch('/api/agents/query-maker', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+		});
+		let data = await response.json();
+		const { vectorQueryTerm, intent: queryIntent } = data as QueryMakerResponse;
+		let vectorQuery = await semanticSearch(vectorQueryTerm);
+		await Promise.all(
+			vectorQuery.map(async (queryResult: any) => {
+				let work = await getWorkById(queryResult.metadata?.work_id);
+				if (work) {
+					addCard({ work: work, insight: '' });
+				}
+				console.log('added card', work);
+			})
+		);
+
+		// Update cards with insights after adding all cards
+		await updateCardInsights(intent || queryIntent);
+		
+		// Ask a follow-up question after processing the results
+		await askNextQuestion();
+	};
+
+	const optionSelected = async (content: string) => {
 		const now = new Date();
 
-		let newMessages: (AiMessage | AiOption[])[] = [
-			{
-				role: AiRole.User,
-				content,
-				time: now
-			}
-		];
-		messages.update((msg) => [
-			...msg.filter((opt) => {
-				return !Array.isArray(opt);
-			}),
-			...newMessages
-		]);
-		state.loading = true;
-		await randomDelay();
-		state.loading = false;
-		newMessages = [];
+		// Add the user's selected option as a message
+		const newUserMessage: AiMessage = {
+			role: AiRole.User,
+			content,
+			time: now
+		};
 
+		// Remove existing options and add the user message
 		messages.update((msg) => [
-			...msg.filter((opt) => {
-				return !Array.isArray(opt);
-			}),
-			...newMessages
+			...msg.filter((opt) => !Array.isArray(opt)),
+			newUserMessage
 		]);
+
+		state.loading = true;
+
+		try {
+			// Get updated chat log with the new message
+			let filteredMessages = get(messages).filter(
+				(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
+			);
+
+			// Determine what action to take based on the conversation
+			const actionResponse = await fetch('/api/agents/action-decision', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+			});
+
+			if (!actionResponse.ok) {
+				console.error('Failed to get action decision:', actionResponse.statusText);
+				state.loading = false;
+				return;
+			}
+
+			const actionData: ActionDecisionResponse = await actionResponse.json();
+			console.log('Action decision:', actionData);
+
+			if (actionData.action === 'search') {
+				// Perform search workflow
+				await performSearchWorkflow();
+			} else {
+				// Continue conversation - just ask a follow-up question
+				await askNextQuestion();
+			}
+		} catch (error) {
+			console.error('Error in option selected:', error);
+		}
+
+		state.loading = false;
 	};
 
 	async function semanticSearch(text: string): Promise<any[]> {
@@ -128,7 +182,48 @@
 			console.error('Error updating card insights:', error);
 		}
 	};
+	const askNextQuestion = async () => {
+		let filteredMessages = get(messages).filter(
+			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
+		);
 
+		try {
+			const response = await fetch('/api/agents/question-maker', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+			});
+
+			if (!response.ok) {
+				console.error('Failed to get follow-up question:', response.statusText);
+				return;
+			}
+
+			const data: QuestionMakerResponse = await response.json();
+			
+			if (data.question && data.question.trim()) {
+				// Add the follow-up question as an AI message
+				const questionMessage: AiMessage = {
+					role: AiRole.Assistant,
+					content: data.question,
+					time: new Date()
+				};
+				
+				messages.update((msg) => [...msg, questionMessage]);
+				
+				// Add quick response options if they exist
+				if (data.quickResponses && data.quickResponses.length > 0) {
+					const options: AiOption[] = data.quickResponses.map(response => ({
+						content: response
+					}));
+					
+					messages.update((msg) => [...msg, options]);
+				}
+			}
+		} catch (error) {
+			console.error('Error getting follow-up question:', error);
+		}
+	};
 	const onSubmit = async (message: string) => {
 		const newUserMessage: AiMessage = {
 			role: AiRole.User,
@@ -137,35 +232,10 @@
 		};
 		messages.update((msg) => [...msg, newUserMessage]);
 		state.loading = true;
-		let filteredMessages = get(messages).filter(
-			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
-		);
-
-		const response = await fetch('/api/agents/query-maker', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
-		});
-		let data = await response.json();
-		console.log(data);
-		const { vectorQueryTerm, intent } = data as QueryMakerResponse;
-		console.log('terms', vectorQueryTerm);
-		console.log('terms', intent);
-		let vectorQuery = await semanticSearch(vectorQueryTerm);
-		await Promise.all(
-			vectorQuery.map(async (queryResult: any) => {
-				let work = await getWorkById(queryResult.metadata?.work_id);
-				if (work) {
-					addCard({ work: work, insight: '' });
-				}
-
-				console.log('added card', work);
-			})
-		);
-
-		// Update cards with insights after adding all cards
-		await updateCardInsights(intent);
-
+		
+		// For direct text input, always perform search workflow
+		await performSearchWorkflow();
+		
 		state.loading = false;
 	};
 </script>

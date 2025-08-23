@@ -1,5 +1,8 @@
 <script lang="ts">
 	import type { Composer } from '$lib/types';
+	import { composerDetail } from '$lib/stores/cardStore.js';
+	import { AngleDownOutline } from 'flowbite-svelte-icons';
+	
 	let { composer } = $props<{
 		composer: Composer;
 	}>();
@@ -30,3 +33,14 @@
 	</section>
 {/if}
 <div class="mt-4 text-xs">{composer.shortDescription}</div>
+
+<button
+	class="mt-4 flex w-full flex-col items-center justify-center text-slate-400"
+	onclick={() => {
+		composerDetail.set(composer);
+	}}
+>
+	<div class="m-0 flex items-center gap-x-2 p-0 text-xs font-bold uppercase">
+		More <AngleDownOutline class="h-4 w-4" />
+	</div>
+</button>

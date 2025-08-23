@@ -34,7 +34,6 @@ export const POST: RequestHandler = async ({ request }) => {
     }]
     try {
         const data = await jsonChat(messages);
-        console.log(data)
         // Handle error response from jsonChat
         if (!data || 'error' in data) {
             return new Response(JSON.stringify({ error: 'Failed to generate query from chat' }), {

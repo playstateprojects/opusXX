@@ -11,6 +11,7 @@
 	import { cardStore } from '$lib/stores/cardStore'; // adjust path if needed
 	import XxWorkCard from '$lib/components/cards/XXWorkCard.svelte';
 	import XxWorkDetail from '$lib/components/cards/XXWorkDetail.svelte';
+	import XxComposerDetail from '$lib/components/cards/XXComposerDetail.svelte';
 	import ColourLoader from '$lib/components/ColourLoader.svelte';
 	import XxSpotlightCards from '$lib/components/XXSpotlightCards.svelte';
 
@@ -76,6 +77,7 @@
 					</div>
 				{/if}
 				<XxWorkDetail />
+				<XxComposerDetail />
 			</svelte:fragment>
 		</SplitPage>
 		<div

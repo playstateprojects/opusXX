@@ -460,7 +460,6 @@ export interface InsightMakerResponse {
 
 // Query Maker API types
 export interface QueryMakerInfo {
-    messages: AiMessage[];
     schema?: object;
     chatLog?: string;
 }
@@ -468,6 +467,28 @@ export interface QueryMakerInfo {
 export interface QueryMakerResponse {
     intent: string;
     vectorQueryTerm: string;
+}
+
+// Question Maker API types
+export interface QuestionMakerInfo {
+    schema?: object;
+    chatLog?: string;
+}
+
+export interface QuestionMakerResponse {
+    question: string;
+    quickResponses?: string[];
+}
+
+// Action Decision API types
+export interface ActionDecisionInfo {
+    schema?: object;
+    chatLog?: string;
+}
+
+export interface ActionDecisionResponse {
+    action: 'search' | 'continue';
+    reason?: string;
 }
 
 // Common error response type

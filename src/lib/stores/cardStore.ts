@@ -1,9 +1,10 @@
-import type { WorkCardType, Work } from "$lib/types.js";
+import type { WorkCardType, Work, Composer } from "$lib/types.js";
 import { writable } from 'svelte/store';
 
-export const maxCards = 15; // set your max limit here
+export const maxCards = 10; // set your max limit here
 export const cardStore = writable<WorkCardType[]>([]);
 export const workDetail = writable<Work | null>(null);
+export const composerDetail = writable<Composer | null>(null);
 
 export function addCard(card: WorkCardType) {
     cardStore.update(cards => {
