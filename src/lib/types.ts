@@ -58,8 +58,7 @@ export interface FormattedVectorResponse {
 export interface Work {
     id?: number;
     name: string;
-    composer?: number; // Foreign key to composer ID
-    composerDetails?: Composer; // Populated composer details
+    composer: Composer; // Full composer object
     source?: string;
     publicationYear?: string;
     firstPerformance?: string;
@@ -359,7 +358,7 @@ export const ComposerExtractSchema = z.object({
     media: z.array(Media).optional(),
     links: z.array(z.string()).optional(),
     tags: z.array(z.string()),
-    refrences: z.array(Reference),
+    references: z.array(Reference),
     gender: z.enum(['male', 'female', 'other']),
     sources: z.array(z.string()).optional(),
     nationality: z.string().optional(),
@@ -410,6 +409,22 @@ export const Spotlight = z.object({
     })
 })
 
+export const WorkSchema = z.object({
+    name: z.string(),
+    composer: z.string(), // Just the name for extraction, will be populated with full object later
+    instrumentation: z.string().optional(),
+    duration: z.string().optional(),
+    publicationYear: z.string().optional(),
+    genre: z.string().optional(),
+    shortDescription: z.string().optional(),
+    longDescription: z.string().optional()
+})
+
+export const WorkListSchema = z.object({
+    works: z.array(WorkSchema)
+})
+
+
 // ===========================================
 // INFERRED TYPES FROM ZOD SCHEMAS
 // ===========================================
@@ -420,3 +435,41 @@ export type ComposerListType = z.infer<typeof ComposerList>
 export type GenresType = z.infer<typeof Genres>
 export type SpotlightType = z.infer<typeof Spotlight>
 export type SourceType = z.infer<typeof Source>
+
+// ===========================================
+// API INTERFACE TYPES
+// ===========================================
+
+// Insight Maker API types
+export interface InsightMakerRequest {
+    works: Work[];
+    intention: string;
+    minRelevanceScore?: number; // Optional filter threshold (0-10)
+}
+
+export interface WorkInsight {
+    workId: string;
+    insight: string;
+    relevanceScore: number;
+}
+
+export interface InsightMakerResponse {
+    works: WorkInsight[];
+}
+
+// Query Maker API types
+export interface QueryMakerInfo {
+    messages: AiMessage[];
+    schema?: object;
+    chatLog?: string;
+}
+
+export interface QueryMakerResponse {
+    intent: string;
+    vectorQueryTerm: string;
+}
+
+// Common error response type
+export interface ErrorResponse {
+    error: string;
+}

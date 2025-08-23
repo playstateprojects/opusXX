@@ -1,4 +1,4 @@
-import { getEmbedding } from '$lib/openai.js';
+import { getEmbedding } from '$lib/server/openai.js';
 import type { Embedding } from 'openai/resources/embeddings.mjs';
 import type { RequestEvent } from '../$types.js';
 

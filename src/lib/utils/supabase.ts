@@ -61,11 +61,14 @@ const parseSupabaseComposers = (data: unknown[]): Composer[] => {
 
 // Function to convert raw database work data to Work type
 const parseSupabaseWork = (work: any): Work => {
+  if (!work.composers) {
+    throw new Error(`Work "${work.name}" missing composer data`);
+  }
+  
   return {
     id: work.id,
     name: work.name || '',
-    composer: work.composer || undefined,
-    composerDetails: work.composers ? parseSupabaseComposer(work.composers) : undefined,
+    composer: parseSupabaseComposer(work.composers),
     source: work.source || undefined,
     publicationYear: work.publication_year || undefined,
     firstPerformance: work.first_performance || undefined,

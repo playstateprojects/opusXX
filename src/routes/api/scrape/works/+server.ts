@@ -1,5 +1,4 @@
-import { extractWorkList } from "$lib/openai";
-import type { WorkListType, WorkExtract } from "$lib/types.js";
+import { extractWorkList } from "$lib/server/openai";
 import { json } from "@sveltejs/kit";
 
 export async function POST({ request }) {
@@ -11,7 +10,7 @@ export async function POST({ request }) {
         // }
         const { data } = await extractWorkList(body.text)
         if (data) {
-            const { works } = data as WorkList
+            const { works } = data
 
             console.log("work", works)
 

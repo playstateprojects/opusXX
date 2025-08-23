@@ -35,10 +35,7 @@
 				onclick={() => (state.showBack = true)}
 			>
 				<img
-					src={workCard.work.composer.imageURL?.replace(
-						/public|wideprofile/,
-						'h=800,w=400,fit=cover,gravity=0.2x0.35'
-					) ||
+					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl ||
 						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=800,w=400,fit=cover,gravity=0.2x0.35'}
 					alt=""
 					class="mb-5 aspect-[0.9] h-full w-24 object-cover"
@@ -56,27 +53,25 @@
 				</div>
 			</button>
 			<div class="flex flex-1 flex-col overflow-y-auto text-xs">
-				<!-- {JSON.stringify(workCard.work)} -->
 				<div class="flex flex-col p-4">
-					<h3 class="font-extrabold">{workCard.work.name}x</h3>
+					<h3 class="font-extrabold">{workCard.work.name}</h3>
 					<span class="text-xs italic">{workCard.work.publicationYear}</span>
 					<div class="mt-2 flex justify-between text-xs uppercase">
 						<span>{workCard.work.genre}</span><span>{workCard.work.duration}</span>
 					</div>
-					<h4 class="mt-4 font-bold">Instrumentation Summary</h4>
-					<p class="text-xs">
-						{workCard.work.instrumentation && Array.isArray(workCard.work.instrumentation)
-							? workCard.work.instrumentation.join(', ')
-							: ''}
-					</p>
-					{#each workCard.work.sections as section}
+					{#if workCard.work.scoring}
+						<h4 class="mb-1 mt-4 font-bold">Score</h4>
+						<p class="text-xs">
+							{workCard.work.scoring}.
+						</p>
+					{/if}
+					{#if workCard.work.shortDescription}
 						<section>
-							<h4 class="mt-4 font-bold">{section.title}</h4>
-							<p class="text-xs">
-								{section.content}
+							<p class="mt-4 text-lg">
+								{workCard.work.shortDescription}
 							</p>
 						</section>
-					{/each}
+					{/if}
 					<section>
 						<h4 class="mt-4 font-bold">Insight</h4>
 						<p class="text-xs">
@@ -128,11 +123,8 @@
 				onclick={() => (state.showBack = false)}
 			>
 				<img
-					src={workCard.work.composer.imageURL?.replace(
-						/public|wideprofile/,
-						'h=120,w=300,fit=cover,gravity=05x0.35'
-					) ||
-						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=120,w=300,fit=cover,gravity=05x0.35'}
+					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl ||
+						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=120,w=300,fit=cover,gravity=05x0.35'}
 					alt=""
 					class="mb-2 aspect-[2.2] w-24 w-full object-cover"
 				/>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { WorkList } from "$lib/types";
 	import { Button, Card, Input, Spinner } from 'flowbite-svelte';
 	import { zodResponseFormat } from 'openai/helpers/zod.mjs';
 	let chunk = `25 PLUS PIANO SOLO 
@@ -107,7 +106,7 @@ Best Edition in Germany 1996!
 Musikalische Einfälle spielerischer Art, die über das Betrachten, Erfahren und Zeichnen von Landschaften und kleinen Fundobjekten aus der natur entstanden sind. Jedes der Stücke beruht auf einer musikalischen Kon.zeption, die improvisatorisch am Klavier in.terpretiert wird. Anregend als unterrichtsma.terial zur Förderung musikalischer Kreativität. „Eine gelungene Verbindung zweier nota.tionen: Auf der linken Seite die graphische notation der Komponistin, auf der rechten jeweils die konventionelle notation.“ (clingKlong 1997) 
 Playful musical ideas inspired by the obser.vation, experiencing and depiction of land.scapes and by a collection of small natural objects. each piece contains a musical con.ception and their interpretation on the piano should be improvisatory. easy to medium dif.ficulty, they provide good teaching material for the development of musical creativity. 
 `;
-	let works: WorkList = { works: [] };
+	let works: { works: any[] } = { works: [] };
 	let loading = false;
 	let elapsedTime = 0;
 	const scrape = async () => {

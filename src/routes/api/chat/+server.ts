@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { CF_ACCOUNT_ID, CF_AI_TOKEN } from '$env/static/private';
 import { AiRole, type AiMessage } from '$lib/types.js';
-import { chat } from '$lib/openai.js';
+import { chat } from '$lib/server/openai.js';
 
 export async function POST({ request }) {
     const body = await request.json();

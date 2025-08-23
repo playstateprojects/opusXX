@@ -1,4 +1,4 @@
-import { extractComposerList } from "$lib/openai";
+import { extractComposerList } from "$lib/server/openai";
 import { json } from "@sveltejs/kit";
 
 export async function POST({ request }) {

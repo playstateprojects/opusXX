@@ -1,25 +1,29 @@
 <script lang="ts">
 	import {
 		AiRole,
-		AiOptionIcon,
 		type AiMessage,
 		type AiOption,
-		type FormattedVectorResponse
+		type FormattedVectorResponse,
+		type InsightMakerRequest,
+		type InsightMakerResponse,
+		type QueryMakerResponse
 	} from '$lib/types.js';
 	import { derived, get } from 'svelte/store';
 	import ChatOption from './ChatOption.svelte';
 	import XxButton from './XXButton.svelte';
 	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
-	import { addCard, cardStore } from '$lib/stores/cardStore.js';
+	import { addCard, cardStore, updateCardInsight } from '$lib/stores/cardStore.js';
+	// import type {
+	// 	InsightMakerRequest,
+	// 	InsightMakerResponse
+	// } from '../../routes/api/agents/insight-maker/+server.js';
 	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
-	import { ComposerDatabaseSchema } from '$lib/databaseTypes';
 	import type { Composer, Work, WorkCardType } from '$lib/types';
-	import { getVectorQuery, processVectors } from '$lib/utils/vectors';
-	import { z } from 'zod';
-	import { getComposerById, getComposerByName, getWorkById } from '$lib/utils/supabase';
-	import { formatComposerProfile } from '$lib/utils/composerParser';
+	import { getWorkById } from '$lib/utils/supabase';
+	import { flattenChat } from '$lib/utils/stringUtils';
+	// import { QueryMakerResponse } from '../../routes/api/agents/query-maker/+server';
 	const state = $state({
 		loading: false
 	});
@@ -118,95 +122,43 @@
 		return Array.isArray(matches) ? matches : [];
 	}
 
-	const loadWorks = async (vectors: { metadata?: { work_id: number } }[]): Promise<Work[]> => {
-		const works = vectors.map(async (vector) => {
-			try {
-				const workId = vector.metadata?.work_id;
-				if (!workId) {
-					console.warn('Vector missing work_id in metadata:', vector);
-					return null;
-				}
-				const work = await getWorkById(workId);
-				return work;
-			} catch (error) {
-				console.error('Error processing vector:', error);
-				return null;
-			}
-		});
+	const updateCardInsights = async (intent: string) => {
+		const currentCards = get(cardStore);
+		const works = currentCards.map((card) => card.work);
 
-		const results = await Promise.all(works);
-		return results.filter((work: Work | null): work is Work => work !== null);
-	};
-
-	const getResponseFormatter = async (vectors: any[], userQuery: string): Promise<string> => {
-		if (!vectors || !Array.isArray(vectors) || vectors.length === 0) {
-			console.warn('No vectors found for the query:', userQuery);
-			return `No relevant documents found for your query: "${userQuery}". Please try a different search term.`;
+		if (works.length === 0) {
+			console.log('No works to generate insights for');
+			return;
 		}
 
-		const docs = await Promise.all(
-			vectors.map(async (v: any) => {
-				try {
-					const work = await getWorkById(v.metadata?.work_id);
-					const composer = await getComposerById(v.metadata?.composer_id);
+		try {
+			const request: InsightMakerRequest = {
+				works: works,
+				intention: intent
+			};
 
-					if (!work || !composer) {
-						console.warn('Missing work or composer in metadata:', v.metadata);
-						return null;
-					}
+			const response = await fetch('/api/agents/insight-maker', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(request)
+			});
 
-					const profile = formatComposerProfile(composer);
+			if (!response.ok) {
+				console.error('Failed to get insights:', response.statusText);
+				return;
+			}
 
-					return {
-						file_id: v.metadata?.file_id || '',
-						composer_name: composer.name || '',
-						work_title: work.name || v.metadata?.title || '',
-						content: work.longDescription || work.shortDescription || '',
-						composer_profile: profile,
-						score: v.score || 0,
-						...v.metadata
-					};
-				} catch (error) {
-					console.error('Error processing vector:', error);
-					return null;
-				}
-			})
-		);
+			const data: InsightMakerResponse = await response.json();
 
-		const matches = docs.filter((doc) => doc !== null);
-		console.log('Processed matches:', matches.length);
+			// Update cards with insights using the store function
+			data.works.forEach((workInsight) => {
+				updateCardInsight(workInsight.workId, workInsight.insight);
+			});
 
-		const prompt = `You are a classical music programming assistant specialized in female composers.
-Your task is to analyze my query and the matched documents below, then respond directly to the user with a structured JSON object that includes a concise explanation of why each document was selected.
-
-My query: ${userQuery}
-
-Matched documents:
-${JSON.stringify(matches, null, 2)}
-
-Your output must strictly follow this JSON structure:
-
-{
-  "overview": "A brief overview of the selection of works to be shared with the user",
-  "matches": [
-    {
-      "document_name": "exact filename of the input document, including .md extension",
-      "file_id": "exact file_id from the supplied information",
-      "composer_name": "name of the composer",
-      "work_title": "title of the work",
-      "justification": "short reason why this document was selected (e.g., similar instrumentation, electronic elements, thematic overlap)",
-      "score": "relevance score from vector search"
-    }
-  ]
-}
-
-Guidelines:
-- Focus on relevance to the user's query
-- Highlight unique aspects of each work
-- Consider instrumentation, style, and thematic elements
-- Keep justifications concise but informative`;
-
-		return prompt;
+			console.log('Updated cards with insights');
+		} catch (error) {
+			console.error('Error updating card insights:', error);
+		}
 	};
 
 	const onSubmit = async (message: string) => {
@@ -220,9 +172,18 @@ Guidelines:
 		let filteredMessages = get(messages).filter(
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
-		// const vectorQuery = await getVectorQuery(filteredMessages);
-		const vectorQuery = await semanticSearch(message);
-		console.log('vq', vectorQuery);
+
+		const response = await fetch('/api/agents/query-maker', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+		});
+		let data = await response.json();
+		console.log(data);
+		const { vectorQueryTerm, intent } = data as QueryMakerResponse;
+		console.log('terms', vectorQueryTerm);
+		console.log('terms', intent);
+		let vectorQuery = await semanticSearch(vectorQueryTerm);
 		await Promise.all(
 			vectorQuery.map(async (queryResult: any) => {
 				let work = await getWorkById(queryResult.metadata?.work_id);
@@ -234,50 +195,10 @@ Guidelines:
 			})
 		);
 
-		const prompt = await getResponseFormatter(vectorQuery, message);
-		const promptMessage: AiMessage = {
-			role: AiRole.User,
-			content: prompt,
-			time: new Date()
-		};
-		const response = await fetch('/api/chat/json', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ messages: [promptMessage] })
-		});
+		// Update cards with insights after adding all cards
+		await updateCardInsights(intent);
 
-		if (!response.ok) {
-			throw new Error(`API request failed with status ${response.status}`);
-		}
-
-		let res = await response.json();
-		console.log(res);
-		return;
-		// let systemMessages: AiMessage[] | AiOption[] = [];
-
-		// let vectors = await searchVectors(vectorQuery);
-		// console.log('vects', vectors);
-		// const vectorResults = vectors?.matches || [];
-		// vectorResults?.forEach((file: any) => {
-		// 	if (file.composer_name) {
-		// 		console.log('composer fould');
-		// 		getComposerByName(file.composer_name).then((composer: Composer) => {
-		// 			console.log('comp found', composer);
-		// 		});
-		// 	}
-		// });
-		// const { cards, overview } = await processVectors(vectorResults, filteredMessages);
-		// console.log('cards', cards);
-		// systemMessages.push({ role: AiRole.Assistant, content: overview });
-		// state.loading = false;
-		// cardStore.set(cards);
-		// console.log('set cards', cards);
-		// messages.update((msg: any) => [
-		// 	...msg.filter((opt: any) => {
-		// 		return !Array.isArray(opt);
-		// 	}),
-		// 	...systemMessages
-		// ]);
+		state.loading = false;
 	};
 </script>
 

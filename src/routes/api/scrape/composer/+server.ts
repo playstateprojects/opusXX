@@ -1,4 +1,4 @@
-import { extractComposer } from "$lib/openai";
+import { extractComposer } from "$lib/server/openai";
 import type { ComposerExtract } from "$lib/types.js";
 import { json } from "@sveltejs/kit";
 // import { createComposer } from "$lib/utils/supabase.js";
@@ -9,7 +9,7 @@ export async function POST({ request }) {
         const { data } = await extractComposer(body.text)
         if (data) {
             const composer: ComposerExtract = data as ComposerExtract
-            
+
             // TODO: Implement createComposer function in supabase.ts
             // Convert extracted data to PostgreSQL format and create in database
             console.log("TODO: Save composer to PostgreSQL database", {
@@ -25,7 +25,7 @@ export async function POST({ request }) {
                 nationality: composer.nationality,
                 sources: composer.sources ? JSON.stringify(composer.sources) : null,
                 tags: composer.tags ? JSON.stringify(composer.tags) : null,
-                references: composer.refrences ? JSON.stringify(composer.refrences) : null
+                references: composer.references ? JSON.stringify(composer.references) : null
             })
         }
 
