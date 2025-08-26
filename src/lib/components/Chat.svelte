@@ -20,7 +20,8 @@
 	import { getWorkById } from '$lib/utils/supabase';
 	import { flattenChat } from '$lib/utils/stringUtils';
 	const state = $state({
-		loading: false
+		loading: false,
+		loadingMessage: ''
 	});
 	let { showInput, children } = $props<{
 		showInput?: boolean;
@@ -55,6 +56,7 @@
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
 
+		state.loadingMessage = 'Analyzing your request...';
 		const response = await fetch('/api/agents/query-maker', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -62,7 +64,11 @@
 		});
 		let data = await response.json();
 		const { vectorQueryTerm, intent: queryIntent } = data as QueryMakerResponse;
+		
+		state.loadingMessage = 'Searching for relevant works...';
 		let vectorQuery = await semanticSearch(vectorQueryTerm);
+		
+		state.loadingMessage = 'Retrieving work details...';
 		await Promise.all(
 			vectorQuery.map(async (queryResult: any) => {
 				let work = await getWorkById(queryResult.metadata?.work_id);
@@ -73,9 +79,11 @@
 			})
 		);
 
+		state.loadingMessage = 'Generating insights...';
 		// Update cards with insights after adding all cards
 		await updateCardInsights(intent || queryIntent);
 		
+		state.loadingMessage = 'Preparing follow-up questions...';
 		// Ask a follow-up question after processing the results
 		await askNextQuestion();
 	};
@@ -97,6 +105,7 @@
 		]);
 
 		state.loading = true;
+		state.loadingMessage = 'Processing your selection...';
 
 		try {
 			// Get updated chat log with the new message
@@ -104,6 +113,7 @@
 				(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 			);
 
+			state.loadingMessage = 'Deciding next action...';
 			// Determine what action to take based on the conversation
 			const actionResponse = await fetch('/api/agents/action-decision', {
 				method: 'POST',
@@ -114,6 +124,7 @@
 			if (!actionResponse.ok) {
 				console.error('Failed to get action decision:', actionResponse.statusText);
 				state.loading = false;
+				state.loadingMessage = '';
 				return;
 			}
 
@@ -124,6 +135,7 @@
 				// Perform search workflow
 				await performSearchWorkflow();
 			} else {
+				state.loadingMessage = 'Preparing follow-up questions...';
 				// Continue conversation - just ask a follow-up question
 				await askNextQuestion();
 			}
@@ -132,6 +144,7 @@
 		}
 
 		state.loading = false;
+		state.loadingMessage = '';
 	};
 
 	async function semanticSearch(text: string): Promise<any[]> {
@@ -237,6 +250,7 @@
 		await performSearchWorkflow();
 		
 		state.loading = false;
+		state.loadingMessage = '';
 	};
 </script>
 
@@ -252,7 +266,7 @@
 				<!-- Handle AiOption[] case -->
 				<div class="mt-2 flex flex-wrap justify-center gap-2 px-14">
 					{#each message as option}
-						<ChatOption content={option.content} {optionSelected}></ChatOption>
+						<ChatOption content={option.content} {optionSelected} disabled={state.loading}></ChatOption>
 					{/each}
 				</div>
 			{:else}
@@ -285,14 +299,19 @@
 		{/if}
 
 		{#if state.loading}
-			<Spinner />
+			<div class="flex flex-col items-center justify-center gap-3">
+				<Spinner />
+				{#if state.loadingMessage}
+					<p class="text-sm text-gray-600">{state.loadingMessage}</p>
+				{/if}
+			</div>
 		{/if}
 		{@render children?.()}
 	</div>
 
 	{#if showInput && !$actions.length}
 		<div class="mt-4 w-full">
-			<ChatInput prompt={'Something else?'} {onSubmit} />
+			<ChatInput prompt={'Something else?'} {onSubmit} active={!state.loading} />
 		</div>
 	{/if}
 </div>
