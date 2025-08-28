@@ -10,12 +10,14 @@
 	} from 'flowbite-svelte-icons';
 	import { workDetail } from '$lib/stores/cardStore.js';
 	import ShareIcon from '$lib/ShareIcon.svelte';
+	import { showUnderDevelopmentModal } from '$lib/stores/modalStore.js';
 	const state = $state({
 		showBack: false
 	});
 	let { workCard } = $props<{
 		workCard?: WorkCardType;
 	}>();
+
 </script>
 
 <div class="flip-container relative aspect-[calc(9/16)] h-full w-full max-w-md">
@@ -112,7 +114,7 @@
 				</button>
 			</section>
 			<section class="my-4 flex items-center justify-center gap-x-4">
-				<XxButton size="sm" excludeIcon link="/library">
+				<XxButton size="sm" excludeIcon action={showUnderDevelopmentModal}>
 					<span class="flex items-center justify-center"
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>

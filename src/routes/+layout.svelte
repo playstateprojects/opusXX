@@ -14,6 +14,7 @@
 	import XxComposerDetail from '$lib/components/cards/XXComposerDetail.svelte';
 	import ColourLoader from '$lib/components/ColourLoader.svelte';
 	import XxSpotlightCards from '$lib/components/XXSpotlightCards.svelte';
+	import XXModal from '$lib/components/XXModal.svelte';
 
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
@@ -86,3 +87,4 @@
 	</div>
 </div>
 <ColourLoader />
+<XXModal />
