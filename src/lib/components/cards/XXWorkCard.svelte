@@ -56,7 +56,7 @@
 				<div class="flex flex-col p-4">
 					<h3 class="font-extrabold">{workCard.work.name}</h3>
 					<span class="text-xs italic">{workCard.work.publicationYear}</span>
-					
+
 					<div class="mt-2 flex justify-between text-xs uppercase">
 						<span>{workCard.work.genre}</span>
 						<span>{workCard.work.duration}</span>
@@ -64,7 +64,7 @@
 
 					{#if workCard.work.instrumentation || workCard.work.scoring}
 						<div class="mt-3">
-							<h4 class="mb-1 font-bold text-xs">Instrumentation</h4>
+							<h4 class="mb-1 text-xs font-bold">Instrumentation</h4>
 							<p class="text-xs text-gray-300">
 								{workCard.work.instrumentation || workCard.work.scoring}
 							</p>
@@ -86,7 +86,7 @@
 					{/if}
 
 					<div class="mt-4">
-						<h4 class="mb-1 font-bold text-xs">Insight</h4>
+						<h4 class="mb-1 text-xs font-bold">Insight</h4>
 						<p class="text-xs text-gray-300">
 							{workCard.insight}
 						</p>
@@ -148,16 +148,10 @@
 					class="mb-2 aspect-[2.2] w-full object-cover"
 				/>
 			</button>
-			<div class="flex h-full flex-col p-4">
+			<div class="flex h-full flex-col px-4 pb-0 pt-4">
 				<XxComposerCard composer={workCard.work.composer} />
 			</div>
-			<section>
-				<button class="flex w-full flex-col items-center justify-center text-slate-400">
-					<div class="m-0 flex items-center gap-x-2 p-0 text-xs font-bold uppercase">
-						More <AngleDownOutline class="h-4 w-4" />
-					</div>
-				</button>
-			</section>
+
 			<section class="my-4 flex items-center justify-center gap-x-4">
 				<XxButton size="sm" excludeIcon link="/library">
 					<span class="flex items-center justify-center"
