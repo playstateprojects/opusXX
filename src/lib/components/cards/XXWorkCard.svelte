@@ -17,7 +17,6 @@
 	let { workCard } = $props<{
 		workCard?: WorkCardType;
 	}>();
-
 </script>
 
 <div class="flip-container relative aspect-[calc(9/16)] h-full w-full max-w-md">
@@ -155,12 +154,12 @@
 			</div>
 
 			<section class="my-4 flex items-center justify-center gap-x-4">
-				<XxButton size="sm" excludeIcon link="/library">
+				<XxButton size="sm" excludeIcon action={showUnderDevelopmentModal}>
 					<span class="flex items-center justify-center"
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>
 				</XxButton>
-				<XxButton size="sm" excludeIcon link="mailto:hello@opusxx.com">
+				<XxButton size="sm" excludeIcon action={showUnderDevelopmentModal}>
 					<span class="flex items-center justify-center">SHARE <ShareIcon /></span>
 				</XxButton>
 			</section>
