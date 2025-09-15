@@ -12,7 +12,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 const prompt = `Task: Analyze the chat conversation to determine if the user's latest message indicates they want to search for musical works or continue the conversation.
 
 Rules:
-- Return "search" if the user expresses a specific musical request, preference, or intent that could be used to find works
+- Return "search" if the user expresses a specific musical request, preference, or intent that could be used to find works and there is enough useful information to find relevant works.
 - Return "continue" if the user is asking questions, seeking clarification, or providing general responses that don't indicate a search intent
 - Consider context: if they just received search results, they might be refining their search or asking follow-up questions
 - Musical search indicators: mentions of instruments, genres, moods, composers, time periods, specific musical characteristics
@@ -25,6 +25,8 @@ Examples:
 - "Tell me more about her" → "continue"
 - "Maybe something quieter" → "search"
 - "Thanks, that's helpful" → "continue"
+- "A piece for a specific instrumentation" → "continue"
+- "A piece that matches a program theme" → "continue"
 
 Output JSON only:
 {

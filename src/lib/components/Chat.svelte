@@ -15,7 +15,6 @@
 	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
 	import { addCard, cardStore, updateCardInsight } from '$lib/stores/cardStore.js';
-	import { randomDelay } from '$lib/utils.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { getWorkById } from '$lib/utils/supabase';
 	import { flattenChat } from '$lib/utils/stringUtils';
@@ -64,10 +63,10 @@
 		});
 		let data = await response.json();
 		const { vectorQueryTerm, intent: queryIntent } = data as QueryMakerResponse;
-		
+
 		state.loadingMessage = 'Searching for relevant works...';
 		let vectorQuery = await semanticSearch(vectorQueryTerm);
-		
+
 		state.loadingMessage = 'Retrieving work details...';
 		await Promise.all(
 			vectorQuery.map(async (queryResult: any) => {
@@ -82,7 +81,7 @@
 		state.loadingMessage = 'Generating insights...';
 		// Update cards with insights after adding all cards
 		await updateCardInsights(intent || queryIntent);
-		
+
 		state.loadingMessage = 'Preparing follow-up questions...';
 		// Ask a follow-up question after processing the results
 		await askNextQuestion();
@@ -99,10 +98,7 @@
 		};
 
 		// Remove existing options and add the user message
-		messages.update((msg) => [
-			...msg.filter((opt) => !Array.isArray(opt)),
-			newUserMessage
-		]);
+		messages.update((msg) => [...msg.filter((opt) => !Array.isArray(opt)), newUserMessage]);
 
 		state.loading = true;
 		state.loadingMessage = 'Processing your selection...';
@@ -213,7 +209,7 @@
 			}
 
 			const data: QuestionMakerResponse = await response.json();
-			
+
 			if (data.question && data.question.trim()) {
 				// Add the follow-up question as an AI message
 				const questionMessage: AiMessage = {
@@ -221,15 +217,15 @@
 					content: data.question,
 					time: new Date()
 				};
-				
+
 				messages.update((msg) => [...msg, questionMessage]);
-				
+
 				// Add quick response options if they exist
 				if (data.quickResponses && data.quickResponses.length > 0) {
-					const options: AiOption[] = data.quickResponses.map(response => ({
+					const options: AiOption[] = data.quickResponses.map((response) => ({
 						content: response
 					}));
-					
+
 					messages.update((msg) => [...msg, options]);
 				}
 			}
@@ -245,10 +241,10 @@
 		};
 		messages.update((msg) => [...msg, newUserMessage]);
 		state.loading = true;
-		
+
 		// For direct text input, always perform search workflow
 		await performSearchWorkflow();
-		
+
 		state.loading = false;
 		state.loadingMessage = '';
 	};
@@ -266,7 +262,8 @@
 				<!-- Handle AiOption[] case -->
 				<div class="mt-2 flex flex-wrap justify-center gap-2 px-14">
 					{#each message as option}
-						<ChatOption content={option.content} {optionSelected} disabled={state.loading}></ChatOption>
+						<ChatOption content={option.content} {optionSelected} disabled={state.loading}
+						></ChatOption>
 					{/each}
 				</div>
 			{:else}

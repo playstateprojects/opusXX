@@ -8,7 +8,7 @@ import {
     type QueryMakerResponse
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
-const prompt = `Task: From the user's message, produce (1) a clean, reusable MUSICAL INTENT and (2) a concise VECTOR QUERY.
+const prompt = `Task: From the conversation log, produce (1) a clean, reusable MUSICAL INTENT (describing the type of musical work the user is searching for) and (2) a concise VECTOR QUERY.
 
                 Rules:
                 - The database ALREADY contains only works by female composers. NEVER include "female", "woman", "underrepresented", or any metadata about identity or the collection.

@@ -9,14 +9,14 @@
 </script>
 
 <div class="flex h-full flex-col">
-	<div class="flex-grow">
+	<div class="flex flex-grow flex-col">
 		<h3 class="font-extrabold">{composer.name}</h3>
 		<span class="text-xs"
 			>{composer.birthDate} {composer.deathDate ? ' - ' : ''}{composer.deathDate}</span
 		>
 		<span class=" text-xs uppercase italic text-gray-400">{composer.nationality}</span>
 		{#if composer.tags}
-			<span class="my-1 text-xs italic">{composer.tags.join(' · ')}</span>
+			<div class="my-2 text-xs italic">{composer.tags.join(' · ')}</div>
 		{/if}
 		{#if composer.representativeWorks}
 			<section>

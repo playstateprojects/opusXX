@@ -16,6 +16,7 @@
 	import { onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { supabaseStore } from '$lib/stores/supabaseStore';
+	import { showUnderDevelopmentModal } from '$lib/stores/modalStore';
 	let unsubscribe: () => void;
 	let supabaseUnsubscribe: () => void;
 
@@ -59,8 +60,8 @@
 		</Dropdown>
 	{/if}
 	<NavUl class="ml-auto">
-		<NavLi href="/about" class="uppercase">About</NavLi>
-		<NavLi href="/faq" class="uppercase">FAQ</NavLi>
-		<NavLi href="/contact" class="uppercase">Contact</NavLi>
+		<NavLi on:click={showUnderDevelopmentModal} class="uppercase">About</NavLi>
+		<NavLi on:click={showUnderDevelopmentModal} class="uppercase">FAQ</NavLi>
+		<NavLi href="https://opusxx.com/contact-us/" target="_blank" class="uppercase">Contact</NavLi>
 	</NavUl>
 </Navbar>

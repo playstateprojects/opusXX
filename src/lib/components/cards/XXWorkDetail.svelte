@@ -182,8 +182,46 @@
 					{#if $workDetail.links}
 						<div>
 							<h2 class="mb-2 text-sm font-semibold">Links</h2>
-							<div class="break-all text-xs text-gray-200">
-								{$workDetail.links}
+							<div class="space-y-1 text-xs">
+								{#each (() => {
+									// Handle both JSON array strings and plain text links
+									let linksArray = [];
+									try {
+										// Try to parse as JSON array first
+										const parsed = JSON.parse($workDetail.links);
+										if (Array.isArray(parsed)) {
+											linksArray = parsed;
+										} else {
+											// Fall back to splitting if it's not a JSON array
+											linksArray = $workDetail.links.split(/[\n,]+/).filter((link) => link.trim());
+										}
+									} catch {
+										// If JSON parsing fails, split by commas/newlines
+										linksArray = $workDetail.links.split(/[\n,]+/).filter((link) => link.trim());
+									}
+									return linksArray;
+								})() as link (link)}
+									{#if link.trim()}
+										<a
+											href={(() => {
+												const trimmedLink = link.trim();
+												// Add https:// protocol if the link doesn't have a protocol
+												if (
+													!trimmedLink.startsWith('http://') &&
+													!trimmedLink.startsWith('https://')
+												) {
+													return 'https://' + trimmedLink;
+												}
+												return trimmedLink;
+											})()}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="break-all text-blue-400 hover:text-blue-300 hover:underline"
+										>
+											{link.trim()}
+										</a>
+									{/if}
+								{/each}
 							</div>
 						</div>
 					{/if}

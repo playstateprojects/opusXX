@@ -13,6 +13,7 @@
 	<div class="flex-1">
 		<div class="text-xs uppercase tracking-widest text-gray-300">{subtitle}</div>
 		<div class="text-xl font-semibold">{title}</div>
+		xx
 		{#if duration}
 			<div class="mt-1 text-sm text-gray-400">~{duration}</div>
 		{/if}
