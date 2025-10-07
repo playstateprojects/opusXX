@@ -9,14 +9,14 @@ import {
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const prompt = `Task: Analyze how each musical work relates to the given intention and provide insights with relevance scores.
+const prompt = `Provide an insight regarding each musical work provided paying particular attention to how it migh relate to the provided intention.
 
 Instructions:
-- For each work, provide a brief insight explaining how it relates to the intention
+- For each work, provide a brief insight highlighting how it relates to the intention
 - Score relevance from 0-10 (10 = perfectly matches intention, 0 = no relation)
 - Be concise but meaningful in insights
-- Consider: genre, instrumentation, period, themes, compositional style
-- If a work has no clear relation to the intention, give it a low score but still provide brief reasoning
+- If a work has no clear relation to the intention, give it a low score
+- Avoid potentially offensive or stereotypical comentary.
 
 Output JSON only in this exact format:
 {

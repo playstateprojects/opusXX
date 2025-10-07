@@ -200,7 +200,7 @@
 										linksArray = $workDetail.links.split(/[\n,]+/).filter((link) => link.trim());
 									}
 									return linksArray;
-								})() as link (link)}
+								})() as link, i (`${link}-${i}`)}
 									{#if link.trim()}
 										<a
 											href={(() => {

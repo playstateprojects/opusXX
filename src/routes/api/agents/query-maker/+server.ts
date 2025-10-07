@@ -13,6 +13,7 @@ const prompt = `Task: From the conversation log, produce (1) a clean, reusable M
                 Rules:
                 - The database ALREADY contains only works by female composers. NEVER include "female", "woman", "underrepresented", or any metadata about identity or the collection.
                 - Use ONLY what the user explicitly states: ensemble/instrumentation, mood or theme, genre/form, era if explicitly stated, length/duration if explicitly stated.
+                - Remain faithful to nuance and include detail from the user.
                 - Do not invent details, synonyms, or composer names. No explanations.
                 - Normalize:
                 - lowercase

@@ -14,7 +14,12 @@
 	import XxButton from './XXButton.svelte';
 	import { messages, actions } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
-	import { addCard, cardStore, updateCardInsight } from '$lib/stores/cardStore.js';
+	import {
+		addCard,
+		cardStore,
+		filterRelevantCards,
+		updateCardInsight
+	} from '$lib/stores/cardStore.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { getWorkById } from '$lib/utils/supabase';
 	import { flattenChat } from '$lib/utils/stringUtils';
@@ -81,6 +86,8 @@
 		state.loadingMessage = 'Generating insights...';
 		// Update cards with insights after adding all cards
 		await updateCardInsights(intent || queryIntent);
+
+		filterRelevantCards();
 
 		state.loadingMessage = 'Preparing follow-up questions...';
 		// Ask a follow-up question after processing the results
