@@ -36,7 +36,10 @@
 				onclick={() => (state.showBack = true)}
 			>
 				<img
-					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl ||
+					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl.replace(
+						/wideprofile|public/,
+						'h=800,w=400,fit=cover,gravity=0.2x0.35'
+					) ||
 						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=800,w=400,fit=cover,gravity=0.2x0.35'}
 					alt=""
 					class="mb-5 aspect-[0.9] h-full w-24 object-cover"
@@ -143,7 +146,10 @@
 				onclick={() => (state.showBack = false)}
 			>
 				<img
-					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl ||
+					src={workCard.work.composer.profileImages?.[0]?.cloudflareImageUrl.replace(
+						/wideprofile|public/,
+						'h=400,w=800,fit=cover,gravity=0.1x0.2'
+					) ||
 						'https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/b584cc33-cddb-4e8f-fcc3-129e4b25d000/h=120,w=300,fit=cover,gravity=05x0.35'}
 					alt=""
 					class="mb-2 aspect-[2.2] w-full object-cover"
