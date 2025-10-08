@@ -14,7 +14,7 @@ export async function POST({ request, platform }) {
 
     const xq = embeddingRes.data[0].embedding;
 
-    const res = await fetch(`https://opusxx-works-a805eee.svc.aped-4627-b74a.pinecone.io/query`, {
+    const res = await fetch(`https://opusxx-a805eee.svc.aped-4627-b74a.pinecone.io/query`, {
         method: 'POST',
         headers: {
             'Api-Key': PINECONE_API_KEY,

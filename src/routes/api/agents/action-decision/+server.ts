@@ -9,30 +9,96 @@ import {
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const prompt = `Task: Analyze the chat conversation to determine if the user's latest message indicates they want to search for musical works or continue the conversation.
+const prompt = `🎼 MUSICAL CHAT CLASSIFIER PROMPT
+--------------------------------
 
-Rules:
-- Return "search" if the user expresses a specific musical request, preference, or intent that could be used to find works and there is enough useful information to find relevant works.
-- Return "continue" if the user is asking questions, seeking clarification, or providing general responses that don't indicate a search intent
-- Consider context: if they just received search results, they might be refining their search or asking follow-up questions
-- Musical search indicators: mentions of instruments, genres, moods, composers, time periods, specific musical characteristics
-- Conversation indicators: "tell me more", "what does that mean", "how about", general questions, acknowledgments
+Task:
+Analyze the latest user message in the context of the conversation to decide whether to:
+- initiate a vector search for musical works, or
+- continue the conversation (ask/answer/follow-up).
+
+If a search is triggered, optionally extract structured filters from the message (if they exist).
+
+
+Decision Rules
+--------------
+
+1. "search"
+Return "search" if the user’s message expresses intent to find or discover musical works and includes enough musical or descriptive information to generate relevant results.
+
+Search indicators:
+- Mentions of instruments, ensembles, or instrumentation
+- References to genre, subgenre, style, or period
+- Mentions of specific composers in the context of finding their works
+- Descriptive musical mood or character ("sad", "joyful", "minimalist", "heroic")
+- Comparative or directive language ("show me", "something like", "I want", "maybe more gentle")
 
 Examples:
-- "I want something for piano" → "search"
-- "Something uplifting and modern" → "search" 
-- "What does that mean?" → "continue"
-- "Tell me more about her" → "continue"
-- "Maybe something quieter" → "search"
-- "Thanks, that's helpful" → "continue"
-- "A piece for a specific instrumentation" → "continue"
-- "A piece that matches a program theme" → "continue"
+- “I’d like a calm string quartet.” → search
+- “Something late Romantic for piano.” → search
+- “A piece for flute and harp.” → search
 
-Output JSON only:
+
+2. "continue"
+Return "continue" if the user is not expressing search intent — e.g., they are:
+- Asking for clarification, background, or context
+- Giving a non-directive reaction (“That’s nice”, “Tell me more”)
+- Discussing composers or works without implying a search
+- Making meta or conversational comments
+
+Examples:
+- “Who was she?” → continue
+- “What defines the Romantic period?” → continue
+- “Thanks, that’s helpful.” → continue
+- “That’s too dramatic.” → continue
+
+
+Optional Filters
+----------------
+If action = "search", extract filter fields when possible:
+- composer – e.g. “by Clara Schumann”
+- period – e.g. “Baroque”, “Romantic”, “20th century”
+- genre – e.g. “opera”, “symphony”
+- subgenre – e.g. “string quartet”, “chamber song”
+- instrument – e.g. “piano”, “violin”, “flute ensemble”
+
+If no filter applies, omit that key.
+
+Example:
+User: “Show me something for violin and piano from the Romantic period.”
+→
+{
+  "action": "search",
+  "reason": "User specifies instruments and period, clear search intent.",
+  "filters": {
+    "period": "Romantic",
+    "instrument": ["violin", "piano"]
+  }
+}
+
+
+Context Awareness
+-----------------
+- If the user just received search results, treat follow-up refinements (e.g. “only by Mendelssohn”, “maybe something slower”) as continuations with search intent — output "search" and include relevant filters.
+- If the message doesn’t include actionable search terms or filters, return "continue".
+
+
+Output Format
+-------------
+Return JSON only:
+
 {
   "action": "search" | "continue",
-  "reason": "<brief explanation of the decision>"
-}`;
+  "reason": "<brief explanation>",
+  "filters": {
+    "composer"?: string,
+    "period"?: string,
+    "genre"?: string,
+    "subgenre"?: string,
+    "instrument"?: string | string[]
+  }
+}
+`;
 
 export const POST: RequestHandler = async ({ request }) => {
     const body: ActionDecisionInfo = await request.json();
