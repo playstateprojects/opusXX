@@ -55,7 +55,7 @@ export const POST: RequestHandler = async ({ request }) => {
             id: work.id || work.name,
             name: work.name,
             composer: work.composer?.name || 'Unknown',
-            genre: work.genre || 'Unknown',
+            genre: work.genre?.name || 'Unknown',
             period: work.period || 'Unknown',
             instrumentation: work.instrumentation || 'Unknown',
             duration: work.duration || 'Unknown'

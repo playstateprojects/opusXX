@@ -46,7 +46,6 @@ export const WorkDatabaseSchema = z.object({
   links: z.string().nullable(),
   status: z.string().nullable(),
   notes: z.string().nullable(),
-  genre: z.string().nullable(),
   period: z.string().nullable(),
   instrumentation: z.string().nullable(),
   related_works: z.string().nullable(),

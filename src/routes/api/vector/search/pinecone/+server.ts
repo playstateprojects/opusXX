@@ -20,7 +20,12 @@ export async function POST({ request, platform }) {
             'Api-Key': PINECONE_API_KEY,
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ vector: xq, topK, includeMetadata: true })
+        body: JSON.stringify({
+            vector: xq,
+            topK,
+            includeMetadata: true,
+            filter: { genre: { "$exists": true } }
+        })
     }).then(r => r.json());
 
     return json(res.matches);

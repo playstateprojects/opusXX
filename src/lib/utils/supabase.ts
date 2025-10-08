@@ -64,7 +64,7 @@ const parseSupabaseWork = (work: any): Work => {
   if (!work.composers) {
     throw new Error(`Work "${work.name}" missing composer data`);
   }
-  
+
   return {
     id: work.id,
     name: work.name || '',
@@ -78,7 +78,6 @@ const parseSupabaseWork = (work: any): Work => {
     links: work.links || undefined,
     status: work.status || undefined,
     notes: work.notes || undefined,
-    genre: work.genre || undefined,
     period: work.period || undefined,
     instrumentation: work.instrumentation || undefined,
     relatedWorks: work.related_works || undefined,
@@ -92,7 +91,13 @@ const parseSupabaseWork = (work: any): Work => {
     iswc: work.iswc || undefined,
     genreId: work.genre_id || undefined,
     subgenreId: work.subgenre_id || undefined,
-    scoring: work.scoring || undefined
+    scoring: work.scoring || undefined,
+    genre: work.genres ? {
+      id: work.genres.id,
+      name: work.genres.name,
+      slug: work.genres.slug,
+      worksId: work.genres.works_id
+    } : undefined
   };
 }
 
@@ -104,7 +109,8 @@ const getWorksByComposerId = async (composerId: number): Promise<Work[]> => {
       composers (
         *,
         profile_images (*)
-      )
+      ),
+      genres (*)
     `)
     .eq('composer', composerId);
 
@@ -134,7 +140,8 @@ const getWorkById = async (workId: number): Promise<Work | null> => {
       composers (
         *,
         profile_images (*)
-      )
+      ),
+      genres (*)
     `)
     .eq('id', workId);
 

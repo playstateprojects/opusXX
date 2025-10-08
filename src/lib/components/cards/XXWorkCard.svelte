@@ -59,7 +59,7 @@
 					<span class="text-xs italic">{workCard.work.publicationYear}</span>
 
 					<div class="mt-2 flex justify-between text-xs uppercase">
-						<span>{workCard.work.genre}</span>
+						<span>{workCard.work.genre?.name || 'Unknown Genre'}</span>
 						<span>{workCard.work.duration}</span>
 					</div>
 

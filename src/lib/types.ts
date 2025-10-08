@@ -68,7 +68,6 @@ export interface Work {
     links?: string;
     status?: string;
     notes?: string;
-    genre?: string;
     period?: string;
     instrumentation?: string;
     relatedWorks?: string;
@@ -83,6 +82,7 @@ export interface Work {
     genreId?: number;
     subgenreId?: number;
     scoring?: string;
+    genre?: Genre; // Genre object from genres table
 }
 
 export interface Composer {
@@ -416,7 +416,6 @@ export const WorkSchema = z.object({
     instrumentation: z.string().optional(),
     duration: z.string().optional(),
     publicationYear: z.string().optional(),
-    genre: z.string().optional(),
     shortDescription: z.string().optional(),
     longDescription: z.string().optional()
 })

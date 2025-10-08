@@ -85,7 +85,7 @@
 
 			<div class="flex w-full justify-between">
 				<div class="text-xs uppercase tracking-wide text-gray-400">
-					{$workDetail.genre || 'Unknown Genre'}
+					{$workDetail.genre?.name || 'Unknown Genre'}
 				</div>
 				<div class="text-xs text-gray-300 md:mt-0">
 					{$workDetail.duration || 'Duration unknown'}
