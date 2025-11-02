@@ -9,9 +9,7 @@ CREATE TABLE public.composer_names (
   CONSTRAINT composer_names_composer_id_fkey FOREIGN KEY (composer_id) REFERENCES public.composers(id)
 );
 CREATE TABLE public.composers (
-  New_Profile_Image text,
-  Birth_Year bigint,
-  id bigint NOT NULL,
+  id bigint NOT NULL DEFAULT nextval('composers_id_seq'::regclass),
   name text,
   birth_date text,
   death_date text,
@@ -37,15 +35,17 @@ CREATE TABLE public.composers (
   created_at timestamp without time zone,
   updated_by character varying,
   updated_at timestamp without time zone,
+  New_Profile_Image text,
+  Birth_Year bigint,
   CONSTRAINT composers_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.contributors (
+  id integer NOT NULL DEFAULT nextval('contributors_id_seq'::regclass),
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
   created_by character varying,
   updated_by character varying,
   nc_order numeric,
-  id integer NOT NULL DEFAULT nextval('contributors_id_seq'::regclass),
   name text,
   email character varying,
   url text,
@@ -54,15 +54,13 @@ CREATE TABLE public.contributors (
   CONSTRAINT contributors_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.genres (
-  works_id bigint UNIQUE,
   id smallint GENERATED ALWAYS AS IDENTITY NOT NULL,
   name text NOT NULL UNIQUE,
   slug text NOT NULL UNIQUE,
-  CONSTRAINT genres_pkey PRIMARY KEY (id),
-  CONSTRAINT fk_works_genres_al8jop6ds2 FOREIGN KEY (works_id) REFERENCES public.works(id)
+  CONSTRAINT genres_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.profile_images (
-  id bigint NOT NULL,
+  id bigint NOT NULL DEFAULT nextval('profile_images_id_seq'::regclass),
   composer_id bigint,
   original_image_url text,
   cloudflare_image_url text,
@@ -73,13 +71,13 @@ CREATE TABLE public.profile_images (
   CONSTRAINT profile_images_composer_id_fkey FOREIGN KEY (composer_id) REFERENCES public.composers(id)
 );
 CREATE TABLE public.publishers (
+  id integer NOT NULL DEFAULT nextval('publishers_id_seq'::regclass),
   created_at timestamp without time zone,
   updated_at timestamp without time zone,
   created_by character varying,
   updated_by character varying,
   nc_order numeric,
   title text,
-  id integer NOT NULL DEFAULT nextval('publishers_id_seq'::regclass),
   description text,
   link text,
   cf_image text,
@@ -94,17 +92,13 @@ CREATE TABLE public.subgenre_genre (
   CONSTRAINT subgenre_genre_genre_id_fkey FOREIGN KEY (genre_id) REFERENCES public.genres(id)
 );
 CREATE TABLE public.subgenres (
-  works_id bigint UNIQUE,
   id integer GENERATED ALWAYS AS IDENTITY NOT NULL,
   name text NOT NULL UNIQUE,
   slug text NOT NULL UNIQUE,
-  CONSTRAINT subgenres_pkey PRIMARY KEY (id),
-  CONSTRAINT fk_works_subgenres_k0q91dhji_ FOREIGN KEY (works_id) REFERENCES public.works(id)
+  CONSTRAINT subgenres_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.works (
-  genre_id bigint,
-  subgenre_id bigint,
-  scoring text,
+  id bigint NOT NULL DEFAULT nextval('works_id_seq'::regclass),
   name text,
   composer bigint,
   source text,
@@ -126,11 +120,16 @@ CREATE TABLE public.works (
   catalog_number text,
   ismn text,
   publisher text,
-  id bigint NOT NULL DEFAULT nextval('works_id_seq'::regclass),
+  scoring text,
   oclc text,
   iswc text,
+  genre_id bigint,
+  subgenre_id bigint,
+  reviewed_by integer,
+  created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+  featured boolean DEFAULT false,
   CONSTRAINT works_pkey PRIMARY KEY (id),
   CONSTRAINT works_composer_fkey FOREIGN KEY (composer) REFERENCES public.composers(id),
-  CONSTRAINT works_subgenre_fkey FOREIGN KEY (subgenre_id) REFERENCES public.subgenres(id),
-  CONSTRAINT works_genre_fkey FOREIGN KEY (genre_id) REFERENCES public.genres(id)
+  CONSTRAINT works_genre_fkey FOREIGN KEY (genre_id) REFERENCES public.genres(id),
+  CONSTRAINT works_subgenre_fkey FOREIGN KEY (subgenre_id) REFERENCES public.subgenres(id)
 );

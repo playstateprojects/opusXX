@@ -166,4 +166,16 @@ const getWorkById = async (workId: number): Promise<Work | null> => {
   return parseSupabaseWork(workData);
 };
 
-export { getComposerByName, parseSupabaseComposer, parseSupabaseComposers, parseSupabaseWork, getWorksByComposerId, getComposerById, getWorkById }
+// Function to parse SQL search results (WorkWithRelations) to Work type
+const parseSqlSearchWork = (work: any): Work => {
+  // SQL search returns composer_details instead of composers
+  // We need to map it to the expected structure
+  const workWithComposers = {
+    ...work,
+    composers: work.composer_details // Map composer_details to composers for parseSupabaseWork
+  };
+
+  return parseSupabaseWork(workWithComposers);
+};
+
+export { getComposerByName, parseSupabaseComposer, parseSupabaseComposers, parseSupabaseWork, parseSqlSearchWork, getWorksByComposerId, getComposerById, getWorkById }

@@ -6,7 +6,6 @@
 	import { get } from 'svelte/store';
 	import { AiOptionIcon, AiRole } from '$lib/types';
 	import { cardStore } from '$lib/stores/cardStore.js';
-	import demo4 from '$lib/demo4.json';
 	import { onMount } from 'svelte';
 	import { getWorksByComposerId } from '$lib/utils/supabase';
 	let pageNumber = 1;
@@ -71,7 +70,8 @@
 	{/if}
 	<Chat showInput={pageNumber > 1}>
 		{#if pageNumber == 1}
-			<button
+			<!-- TODO: fetch a featured work -->
+			<!-- <button
 				class="mt-4 font-light uppercase underline"
 				onclick={() => {
 					pageNumber = 2;
@@ -91,7 +91,7 @@ Alice Shields – A pioneer in electronic opera, Apocalypse (1994) fuses myth, v
 				}}
 			>
 				Surprise Me!
-			</button>
+			</button> -->
 		{/if}
 	</Chat>
 	{#if pageNumber == 1}

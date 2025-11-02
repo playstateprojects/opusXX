@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run check:watch` - Run Svelte type checking in watch mode
 
 ### Data Generation
-- Database types are defined in `src/lib/databaseTypes.ts` and `src/lib/types.ts`
+- `npm run zod:generate` - Generate Zod types from Airtable schema
 
 ## Project Architecture
 
@@ -41,11 +41,17 @@ This is a SvelteKit application deployed on Cloudflare Pages with the following 
 ## Key Directories
 
 ### `/src/lib/`
-- `types.ts` - Core TypeScript interfaces and enums
+Core library files:
+- `types.ts` - TypeScript interfaces, Zod schemas for validation, and API types (composers, works, genres, etc.)
 - `databaseTypes.ts` - PostgreSQL database schema types
-- `zodDefinitions.ts` - Zod schemas for structured AI responses
-- `openai.ts` - AI chat functions with schema validation
+- `openai.ts` - Client-side AI function wrappers (calls API routes)
 - `supabase.ts` - Supabase client configuration
+- `assitants.ts` - OpenAI Assistants API integration with thread management
+- `scrapingUtils.ts` - Web scraping utilities
+
+### `/src/lib/server/`
+Server-only code:
+- `openai.ts` - Server-side OpenAI/DeepSeek integration with structured output using Zod schemas
 
 ### `/src/lib/stores/`
 Svelte stores for state management:
@@ -53,21 +59,27 @@ Svelte stores for state management:
 - `userStore.ts` - User authentication state
 - `supabaseStore.ts` - Supabase client store
 - `cardStore.ts` - Card display state
+- `modalStore.ts` - Modal visibility state
 - `errorStore.ts` - Error handling
 - `loadStore.ts` - Loading states
 
 ### `/src/lib/components/`
-Reusable Svelte components including:
-- Chat interface components (`Chat.svelte`, `ChatBubble.svelte`, etc.)
-- UI components with XX branding prefix
-- Card components for composer and work display
+Reusable Svelte components:
+- Chat interface: `Chat.svelte`, `ChatBubble.svelte`, `ChatInput.svelte`, `ChatOption.svelte`, `ChatLoading.svelte`
+- Branding components: `XXButton.svelte`, `XXHeader.svelte`, `XXFooter.svelte`, `XXModal.svelte`
+- Card components: `cards/XXComposerCard.svelte`, `cards/XXWorkCard.svelte`, `cards/XXComposerDetail.svelte`, `cards/XXWorkDetail.svelte`
+- UI utilities: `ColourLoader.svelte`, `AnimatedPageTransition.svelte`
 
 ### `/src/routes/api/`
 SvelteKit API routes organized by functionality:
-- `/chat/` - AI chat endpoints
-- `/vector/` - Vector search operations
-- `/scrape/` - Data scraping utilities
+- `/agents/` - AI agent endpoints (insight-maker, query-maker, question-maker, action-decision)
+- `/chat/` - AI chat endpoints (standard, JSON, Cloudflare AI)
+- `/extract/` - Data extraction endpoints (composer, composer-list, work-list)
+- `/scrape/` - Web scraping utilities
+- `/vector/` - Vector search operations (Vectorize and Pinecone)
+- `/embeddings/` - OpenAI embeddings generation
 - `/r2/` - R2 bucket operations
+- `/base/` - Base data endpoints
 
 ## Environment Setup
 
@@ -79,30 +91,65 @@ Required environment variables (see `app.d.ts` for platform types):
 - `CF_ACCOUNT_ID` - Cloudflare account ID
 - `CF_AI_TOKEN` - Cloudflare AI token
 
-## Authentication Flow
+## AI Integration Architecture
 
-The application uses Supabase authentication with server-side session handling in `hooks.server.ts`. User state is managed through Svelte stores and passed to all routes via `app.locals`.
+### Dual Provider Setup
+The application supports switching between OpenAI and DeepSeek via the `useDeepseek` flag in `src/lib/server/openai.ts`:
+- When `useDeepseek = false`: Uses OpenAI with `gpt-4` model
+- When `useDeepseek = true`: Uses DeepSeek API with `deepseek-chat` model
 
-## AI Integration Patterns
+### Structured Data Extraction
+Server-side functions in `src/lib/server/openai.ts` use Zod schemas with OpenAI's structured output:
+- `extractComposer()` - Extract composer biographical data using `ComposerExtractSchema`
+- `extractComposerList()` - Extract composer links from directory pages using `ComposerList` schema
+- `extractWorkList()` - Extract musical work metadata using `WorkListSchema`
 
-### Structured Output
-The application uses OpenAI's structured output with Zod schemas for consistent data extraction:
-- `extractComposer()` - Extract composer biographical data
-- `extractComposerList()` - Extract composer links from directory pages
-- `extractWorkList()` - Extract musical work metadata
+### AI Agent System
+The `/api/agents/` endpoints implement specialized AI agents:
+- **insight-maker**: Analyzes musical works against user intentions, returns relevance scores (0-10)
+- **query-maker**: Transforms chat context into structured search queries
+- **question-maker**: Generates follow-up questions based on conversation context
+- **action-decision**: Determines whether to search or continue conversation
 
-### Chat Interface
-Chat functionality supports both standard and JSON responses, with schema validation for structured data requests.
+### Chat Modes
+- Standard chat: `/api/chat/` - Regular conversational responses
+- JSON chat: `/api/chat/json/` - Structured JSON responses
+- Cloudflare AI: `/api/chat/cf/` - Uses Cloudflare Workers AI binding
+
+### OpenAI Assistants Integration
+The `assitants.ts` module provides thread-based conversation management:
+- `createThread()` - Initialize conversation threads
+- `addMessage()` - Add messages to threads
+- `runAssistant()` - Execute assistant with custom instructions
+- `waitForRun()` - Poll for completion with timeout
+- `getMessages()` - Retrieve thread messages
 
 ## Vector Search Architecture
 
-The application implements semantic search using:
-1. Cloudflare Vectorize for vector storage
-2. OpenAI embeddings for text vectorization
-3. Custom search endpoints with metadata filtering
+The application implements dual vector search:
+1. **Cloudflare Vectorize** (primary) - Platform-integrated vector storage via `VECTORIZE` binding
+2. **Pinecone** (alternative) - External vector database via `/api/vector/search/pinecone/`
 
-## Deployment Notes
+Embeddings are generated via OpenAI's `text-embedding-3-small` model through `/api/embeddings/`.
 
-- Uses Cloudflare adapter with Pages deployment
-- Wrangler configuration in `wrangler.toml` defines bindings for AI, Vectorize, and R2
-- CSP configuration allows external fonts and services in `svelte.config.js`
+## Authentication Flow
+
+Server-side authentication in `hooks.server.ts`:
+- Creates Supabase client for each request with `createSupabaseServerClient()`
+- Exposes `event.locals.supabase`, `event.locals.getSession()`, and `event.locals.getUser()`
+- Nonce generation for CSP headers
+- Session data passed to routes via `app.locals`
+
+## Platform Bindings
+
+Cloudflare Workers bindings defined in `wrangler.toml` and typed in `app.d.ts`:
+- `AI` - Cloudflare AI Workers for LLM inference
+- `VECTORIZE` - Vector database binding (index: `opusxx-vectors`)
+- `R2` - Object storage bucket (`composer-data`)
+
+## Deployment
+
+- Uses `@sveltejs/adapter-cloudflare` for Cloudflare Pages
+- Development requires both Vite and Wrangler running concurrently
+- Environment variables loaded via `dotenv-cli` in dev mode
+- CSP allows TypeKit fonts, Google Fonts, and Cloudflare Image Delivery

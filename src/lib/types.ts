@@ -485,9 +485,18 @@ export interface ActionDecisionInfo {
     chatLog?: string;
 }
 
+export interface ActionDecisionFilters {
+    composer?: string;
+    period?: string;
+    genre?: string;
+    subgenre?: string;
+    instrument?: string | string[];
+}
+
 export interface ActionDecisionResponse {
-    action: 'search' | 'continue';
+    action: 'sql_search' | 'vector_search' | 'continue';
     reason?: string;
+    filters?: ActionDecisionFilters;
 }
 
 // Common error response type

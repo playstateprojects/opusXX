@@ -21,7 +21,7 @@
 		updateCardInsight
 	} from '$lib/stores/cardStore.js';
 	import { Spinner } from 'flowbite-svelte';
-	import { getWorkById } from '$lib/utils/supabase';
+	import { getWorkById, parseSqlSearchWork } from '$lib/utils/supabase';
 	import { flattenChat } from '$lib/utils/stringUtils';
 	const state = $state({
 		loading: false,
@@ -55,7 +55,46 @@
 		}, -1);
 	});
 
-	const performSearchWorkflow = async (intent?: string) => {
+	const performSqlSearch = async (filters: any, intent?: string) => {
+		state.loadingMessage = 'Searching database with filters...';
+
+		try {
+			const response = await fetch('/api/search/sql', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ filters, limit: 10 })
+			});
+
+			if (!response.ok) {
+				console.error('SQL search failed:', response.statusText);
+				return;
+			}
+
+			const { works, total } = await response.json();
+			console.log(`Found ${total} works using SQL search`);
+
+			state.loadingMessage = 'Loading work details...';
+			// Parse and add works to cards
+			works.forEach((work: any) => {
+				const parsedWork = parseSqlSearchWork(work);
+				addCard({ work: parsedWork, insight: '' });
+			});
+
+			if (works.length > 0) {
+				state.loadingMessage = 'Generating insights...';
+				// Generate insights for the found works
+				await updateCardInsights(intent || 'Relevant works based on your filters');
+				filterRelevantCards();
+			}
+
+			state.loadingMessage = 'Preparing follow-up questions...';
+			await askNextQuestion();
+		} catch (error) {
+			console.error('Error in SQL search:', error);
+		}
+	};
+
+	const performVectorSearch = async (intent?: string) => {
 		let filteredMessages = get(messages).filter(
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
@@ -134,9 +173,12 @@
 			const actionData: ActionDecisionResponse = await actionResponse.json();
 			console.log('Action decision:', actionData);
 
-			if (actionData.action === 'search') {
-				// Perform search workflow
-				await performSearchWorkflow();
+			if (actionData.action === 'sql_search') {
+				// Perform SQL search with filters
+				await performSqlSearch(actionData.filters);
+			} else if (actionData.action === 'vector_search') {
+				// Perform vector search workflow
+				await performVectorSearch();
 			} else {
 				state.loadingMessage = 'Preparing follow-up questions...';
 				// Continue conversation - just ask a follow-up question
@@ -249,8 +291,44 @@
 		messages.update((msg) => [...msg, newUserMessage]);
 		state.loading = true;
 
-		// For direct text input, always perform search workflow
-		await performSearchWorkflow();
+		try {
+			// Get updated chat log with the new message
+			let filteredMessages = get(messages).filter(
+				(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
+			);
+
+			state.loadingMessage = 'Deciding next action...';
+			// Determine what action to take based on the conversation
+			const actionResponse = await fetch('/api/agents/action-decision', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+			});
+
+			if (!actionResponse.ok) {
+				console.error('Failed to get action decision:', actionResponse.statusText);
+				state.loading = false;
+				state.loadingMessage = '';
+				return;
+			}
+
+			const actionData: ActionDecisionResponse = await actionResponse.json();
+			console.log('Action decision:', actionData);
+
+			if (actionData.action === 'sql_search') {
+				// Perform SQL search with filters
+				await performSqlSearch(actionData.filters);
+			} else if (actionData.action === 'vector_search') {
+				// Perform vector search workflow
+				await performVectorSearch();
+			} else {
+				state.loadingMessage = 'Preparing follow-up questions...';
+				// Continue conversation - just ask a follow-up question
+				await askNextQuestion();
+			}
+		} catch (error) {
+			console.error('Error in onSubmit:', error);
+		}
 
 		state.loading = false;
 		state.loadingMessage = '';
