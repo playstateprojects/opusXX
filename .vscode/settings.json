@@ -1,0 +1,17 @@
+{
+	"claudeCode.environmentVariables": [
+		{
+			"mcpServers": {
+				"NocoDB Base - opus_xx": {
+					"command": "npx",
+					"args": [
+						"mcp-remote",
+						"https://base.opusxx.com/mcp/nc2otpsn8ncslmkj",
+						"--header",
+						"xc-mcp-token: UXNYBNYAl6-X4oUvzCjhE7H7BT8M-5fU"
+					]
+				}
+			}
+		}
+	]
+}
