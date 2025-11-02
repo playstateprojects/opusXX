@@ -1,7 +1,9 @@
 <script lang="ts">
-	let { content, optionSelected, disabled = false } = $props<{
-		content: string;
-		optionSelected?: (content: string) => void;
+	import type { AiOption } from '$lib/types.js';
+
+	let { option, optionSelected, disabled = false } = $props<{
+		option: AiOption;
+		optionSelected?: (option: AiOption) => void;
 		disabled?: boolean;
 	}>();
 </script>
@@ -9,13 +11,13 @@
 <button
 	onclick={() => {
 		if (!disabled) {
-			optionSelected(content);
+			optionSelected(option);
 		}
 	}}
 	{disabled}
 	class="m-1 flex items-center gap-1 rounded-lg border-[1.5px] border-solid px-4 py-1 align-middle text-xs shadow-[0_2px_0_0_rgba(156,163,175)] {disabled ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed' : 'border-black bg-white text-black hover:bg-gray-50'}"
 >
-	{content}
+	{option.content}
 	<svg
 		width="16"
 		height="17"

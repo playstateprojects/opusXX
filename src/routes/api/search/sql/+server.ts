@@ -44,19 +44,35 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         // 1. Period filter - works.period column (exact match or contains)
         if (filters.period) {
-            query = query.ilike('period', `%${filters.period}%`);
+            const periods = Array.isArray(filters.period) ? filters.period : [filters.period];
+
+            if (periods.length === 1) {
+                query = query.ilike('period', `%${periods[0]}%`);
+            } else if (periods.length > 1) {
+                // Multiple periods - use OR condition
+                const orConditions = periods.map(p => `period.ilike.%${p}%`);
+                query = query.or(orConditions.join(','));
+            }
         }
 
         // 2. Composer filter - first get matching composer IDs, then filter works
         if (filters.composer) {
-            const { data: composerData } = await supabase
-                .from('composers')
-                .select('id')
-                .ilike('name', `%${filters.composer}%`);
+            const composers = Array.isArray(filters.composer) ? filters.composer : [filters.composer];
+            const allComposerIds: number[] = [];
 
-            if (composerData && composerData.length > 0) {
-                const composerIds = composerData.map(c => c.id);
-                query = query.in('composer', composerIds);
+            for (const composerName of composers) {
+                const { data: composerData } = await supabase
+                    .from('composers')
+                    .select('id')
+                    .ilike('name', `%${composerName}%`);
+
+                if (composerData && composerData.length > 0) {
+                    allComposerIds.push(...composerData.map(c => c.id));
+                }
+            }
+
+            if (allComposerIds.length > 0) {
+                query = query.in('composer', allComposerIds);
             } else {
                 // No matching composers found - query will return empty
                 query = query.eq('composer', -1); // Force empty result
@@ -66,35 +82,54 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         // 3. Genre filter - filter by genre_id matching the genre name
         // Also check the legacy 'genre' text column for backwards compatibility
         if (filters.genre) {
-            // First get genre ID(s) that match
-            const { data: genreData } = await supabase
-                .from('genres')
-                .select('id')
-                .eq('name', filters.genre)
-                .limit(1)
-                .single();
+            const genres = Array.isArray(filters.genre) ? filters.genre : [filters.genre];
+            const orConditions: string[] = [];
 
-            if (genreData) {
-                // Search both genre_id (foreign key) and genre (text) columns
-                query = query.or(`genre_id.eq.${genreData.id},genre.ilike.%${filters.genre}%`);
-            } else {
-                // If no genre_id match, try the text genre column
-                query = query.ilike('genre', `%${filters.genre}%`);
+            for (const genreName of genres) {
+                // First get genre ID(s) that match
+                const { data: genreData } = await supabase
+                    .from('genres')
+                    .select('id')
+                    .eq('name', genreName)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (genreData) {
+                    // Search both genre_id (foreign key) and genre (text) columns
+                    orConditions.push(`genre_id.eq.${genreData.id}`);
+                    orConditions.push(`genre.ilike.%${genreName}%`);
+                } else {
+                    // If no genre_id match, try the text genre column
+                    orConditions.push(`genre.ilike.%${genreName}%`);
+                }
+            }
+
+            if (orConditions.length > 0) {
+                query = query.or(orConditions.join(','));
             }
         }
 
         // 4. Subgenre filter - filter by subgenre_id matching the subgenre name
         if (filters.subgenre) {
-            // First get subgenre ID(s) that match
-            const { data: subgenreData } = await supabase
-                .from('subgenres')
-                .select('id')
-                .eq('name', filters.subgenre)
-                .limit(1)
-                .single();
+            const subgenres = Array.isArray(filters.subgenre) ? filters.subgenre : [filters.subgenre];
+            const subgenreIds: number[] = [];
 
-            if (subgenreData) {
-                query = query.eq('subgenre_id', subgenreData.id);
+            for (const subgenreName of subgenres) {
+                // First get subgenre ID(s) that match
+                const { data: subgenreData } = await supabase
+                    .from('subgenres')
+                    .select('id')
+                    .eq('name', subgenreName)
+                    .limit(1)
+                    .maybeSingle();
+
+                if (subgenreData) {
+                    subgenreIds.push(subgenreData.id);
+                }
+            }
+
+            if (subgenreIds.length > 0) {
+                query = query.in('subgenre_id', subgenreIds);
             }
         }
 

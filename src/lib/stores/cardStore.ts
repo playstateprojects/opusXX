@@ -1,7 +1,7 @@
 import type { WorkCardType, Work, Composer } from "$lib/types.js";
 import { writable } from 'svelte/store';
 
-export const maxCards = 10; // set your max limit here
+export const maxCards = 30; // Increased to support incremental searches (multiple periods/composers)
 export const cardStore = writable<WorkCardType[]>([]);
 export const workDetail = writable<Work | null>(null);
 export const composerDetail = writable<Composer | null>(null);
@@ -15,7 +15,8 @@ export function addCard(card: WorkCardType) {
         }
 
         const newCards = [card, ...cards];
-        return newCards.length > maxCards ? newCards.slice(1) : newCards;
+        // Keep the newest cards (at the beginning) if we exceed maxCards
+        return newCards.length > maxCards ? newCards.slice(0, maxCards) : newCards;
     });
 }
 
@@ -26,9 +27,9 @@ export function clearError() {
 export function filterRelevantCards() {
     cardStore.update(cards => {
         const newCards = [...cards.filter(card => { return card.relevance && card.relevance > 3 })];
-        return newCards.length > maxCards ? newCards.slice(1) : newCards;
+        // Keep the newest/highest relevance cards if we exceed maxCards
+        return newCards.length > maxCards ? newCards.slice(0, maxCards) : newCards;
     });
-    // updatedCards = updatedCards.filter(card => { return card.relevance && card.relevance > 3 })
 }
 export function updateCardInsight(workId: string | number | undefined, insight: string, relevance: number) {
     cardStore.update(cards => {

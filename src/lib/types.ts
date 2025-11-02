@@ -26,7 +26,12 @@ export interface AiMessage {
 }
 export interface AiOption {
     content: string,
-    icon?: AiOptionIcon
+    icon?: AiOptionIcon,
+    // Predefined response data - when present, skips the action-decision API call
+    predefined?: {
+        question: string,
+        quickResponses?: string[]
+    }
 }
 export interface ChatAction {
     label: string,
@@ -184,7 +189,7 @@ export const periods = z.enum([
 ])
 
 export const genres = z.enum([
-    "Chamber music",
+    "Chamber Music",
     "Choral",
     "Opera",
     "Orchestral",
@@ -486,10 +491,10 @@ export interface ActionDecisionInfo {
 }
 
 export interface ActionDecisionFilters {
-    composer?: string;
-    period?: string;
-    genre?: string;
-    subgenre?: string;
+    composer?: string | string[];
+    period?: string | string[];
+    genre?: string | string[];
+    subgenre?: string | string[];
     instrument?: string | string[];
 }
 

@@ -55,7 +55,7 @@
 		}, -1);
 	});
 
-	const performSqlSearch = async (filters: any, intent?: string) => {
+	const performSqlSearch = async (filters: any, intent?: string, currentMessages?: AiMessage[]) => {
 		state.loadingMessage = 'Searching database with filters...';
 
 		try {
@@ -88,14 +88,14 @@
 			}
 
 			state.loadingMessage = 'Preparing follow-up questions...';
-			await askNextQuestion();
+			await askNextQuestion(currentMessages);
 		} catch (error) {
 			console.error('Error in SQL search:', error);
 		}
 	};
 
-	const performVectorSearch = async (intent?: string) => {
-		let filteredMessages = get(messages).filter(
+	const performVectorSearch = async (intent?: string, filters?: any, currentMessages?: AiMessage[]) => {
+		let filteredMessages = currentMessages || get(messages).filter(
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
 
@@ -109,7 +109,7 @@
 		const { vectorQueryTerm, intent: queryIntent } = data as QueryMakerResponse;
 
 		state.loadingMessage = 'Searching for relevant works...';
-		let vectorQuery = await semanticSearch(vectorQueryTerm);
+		let vectorQuery = await semanticSearch(vectorQueryTerm, filters);
 
 		state.loadingMessage = 'Retrieving work details...';
 		await Promise.all(
@@ -130,59 +130,81 @@
 
 		state.loadingMessage = 'Preparing follow-up questions...';
 		// Ask a follow-up question after processing the results
-		await askNextQuestion();
+		await askNextQuestion(currentMessages);
 	};
 
-	const optionSelected = async (content: string) => {
+	const optionSelected = async (option: AiOption) => {
 		const now = new Date();
 
 		// Add the user's selected option as a message
 		const newUserMessage: AiMessage = {
 			role: AiRole.User,
-			content,
+			content: option.content,
 			time: now
 		};
 
 		// Remove existing options and add the user message
 		messages.update((msg) => [...msg.filter((opt) => !Array.isArray(opt)), newUserMessage]);
 
+		// Get updated messages array including the new message
+		const currentMessages = get(messages).filter(
+			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
+		);
+
 		state.loading = true;
 		state.loadingMessage = 'Processing your selection...';
 
 		try {
-			// Get updated chat log with the new message
-			let filteredMessages = get(messages).filter(
-				(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
-			);
+			// Check if this option has a predefined response
+			if (option.predefined) {
+				// Use predefined response instead of calling the API
+				const questionMessage: AiMessage = {
+					role: AiRole.Assistant,
+					content: option.predefined.question,
+					time: new Date()
+				};
 
-			state.loadingMessage = 'Deciding next action...';
-			// Determine what action to take based on the conversation
-			const actionResponse = await fetch('/api/agents/action-decision', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
-			});
+				messages.update((msg) => [...msg, questionMessage]);
 
-			if (!actionResponse.ok) {
-				console.error('Failed to get action decision:', actionResponse.statusText);
-				state.loading = false;
-				state.loadingMessage = '';
-				return;
-			}
+				// Add quick response options if they exist
+				if (option.predefined.quickResponses && option.predefined.quickResponses.length > 0) {
+					const options: AiOption[] = option.predefined.quickResponses.map((response) => ({
+						content: response
+					}));
 
-			const actionData: ActionDecisionResponse = await actionResponse.json();
-			console.log('Action decision:', actionData);
-
-			if (actionData.action === 'sql_search') {
-				// Perform SQL search with filters
-				await performSqlSearch(actionData.filters);
-			} else if (actionData.action === 'vector_search') {
-				// Perform vector search workflow
-				await performVectorSearch();
+					messages.update((msg) => [...msg, options]);
+				}
 			} else {
-				state.loadingMessage = 'Preparing follow-up questions...';
-				// Continue conversation - just ask a follow-up question
-				await askNextQuestion();
+				// Original flow - call the action-decision API
+				state.loadingMessage = 'Deciding next action...';
+				// Determine what action to take based on the conversation
+				const actionResponse = await fetch('/api/agents/action-decision', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ chatLog: flattenChat(currentMessages) })
+				});
+
+				if (!actionResponse.ok) {
+					console.error('Failed to get action decision:', actionResponse.statusText);
+					state.loading = false;
+					state.loadingMessage = '';
+					return;
+				}
+
+				const actionData: ActionDecisionResponse = await actionResponse.json();
+				console.log('Action decision:', actionData);
+
+				if (actionData.action === 'sql_search') {
+					// Perform SQL search with filters
+					await performSqlSearch(actionData.filters, undefined, currentMessages);
+				} else if (actionData.action === 'vector_search') {
+					// Perform vector search workflow with filters from action-decision
+					await performVectorSearch(undefined, actionData.filters, currentMessages);
+				} else {
+					state.loadingMessage = 'Preparing follow-up questions...';
+					// Continue conversation - just ask a follow-up question
+					await askNextQuestion(currentMessages);
+				}
 			}
 		} catch (error) {
 			console.error('Error in option selected:', error);
@@ -192,10 +214,10 @@
 		state.loadingMessage = '';
 	};
 
-	async function semanticSearch(text: string): Promise<any[]> {
+	async function semanticSearch(text: string, filters?: any): Promise<any[]> {
 		const res = await fetch('/api/vector/search/pinecone', {
 			method: 'POST',
-			body: JSON.stringify({ query: text, topK: 5 })
+			body: JSON.stringify({ query: text, topK: 5, filters })
 		});
 		const matches = await res.json();
 		console.log('matches', matches);
@@ -240,8 +262,8 @@
 			console.error('Error updating card insights:', error);
 		}
 	};
-	const askNextQuestion = async () => {
-		let filteredMessages = get(messages).filter(
+	const askNextQuestion = async (currentMessages?: AiMessage[]) => {
+		let filteredMessages = currentMessages || get(messages).filter(
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
 
@@ -289,20 +311,21 @@
 			time: new Date()
 		};
 		messages.update((msg) => [...msg, newUserMessage]);
+
+		// Get updated messages array including the new message
+		const currentMessages = get(messages).filter(
+			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
+		);
+
 		state.loading = true;
 
 		try {
-			// Get updated chat log with the new message
-			let filteredMessages = get(messages).filter(
-				(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
-			);
-
 			state.loadingMessage = 'Deciding next action...';
 			// Determine what action to take based on the conversation
 			const actionResponse = await fetch('/api/agents/action-decision', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+				body: JSON.stringify({ chatLog: flattenChat(currentMessages) })
 			});
 
 			if (!actionResponse.ok) {
@@ -317,14 +340,14 @@
 
 			if (actionData.action === 'sql_search') {
 				// Perform SQL search with filters
-				await performSqlSearch(actionData.filters);
+				await performSqlSearch(actionData.filters, undefined, currentMessages);
 			} else if (actionData.action === 'vector_search') {
-				// Perform vector search workflow
-				await performVectorSearch();
+				// Perform vector search workflow with filters from action-decision
+				await performVectorSearch(undefined, actionData.filters, currentMessages);
 			} else {
 				state.loadingMessage = 'Preparing follow-up questions...';
 				// Continue conversation - just ask a follow-up question
-				await askNextQuestion();
+				await askNextQuestion(currentMessages);
 			}
 		} catch (error) {
 			console.error('Error in onSubmit:', error);
@@ -347,8 +370,7 @@
 				<!-- Handle AiOption[] case -->
 				<div class="mt-2 flex flex-wrap justify-center gap-2 px-14">
 					{#each message as option}
-						<ChatOption content={option.content} {optionSelected} disabled={state.loading}
-						></ChatOption>
+						<ChatOption {option} {optionSelected} disabled={state.loading}></ChatOption>
 					{/each}
 				</div>
 			{:else}

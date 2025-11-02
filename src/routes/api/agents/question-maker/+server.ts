@@ -9,19 +9,19 @@ import {
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const prompt = `Task: Based on the chat conversation, generate a thoughtful follow-up question to help the user discover more relevant musical works by female composers.
+const prompt = `Task: Based on the chat conversation, generate a direct follow-up question to gather specific information about the user's musical preferences.
 
 Rules:
-- Ask ONE clear, engaging follow-up question that builds naturally on the conversation
-- The question should help narrow down or expand their musical exploration
-- Focus on musical aspects: instrumentation, mood, era, genre, composer style, performance context
-- Keep questions conversational and helpful, not interrogative
+- Ask ONE specific question to clarify their search criteria
+- Focus on concrete musical attributes: instrumentation, time period, genre, duration, difficulty level, performance setting
+- Be direct and factual - avoid creative or poetic language
+- Only ask for information that would meaningfully filter search results
 - Optionally provide 2-4 short quick response options (each 1-4 words) that users can click
-- Quick responses should be diverse and cover different musical dimensions
+- Quick responses should be specific and actionable
 
 Output JSON only:
 {
-  "question": "<engaging follow-up question>",
+  "question": "<direct follow-up question>",
   "quickResponses": ["<option1>", "<option2>", "<option3>", "<option4>"]
 }
 

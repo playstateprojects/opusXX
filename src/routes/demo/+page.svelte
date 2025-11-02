@@ -11,26 +11,61 @@
 	let pageNumber = 1;
 	let startMessages = [
 		{
-			content: 'What are you programming? Let’s find the perfect match.',
+			content: "What are you programming? Let's find the perfect match.",
 			role: AiRole.System,
 			time: new Date()
 		},
 		[
 			{
 				content: 'A piece from a specific time period',
-				icon: AiOptionIcon.period
+				icon: AiOptionIcon.period,
+				predefined: {
+					question: 'Which time period interests you?',
+					quickResponses: [
+						'Medieval',
+						'Renaissance',
+						'Baroque',
+						'Classical',
+						'Romantic',
+						'20th Century',
+						'Contemporary'
+					]
+				}
 			},
 			{
 				content: 'A piece for a specific instrumentation',
-				icon: AiOptionIcon.drama
+				icon: AiOptionIcon.drama,
+				predefined: {
+					question: 'What type of ensemble or instrumentation?',
+					quickResponses: [
+						'Chamber music',
+						'Choral',
+						'Opera',
+						'Orchestral',
+						'Solo',
+						'Vocal'
+					]
+				}
 			},
 			{
 				content: 'A piece that creates a particular atmosphere',
-				icon: AiOptionIcon.drama
+				icon: AiOptionIcon.drama,
+				predefined: {
+					question: 'What mood or atmosphere are you looking for?',
+					quickResponses: [
+						'Meditative',
+						'Upbeat',
+						'Melancholic',
+						'Virtuosic',
+						'Relaxing',
+						'Dramatic'
+					]
+				}
 			},
 			{
 				content: 'A piece that matches a program theme',
 				icon: AiOptionIcon.theme
+				// This one will use the AI decision endpoint for more complex matching
 			}
 		]
 	];
