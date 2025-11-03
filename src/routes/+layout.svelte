@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { onMount, setContext } from 'svelte';
 	import type { LayoutData } from './$type';
 	import '../app.css';
@@ -15,6 +16,8 @@
 	import ColourLoader from '$lib/components/ColourLoader.svelte';
 	import XxSpotlightCards from '$lib/components/XXSpotlightCards.svelte';
 	import XXModal from '$lib/components/XXModal.svelte';
+
+	$: isAboutPage = $page.url.pathname === '/about';
 
 	const isWideScreen = writable(false);
 	setContext('isWideScreen', isWideScreen);
@@ -60,7 +63,15 @@
 			</svelte:fragment>
 
 			<svelte:fragment slot="side">
-				{#if $cardStore.length > 0}
+				{#if isAboutPage}
+					<div class="h-full w-full overflow-hidden">
+						<img
+							src="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/ddd98447-594d-45b0-a074-883f30d97c00/public"
+							alt="Opus XX"
+							class="h-full w-full object-cover"
+						/>
+					</div>
+				{:else if $cardStore.length > 0}
 					<div class="flex h-full w-full flex-col justify-center overflow-hidden p-2">
 						<div class="flex gap-4 overflow-x-auto">
 							{#each $cardStore as card}
