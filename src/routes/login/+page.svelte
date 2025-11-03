@@ -20,7 +20,7 @@
 				password
 			});
 			if (error) throw error;
-			goto('/discover');
+			goto('/demo');
 		} catch (error) {
 			if (error instanceof Error) {
 				alert(error.message);
