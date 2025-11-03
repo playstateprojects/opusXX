@@ -60,7 +60,12 @@
 		</Dropdown>
 	{/if}
 	<NavUl class="ml-auto">
-		<NavLi on:click={showUnderDevelopmentModal} class="uppercase">About</NavLi>
+		<NavLi
+			on:click={() => {
+				goto('/about');
+			}}
+			class="uppercase">About</NavLi
+		>
 		<NavLi on:click={showUnderDevelopmentModal} class="uppercase">FAQ</NavLi>
 		<NavLi href="https://opusxx.com/contact-us/" target="_blank" class="uppercase">Contact</NavLi>
 	</NavUl>

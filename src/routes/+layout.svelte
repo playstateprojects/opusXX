@@ -64,7 +64,7 @@
 
 			<svelte:fragment slot="side">
 				{#if isAboutPage}
-					<div class="h-full w-full overflow-hidden">
+					<div class="-m-4 h-[calc(100%+2rem)] w-[calc(100%+2rem)] overflow-hidden">
 						<img
 							src="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/ddd98447-594d-45b0-a074-883f30d97c00/public"
 							alt="Opus XX"
