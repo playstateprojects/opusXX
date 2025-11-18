@@ -6,7 +6,7 @@
 	<div class="mt-6 flex w-full max-w-xl items-center justify-center">
 		<!-- Row 1 -->
 		<img
-			src="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/770e3c5a-dd89-418b-cbd3-9d551587b800/public"
+			src="https://imagedelivery.net/5mdpBKEVK9RVERfzVJ-NHg/6f60be5b-2703-49cc-d8cc-0246fcf23d00/public"
 			alt="supported by"
 			class="scale-90"
 		/>
