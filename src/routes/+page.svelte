@@ -80,7 +80,7 @@
 	const surpriseMe = async () => {
 		isLoadingSurprise = true;
 		pageNumber = 2;
-		messages.set([{ content: 'Considering the options', role: AiRole.Assistant }]);
+		messages.set([{ content: 'Selecting a Work...', role: AiRole.Assistant }]);
 		actions.set([]);
 		try {
 			const response = await fetch('/api/agents/surprise-ninja');
