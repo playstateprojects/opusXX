@@ -24,6 +24,16 @@
 		// console.log('Current user:', currentUser);
 	});
 
+	function handleLogoClick(event: MouseEvent) {
+		event.preventDefault();
+		console.log('reload', window.location.pathname);
+		if (window.location.pathname === '/') {
+			window.location.reload();
+		} else {
+			window.location.href = '/';
+		}
+	}
+
 	async function handleSignOut() {
 		const $supabase = get(supabaseStore);
 		if (!$supabase) return;
@@ -39,7 +49,7 @@
 
 <Navbar>
 	<NavBrand href="/">
-		<img src="/images/logo.png" class="me-3 w-[140px]" alt="Flowbite Logo" />
+		<img src="/images/logo.png" class="me-3 w-[140px]" alt="Flowbite Logo" on:click={handleLogoClick} />
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if $user}

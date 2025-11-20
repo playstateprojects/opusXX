@@ -37,14 +37,7 @@
 				icon: AiOptionIcon.drama,
 				predefined: {
 					question: 'What type of ensemble or instrumentation?',
-					quickResponses: [
-						'Chamber music',
-						'Choral',
-						'Opera',
-						'Orchestral',
-						'Solo',
-						'Vocal'
-					]
+					quickResponses: ['Chamber music', 'Choral', 'Opera', 'Orchestral', 'Solo', 'Vocal']
 				}
 			},
 			{

@@ -12,13 +12,14 @@
 	import { derived, get } from 'svelte/store';
 	import ChatOption from './ChatOption.svelte';
 	import XxButton from './XXButton.svelte';
-	import { messages, actions } from '$lib/stores/chatStore.js';
+	import { messages, actions, resetChat } from '$lib/stores/chatStore.js';
 	import ChatInput from './ChatInput.svelte';
 	import {
 		addCard,
 		cardStore,
 		filterRelevantCards,
-		updateCardInsight
+		updateCardInsight,
+		clearCards
 	} from '$lib/stores/cardStore.js';
 	import { Spinner } from 'flowbite-svelte';
 	import { getWorkById, parseSqlSearchWork } from '$lib/utils/supabase';
@@ -356,6 +357,11 @@
 		state.loading = false;
 		state.loadingMessage = '';
 	};
+
+	const handleStartNewSearch = () => {
+		resetChat();
+		clearCards();
+	};
 </script>
 
 <div
@@ -415,7 +421,13 @@
 
 	{#if showInput && !$actions.length}
 		<div class="mt-4 w-full">
-			<ChatInput prompt={'Something else?'} {onSubmit} active={!state.loading} />
+			<ChatInput
+				prompt={'Something else?'}
+				{onSubmit}
+				active={!state.loading}
+				onReset={handleStartNewSearch}
+				showReset={$messages.length > 0}
+			/>
 		</div>
 	{/if}
 </div>

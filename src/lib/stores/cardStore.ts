@@ -20,7 +20,7 @@ export function addCard(card: WorkCardType) {
     });
 }
 
-export function clearError() {
+export function clearCards() {
     cardStore.set([]);
 }
 

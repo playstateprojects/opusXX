@@ -8,7 +8,11 @@
 	import { cardStore } from '$lib/stores/cardStore.js';
 	import { onMount } from 'svelte';
 	import { getWorksByComposerId } from '$lib/utils/supabase';
+	import type { SurpriseResponse } from './api/agents/surprise-ninja/+server';
+	import type { WorkCardType, QuestionMakerResponse, QuestionMakerInfo } from '$lib/types';
+
 	let pageNumber = 1;
+	let isLoadingSurprise = false;
 	let startMessages = [
 		{
 			content: "What are you programming? Let's find the perfect match.",
@@ -37,14 +41,7 @@
 				icon: AiOptionIcon.drama,
 				predefined: {
 					question: 'What type of ensemble or instrumentation?',
-					quickResponses: [
-						'Chamber music',
-						'Choral',
-						'Opera',
-						'Orchestral',
-						'Solo',
-						'Vocal'
-					]
+					quickResponses: ['Chamber music', 'Choral', 'Opera', 'Orchestral', 'Solo', 'Vocal']
 				}
 			},
 			{
@@ -80,6 +77,105 @@
 			action: clearIntro
 		}
 	]);
+	const surpriseMe = async () => {
+		isLoadingSurprise = true;
+		pageNumber = 2;
+		messages.set([{ content: 'Considering the options', role: AiRole.Assistant }]);
+		actions.set([]);
+		try {
+			const response = await fetch('/api/agents/surprise-ninja');
+			if (!response.ok) {
+				throw new Error('Failed to fetch surprise work');
+			}
+
+			const data: SurpriseResponse = await response.json();
+
+			// Transform the database work to the Work type expected by cardStore
+			const work = {
+				id: data.work.id,
+				name: data.work.name || '',
+				composer: {
+					id: data.work.composer_details?.id,
+					name: data.work.composer_details?.name || '',
+					birthDate: data.work.composer_details?.birth_date || undefined,
+					deathDate: data.work.composer_details?.death_date || undefined,
+					nationality: data.work.composer_details?.nationality || undefined,
+					composerPeriod: data.work.composer_details?.composer_period || undefined,
+					shortDescription: data.work.composer_details?.short_description || undefined
+				},
+				period: data.work.period || undefined,
+				instrumentation: data.work.instrumentation || undefined,
+				duration: data.work.duration || undefined,
+				publisher: data.work.publisher || undefined,
+				shortDescription: data.work.short_description || undefined,
+				longDescription: data.work.long_description || undefined,
+				genre: data.work.genre_details
+					? {
+							id: data.work.genre_details.id,
+							name: data.work.genre_details.name
+						}
+					: undefined
+			};
+
+			const card: WorkCardType = {
+				work,
+				insight: data.summary,
+				relevance: 10 // Featured work, so max relevance
+			};
+
+			// Call question-maker to generate a follow-up question based on the surprise
+			const chatLog = `System: Here's a featured work for you:\n\nWork: ${work.name} by ${work.composer.name}\n${data.summary}`;
+
+			const questionMakerBody: QuestionMakerInfo = {
+				chatLog: chatLog
+			};
+
+			const questionResponse = await fetch('/api/agents/question-maker', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(questionMakerBody)
+			});
+
+			let questionData: QuestionMakerResponse | null = null;
+			if (questionResponse.ok) {
+				questionData = await questionResponse.json();
+			}
+
+			// Update the UI
+			pageNumber = 2;
+			cardStore.set([card]);
+
+			// Use the question from question-maker if available, otherwise fall back to the summary
+			const displayMessage = questionData?.question || data.summary;
+
+			messages.set([
+				{
+					content: displayMessage,
+					role: AiRole.System,
+					time: new Date()
+				}
+			]);
+
+			// Add quick responses if provided by question-maker
+			if (questionData?.quickResponses && questionData.quickResponses.length > 0) {
+				messages.update((msgs) => [
+					...msgs,
+					questionData.quickResponses!.map((response) => ({
+						content: response,
+						icon: AiOptionIcon.theme
+					}))
+				]);
+			}
+
+			actions.set([]);
+		} catch (error) {
+			console.error('Error fetching surprise:', error);
+			// Optionally show an error message to the user
+		} finally {
+			isLoadingSurprise = false;
+		}
+	};
+
 	onMount(() => {
 		cardStore.set([]);
 		// getWorksByComposerId(410).then((res: any) => {
@@ -105,28 +201,13 @@
 	{/if}
 	<Chat showInput={pageNumber > 1}>
 		{#if pageNumber == 1}
-			<!-- TODO: fetch a featured work -->
-			<!-- <button
+			<button
 				class="mt-4 font-light uppercase underline"
-				onclick={() => {
-					pageNumber = 2;
-					cardStore.set(demo4);
-					messages.set([
-						{
-							content: `Three composers who reshaped musical boundaries in their own time — and ours.
-
-Maddalena Laura Sirmen – An 18th-century violinist-composer who broke into the male-dominated quartet form with elegance and authority.
-Grace Williams – The first Welsh woman to have a symphony performed publicly and a major voice in 20th-century British music.
-Alice Shields – A pioneer in electronic opera, Apocalypse (1994) fuses myth, voice, and technology into something raw and otherworldly.`,
-							role: AiRole.System,
-							time: new Date()
-						}
-					]);
-					actions.set([]);
-				}}
+				onclick={surpriseMe}
+				disabled={isLoadingSurprise}
 			>
-				Surprise Me!
-			</button> -->
+				{isLoadingSurprise ? 'Loading...' : 'Surprise Me!'}
+			</button>
 		{/if}
 	</Chat>
 	{#if pageNumber == 1}

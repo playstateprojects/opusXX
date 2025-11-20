@@ -6,3 +6,8 @@ export const messages = writable<(AiMessage | AiOption[])[]>([]);
 
 export const actions = writable<ChatAction[]>([]);
 
+export function resetChat() {
+	messages.set([]);
+	actions.set([]);
+}
+
