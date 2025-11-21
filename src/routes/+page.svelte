@@ -2,7 +2,7 @@
 	import Chat from '$lib/components/Chat.svelte';
 	import XXFooter from '$lib/components/XXFooter.svelte';
 	import { slide } from 'svelte/transition';
-	import { actions, messages } from '$lib/stores/chatStore';
+	import { actions, messages, startMessages } from '$lib/stores/chatStore';
 	import { get } from 'svelte/store';
 	import { AiOptionIcon, AiRole } from '$lib/types';
 	import { cardStore } from '$lib/stores/cardStore.js';
@@ -13,68 +13,6 @@
 
 	let pageNumber = 1;
 	let isLoadingSurprise = false;
-	let startMessages = [
-		{
-			content: 'W Let me help you find the perfect piece to program.',
-			role: AiRole.System,
-			time: new Date()
-		},
-		[
-			{
-				content: 'From a specific time period',
-				icon: AiOptionIcon.period,
-				predefined: {
-					question: 'Which period are you interested in?',
-					quickResponses: [
-						'Medieval',
-						'Renaissance',
-						'Baroque',
-						'Classical',
-						'Romantic',
-						'20th Century',
-						'Contemporary'
-					]
-				}
-			},
-			{
-				content: 'For a specific instrumentation',
-				icon: AiOptionIcon.drama,
-				predefined: {
-					question: 'What type of ensemble or instrumentation?',
-					quickResponses: ['Chamber music', 'Choral', 'Opera', 'Orchestral', 'Solo', 'Vocal']
-				}
-			},
-			{
-				content: 'With a particular atmosphere',
-				icon: AiOptionIcon.drama,
-				predefined: {
-					question: 'What kind of atmosphere are you looking for?',
-					quickResponses: [
-						'Calm & Meditative',
-						'Intense & Driving',
-						'Dark & Mysterious',
-						'Bright & Uplifting'
-					]
-				}
-			},
-			{
-				content: 'That matches a programme theme',
-				icon: AiOptionIcon.theme,
-				predefined: {
-					question: "What is your programme's theme?",
-					quickResponses: [
-						'Meditative',
-						'Upbeat',
-						'Melancholic',
-						'Virtuosic',
-						'Relaxing',
-						'Dramatic'
-					]
-				}
-				// This one will use the AI decision endpoint for more complex matching
-			}
-		]
-	];
 	const clearIntro = () => {
 		pageNumber = 2;
 		messages.set([...get(messages), ...startMessages]);
