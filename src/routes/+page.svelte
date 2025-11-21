@@ -15,16 +15,16 @@
 	let isLoadingSurprise = false;
 	let startMessages = [
 		{
-			content: "What are you programming? Let's find the perfect match.",
+			content: 'W Let me help you find the perfect piece to program.',
 			role: AiRole.System,
 			time: new Date()
 		},
 		[
 			{
-				content: 'A piece from a specific time period',
+				content: 'From a specific time period',
 				icon: AiOptionIcon.period,
 				predefined: {
-					question: 'Which time period interests you?',
+					question: 'Which period are you interested in?',
 					quickResponses: [
 						'Medieval',
 						'Renaissance',
@@ -37,7 +37,7 @@
 				}
 			},
 			{
-				content: 'A piece for a specific instrumentation',
+				content: 'For a specific instrumentation',
 				icon: AiOptionIcon.drama,
 				predefined: {
 					question: 'What type of ensemble or instrumentation?',
@@ -45,10 +45,23 @@
 				}
 			},
 			{
-				content: 'A piece that creates a particular atmosphere',
+				content: 'With a particular atmosphere',
 				icon: AiOptionIcon.drama,
 				predefined: {
-					question: 'What mood or atmosphere are you looking for?',
+					question: 'What kind of atmosphere are you looking for?',
+					quickResponses: [
+						'Calm & Meditative',
+						'Intense & Driving',
+						'Dark & Mysterious',
+						'Bright & Uplifting'
+					]
+				}
+			},
+			{
+				content: 'That matches a programme theme',
+				icon: AiOptionIcon.theme,
+				predefined: {
+					question: "What is your programme's theme?",
 					quickResponses: [
 						'Meditative',
 						'Upbeat',
@@ -58,10 +71,6 @@
 						'Dramatic'
 					]
 				}
-			},
-			{
-				content: 'A piece that matches a program theme',
-				icon: AiOptionIcon.theme
 				// This one will use the AI decision endpoint for more complex matching
 			}
 		]
