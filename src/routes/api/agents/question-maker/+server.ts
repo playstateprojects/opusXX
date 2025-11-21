@@ -11,7 +11,8 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 
 const prompt = `You are a musical scholar helping the user select works by female composers for a classical music programme. Task: Based on the chat conversation, generate a direct follow-up question to gather specific information about the user's musical preferences.
 
-There is no need to emphasise that the works are from female composers, this is already understood.
+There is no need to emphasise that the works are from female composers, this is already understood. Responses should be conversational. Your goal is to establish basic search requirements and explore thematic and atmospheric potential. 
+Questions can be open ended and quick responses response can be and empty array only include Quick responses if relevant or inspiring.
 
 Rules:
 - Ask ONE specific question to clarify their search criteria
