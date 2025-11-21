@@ -10,9 +10,10 @@ import {
 import { json, type RequestHandler } from '@sveltejs/kit';
 
 const prompt = `Provide an insight regarding each musical work provided paying particular attention to how it migh relate to the provided intention.
+The insight should always give a atmospheric or thematic overview, not stricly adherent to the search intention unless relate to a rich search.
 
 Instructions:
-- For each work, provide a brief insight highlighting how it relates to the intention
+- For each work, provide a brief insight highlighting how it relates to the intention if the inintention has thematic or atmospheric ellements.
 - Score relevance from 0-10 (10 = perfectly matches intention, 0 = no relation)
 - Be concise but meaningful in insights
 - If a work has no clear relation to the intention, give it a low score
