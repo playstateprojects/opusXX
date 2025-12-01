@@ -10,14 +10,34 @@
 	import { getWorksByComposerId } from '$lib/utils/supabase';
 	import type { SurpriseResponse } from './api/agents/surprise-ninja/+server';
 	import type { WorkCardType, QuestionMakerResponse, QuestionMakerInfo } from '$lib/types';
+	import { user } from '$lib/stores/userStore';
+	import { goto } from '$app/navigation';
 
 	let pageNumber = 1;
 	let isLoadingSurprise = false;
+	let hasCheckedAuth = false;
+
 	const clearIntro = () => {
+		// Check if user is logged in
+		const currentUser = get(user);
+		if (!currentUser) {
+			// Redirect to login if not logged in
+			goto('/login');
+			return;
+		}
+
+		// Proceed with clearing intro if user is logged in
 		pageNumber = 2;
 		messages.set([...get(messages), ...startMessages]);
 		actions.set([]);
 	};
+
+	// Watch for user changes and auto-proceed if logged in
+	$: if ($user && !hasCheckedAuth && pageNumber === 1) {
+		hasCheckedAuth = true;
+		clearIntro();
+	}
+
 	actions.set([
 		{
 			label: 'Start Curating',

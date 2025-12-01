@@ -3,10 +3,9 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { onMount, setContext } from 'svelte';
-	import type { LayoutData } from './$type';
+	import type { LayoutData } from './$types';
 	import '../app.css';
 	import XXHeader from '$lib/components/XXHeader.svelte';
-	import SpotlightCard from '$lib/components/cards/SpotlightCard.svelte';
 	import SplitPage from '$lib/components/SplitPage.svelte';
 	import { writable } from 'svelte/store';
 	import { cardStore } from '$lib/stores/cardStore'; // adjust path if needed
@@ -39,7 +38,7 @@
 
 		const {
 			data: { subscription }
-		} = supabase.auth.onAuthStateChange((event, _session) => {
+		} = supabase.auth.onAuthStateChange((event: any, _session: any) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
@@ -76,9 +75,7 @@
 						<div class="flex gap-4 overflow-x-auto">
 							{#each $cardStore as card}
 								<div class="w-80 flex-shrink-0 snap-center">
-									<XxWorkCard workCard={card}>
-										<div class="mx-2 p-4 text-center font-semibold"></div>
-									</XxWorkCard>
+									<XxWorkCard workCard={card} />
 								</div>
 							{/each}
 						</div>
