@@ -277,31 +277,82 @@
 			return;
 		}
 
+		// Process works in batches of 5 to avoid payload size issues
+		const BATCH_SIZE = 5;
+		const batches = [];
+		for (let i = 0; i < works.length; i += BATCH_SIZE) {
+			batches.push(works.slice(i, i + BATCH_SIZE));
+		}
+
+		console.log(`Processing ${works.length} works in ${batches.length} batches`);
+
 		try {
-			const request: InsightMakerRequest = {
-				works: works,
-				intention: intent
-			};
+			// Process batches sequentially to avoid overwhelming the API
+			for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+				const batch = batches[batchIndex];
+				console.log(`Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} works)`);
 
-			const response = await fetch('/api/agents/insight-maker', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(request)
-			});
+				const request: InsightMakerRequest = {
+					works: batch,
+					intention: intent
+				};
 
-			if (!response.ok) {
-				console.error('Failed to get insights:', response.statusText);
-				return;
+				// Retry logic with exponential backoff
+				let retries = 3;
+				let delay = 1000;
+				let success = false;
+
+				while (retries > 0 && !success) {
+					try {
+						const controller = new AbortController();
+						const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+						const response = await fetch('/api/agents/insight-maker', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(request),
+							signal: controller.signal
+						});
+
+						clearTimeout(timeoutId);
+
+						if (!response.ok) {
+							throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+						}
+
+						const data: InsightMakerResponse = await response.json();
+
+						// Update cards with insights using the store function
+						data.works.forEach((workInsight) => {
+							updateCardInsight(workInsight.workId, workInsight.insight, workInsight.relevanceScore);
+						});
+
+						console.log(`Batch ${batchIndex + 1} completed: ${data.works.length} insights generated`);
+						success = true;
+
+					} catch (error) {
+						retries--;
+						if (retries > 0) {
+							console.warn(`Batch ${batchIndex + 1} failed, retrying in ${delay}ms... (${retries} retries left)`, error);
+							await new Promise(resolve => setTimeout(resolve, delay));
+							delay *= 2; // Exponential backoff
+						} else {
+							console.error(`Batch ${batchIndex + 1} failed after all retries:`, error);
+							// Set default insights for failed batch
+							batch.forEach((work) => {
+								updateCardInsight(work.id || work.name, 'Unable to generate insight', 5);
+							});
+						}
+					}
+				}
+
+				// Small delay between batches to avoid rate limiting
+				if (batchIndex < batches.length - 1) {
+					await new Promise(resolve => setTimeout(resolve, 500));
+				}
 			}
 
-			const data: InsightMakerResponse = await response.json();
-
-			// Update cards with insights using the store function
-			data.works.forEach((workInsight) => {
-				updateCardInsight(workInsight.workId, workInsight.insight, workInsight.relevanceScore);
-			});
-
-			console.log('Updated cards with insights', data.works);
+			console.log('All insight batches completed');
 		} catch (error) {
 			console.error('Error updating card insights:', error);
 		}

@@ -62,16 +62,30 @@ export const POST: RequestHandler = async ({ request }) => {
         }
 
         // Prepare works data for AI (simplified to avoid token bloat)
-        const worksData = body.works.map(work => ({
-            id: work.id || work.name,
-            name: work.name,
-            composer: work.composer?.name || 'Unknown',
-            genre: work.genre?.name || 'Unknown',
-            period: work.period || 'Unknown',
-            instrumentation: work.instrumentation || 'Unknown',
-            duration: work.duration || 'Unknown',
-            description: work.shortDescription || work.longDescription?.substring(0, 300) || 'No description available'
-        }));
+        const worksData = body.works.map(work => {
+            // More aggressive description truncation to avoid payload issues
+            let description = 'No description available';
+            if (work.shortDescription) {
+                description = work.shortDescription.substring(0, 200);
+            } else if (work.longDescription) {
+                description = work.longDescription.substring(0, 200);
+            }
+
+            return {
+                id: work.id || work.name,
+                name: work.name,
+                composer: work.composer?.name || 'Unknown',
+                genre: work.genre?.name || 'Unknown',
+                period: work.period || 'Unknown',
+                instrumentation: Array.isArray(work.instrumentation)
+                    ? work.instrumentation.slice(0, 5).join(', ')
+                    : typeof work.instrumentation === 'string'
+                        ? work.instrumentation.substring(0, 100)
+                        : 'Unknown',
+                duration: work.duration || 'Unknown',
+                description: description
+            };
+        });
 
         const messages: AiMessage[] = [{
             role: AiRole.User,

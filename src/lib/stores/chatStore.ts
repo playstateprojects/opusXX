@@ -60,8 +60,7 @@ export const startMessages: (AiMessage | AiOption[])[] = [
 					'World peace',
 					'Spiritual awakening',
 					'Climate change',
-					'Connection',
-					'Fascism'
+					'Connection'
 				]
 			}
 		}
