@@ -51,14 +51,17 @@ export const startMessages: (AiMessage | AiOption[])[] = [
 			content: 'That matches a programme theme',
 			icon: AiOptionIcon.theme,
 			predefined: {
-				question: "What is your programme's theme?",
+				question: "Would any of these themes be interesting to you?",
 				quickResponses: [
-					'Meditative',
-					'Upbeat',
-					'Melancholic',
-					'Virtuosic',
-					'Relaxing',
-					'Dramatic'
+					'Love',
+					'Transcendence',
+					'Innocence',
+					'Social unrest',
+					'World peace',
+					'Spiritual awakening',
+					'Climate change',
+					'Connection',
+					'Fascism'
 				]
 			}
 		}
