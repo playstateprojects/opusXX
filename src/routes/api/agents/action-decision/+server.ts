@@ -16,14 +16,19 @@ const prompt = `🎼 MUSICAL CHAT CLASSIFIER & FILTER EXTRACTION PROMPT (v2)
 ------------------------------------------------------
 
 Task:
-Analyze the latest user message in the context of the conversation to:
+Analyze the latest user message in the context of the conversation and currently displayed works (if any) to:
 1. Decide whether to initiate a SQL search, vector search, or continue conversation
 2. Extract ALL implicit and explicit filters from the ENTIRE CONVERSATION HISTORY when search is triggered
 
 GLOBAL BIAS (IMPORTANT):
 - When in doubt, assume the user wants a search.
-- If the user is talking about pieces they might want to hear / see / use (e.g. “something…”, “show me…”, “I want…”, “too dramatic”, “more dreamy”), you MUST return either "sql_search" or "vector_search", NOT "continue".
+- If the user is talking about pieces they might want to hear / see / use (e.g. "something…", "show me…", "I want…", "too dramatic", "more dreamy"), you MUST return either "sql_search" or "vector_search", NOT "continue".
 - After at least one musical filter (composer, period, genre, instrument, etc.) has appeared earlier in the conversation, only use "continue" when the user is clearly asking for meta-information (history, definitions) or explicitly not asking for more works.
+
+DISPLAYED WORKS AWARENESS:
+- If works are currently displayed, consider whether the user's message is refining/filtering those results or asking for completely new criteria
+- User comments on displayed works (e.g., "too dramatic", "more upbeat", "something different") should trigger vector_search with accumulated filters
+- If user is satisfied with displayed works and just commenting positively, consider "continue" instead of searching again
 
 
 Decision Rules
@@ -242,15 +247,37 @@ IMPORTANT:
 
 export const POST: RequestHandler = async ({ request }) => {
     const body: ActionDecisionInfo = await request.json();
+
+    // Build context string including displayed works if available
+    let contextString = '\n\nChat conversation:\n' + body.chatLog;
+
+    if (body.displayedWorks && body.displayedWorks.length > 0) {
+        contextString += '\n\nCurrently displayed works:\n';
+        body.displayedWorks.forEach((work, index) => {
+            contextString += `${index + 1}. "${work.workName}" by ${work.composerName}`;
+            if (work.period) contextString += ` (${work.period})`;
+            if (work.genre) contextString += ` - ${work.genre}`;
+            if (work.relevance !== undefined) contextString += ` [Relevance: ${work.relevance}/10]`;
+            if (work.shortDescription) contextString += `\n   Description: ${work.shortDescription}`;
+            if (work.insight) contextString += `\n   Insight: ${work.insight}`;
+            contextString += '\n';
+        });
+    }
+
     const messages: AiMessage[] = [{
         role: AiRole.User,
-        content: prompt + '\n\nChat conversation:\n' + body.chatLog
+        content: prompt + contextString
     }]
     try {
         const data = await jsonChat(messages);
         // Handle error response from jsonChat
         if (!data || 'error' in data) {
-            return new Response(JSON.stringify({ error: 'Failed to determine action from chat' }), {
+            const errorMessage = (data as any)?.message || 'Failed to determine action from chat';
+            console.error('Action decision error:', errorMessage);
+            return new Response(JSON.stringify({
+                error: errorMessage,
+                action: 'continue' // Fallback to continue conversation on error
+            }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
             });

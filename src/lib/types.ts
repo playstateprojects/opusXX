@@ -477,17 +477,36 @@ export interface QueryMakerResponse {
 export interface QuestionMakerInfo {
     schema?: object;
     chatLog?: string;
+    displayedWorks?: Array<{
+        workName: string;
+        composerName: string;
+        period?: string;
+        genre?: string;
+        relevance?: number;
+        insight?: string;
+        shortDescription?: string;
+    }>;
 }
 
 export interface QuestionMakerResponse {
     question: string;
     quickResponses?: string[];
+    summary?: string; // Optional summary of displayed works
 }
 
 // Action Decision API types
 export interface ActionDecisionInfo {
     schema?: object;
     chatLog?: string;
+    displayedWorks?: Array<{
+        workName: string;
+        composerName: string;
+        period?: string;
+        genre?: string;
+        relevance?: number;
+        insight?: string;
+        shortDescription?: string;
+    }>;
 }
 
 export interface ActionDecisionFilters {
@@ -502,6 +521,7 @@ export interface ActionDecisionResponse {
     action: 'sql_search' | 'vector_search' | 'continue';
     reason?: string;
     filters?: ActionDecisionFilters;
+    error?: string; // Optional error message when AI call fails
 }
 
 // Common error response type

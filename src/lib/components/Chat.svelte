@@ -56,6 +56,18 @@
 		}, -1);
 	});
 
+	// Helper function to generate intent from recent chat messages
+	const generateIntentFromChat = (chatMessages: AiMessage[]): string => {
+		// Get the last 3-5 user messages to capture the conversation intent
+		const userMessages = chatMessages
+			.filter(msg => msg.role === AiRole.User)
+			.slice(-5)
+			.map(msg => msg.content)
+			.join('. ');
+
+		return userMessages || 'Relevant works based on your search';
+	};
+
 	const performSqlSearch = async (filters: any, intent?: string, currentMessages?: AiMessage[]) => {
 		state.loadingMessage = 'Searching database with filters...';
 
@@ -83,8 +95,9 @@
 
 			if (works.length > 0) {
 				state.loadingMessage = 'Generating insights...';
-				// Generate insights for the found works
-				await updateCardInsights(intent || 'Relevant works based on your filters');
+				// Generate insights for the found works using chat-derived intent
+				const derivedIntent = intent || (currentMessages ? generateIntentFromChat(currentMessages) : 'Relevant works based on your filters');
+				await updateCardInsights(derivedIntent);
 				filterRelevantCards();
 			}
 
@@ -124,8 +137,9 @@
 		);
 
 		state.loadingMessage = 'Generating insights...';
-		// Update cards with insights after adding all cards
-		await updateCardInsights(intent || queryIntent);
+		// Update cards with insights after adding all cards using chat-derived intent
+		const derivedIntent = intent || queryIntent || (filteredMessages ? generateIntentFromChat(filteredMessages) : 'Relevant works based on your search');
+		await updateCardInsights(derivedIntent);
 
 		filterRelevantCards();
 
@@ -178,11 +192,27 @@
 			} else {
 				// Original flow - call the action-decision API
 				state.loadingMessage = 'Deciding next action...';
+
+				// Get current displayed works from card store
+				const currentCards = get(cardStore);
+				const displayedWorks = currentCards.map(card => ({
+					workName: card.work.name,
+					composerName: card.work.composer.name || 'Unknown',
+					period: card.work.period,
+					genre: card.work.genre?.name,
+					relevance: card.relevance,
+					insight: card.insight,
+					shortDescription: card.work.shortDescription
+				}));
+
 				// Determine what action to take based on the conversation
 				const actionResponse = await fetch('/api/agents/action-decision', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ chatLog: flattenChat(currentMessages) })
+					body: JSON.stringify({
+						chatLog: flattenChat(currentMessages),
+						displayedWorks: displayedWorks.length > 0 ? displayedWorks : undefined
+					})
 				});
 
 				if (!actionResponse.ok) {
@@ -194,6 +224,19 @@
 
 				const actionData: ActionDecisionResponse = await actionResponse.json();
 				console.log('Action decision:', actionData);
+
+				// Check if there was an error in the response
+				if ('error' in actionData) {
+					console.error('Action decision returned error:', actionData.error);
+					// Fall back to asking a question if decision-maker fails
+					if (actionData.action === 'continue') {
+						state.loadingMessage = 'Preparing follow-up questions...';
+						await askNextQuestion(currentMessages);
+						state.loading = false;
+						state.loadingMessage = '';
+						return;
+					}
+				}
 
 				if (actionData.action === 'sql_search') {
 					// Perform SQL search with filters
@@ -268,11 +311,26 @@
 			(ms): ms is AiMessage => !Array.isArray(ms) && 'role' in ms
 		);
 
+		// Get current displayed works from card store
+		const currentCards = get(cardStore);
+		const displayedWorks = currentCards.map(card => ({
+			workName: card.work.name,
+			composerName: card.work.composer.name || 'Unknown',
+			period: card.work.period,
+			genre: card.work.genre?.name,
+			relevance: card.relevance,
+			insight: card.insight,
+			shortDescription: card.work.shortDescription
+		}));
+
 		try {
 			const response = await fetch('/api/agents/question-maker', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ chatLog: flattenChat(filteredMessages) })
+				body: JSON.stringify({
+					chatLog: flattenChat(filteredMessages),
+					displayedWorks: displayedWorks.length > 0 ? displayedWorks : undefined
+				})
 			});
 
 			if (!response.ok) {
@@ -282,7 +340,18 @@
 
 			const data: QuestionMakerResponse = await response.json();
 
-			if (data.question && data.question.trim()) {
+			// Handle summary response (when conversation is extensive)
+			if (data.summary && data.summary.trim()) {
+				const summaryMessage: AiMessage = {
+					role: AiRole.Assistant,
+					content: data.summary,
+					time: new Date()
+				};
+
+				messages.update((msg) => [...msg, summaryMessage]);
+			}
+			// Handle question response
+			else if (data.question && data.question.trim()) {
 				// Add the follow-up question as an AI message
 				const questionMessage: AiMessage = {
 					role: AiRole.Assistant,
@@ -338,6 +407,19 @@
 
 			const actionData: ActionDecisionResponse = await actionResponse.json();
 			console.log('Action decision:', actionData);
+
+			// Check if there was an error in the response
+			if ('error' in actionData) {
+				console.error('Action decision returned error:', actionData.error);
+				// Fall back to asking a question if decision-maker fails
+				if (actionData.action === 'continue') {
+					state.loadingMessage = 'Preparing follow-up questions...';
+					await askNextQuestion(currentMessages);
+					state.loading = false;
+					state.loadingMessage = '';
+					return;
+				}
+			}
 
 			if (actionData.action === 'sql_search') {
 				// Perform SQL search with filters

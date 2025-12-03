@@ -27,32 +27,92 @@ const getEmbedding = async (text: string) => {
     return embedding
 }
 
-const chat = async (messages: AiMessage[]) => {
-    const response = await openai.chat.completions.create({
-        model: aiModel,
-        messages: messages
-    });
-    console.log("ch12", response)
-    if (response && response.choices[0].message) {
-        return response.choices[0].message
-    } else {
-        return { error: true }
+const chat = async (messages: AiMessage[], retries = 2) => {
+    let lastError: any;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const response = await openai.chat.completions.create({
+                model: aiModel,
+                messages: messages,
+                timeout: 30000 // 30 second timeout
+            });
+
+            console.log("ch12", response)
+            if (response && response.choices[0].message) {
+                return response.choices[0].message
+            } else {
+                return { error: true }
+            }
+        } catch (error: any) {
+            lastError = error;
+
+            // Check if it's a network/connection error worth retrying
+            const isNetworkError = error.message?.includes('fetch') ||
+                                  error.message?.includes('Premature close') ||
+                                  error.code === 'ECONNRESET' ||
+                                  error.code === 'ETIMEDOUT';
+
+            if (isNetworkError && attempt < retries) {
+                console.log(`Network error on attempt ${attempt + 1}, retrying...`);
+                // Exponential backoff: wait 1s, then 2s
+                await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                continue;
+            }
+
+            // Don't retry on other errors or if max retries reached
+            break;
+        }
     }
+
+    // All retries failed
+    console.error('chat failed after retries:', lastError);
+    return { error: true, message: lastError?.message || 'Unknown error' }
 }
 
-const jsonChat = async (messages: AiMessage[]) => {
-    const response = await openai.chat.completions.create({
-        model: aiModel,
-        messages: messages,
-        response_format: {
-            'type': 'json_object'
+const jsonChat = async (messages: AiMessage[], retries = 2) => {
+    let lastError: any;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+            const response = await openai.chat.completions.create({
+                model: aiModel,
+                messages: messages,
+                response_format: {
+                    'type': 'json_object'
+                },
+                timeout: 30000 // 30 second timeout
+            });
+
+            if (response && response.choices[0].message) {
+                return response.choices[0].message
+            } else {
+                return { error: true }
+            }
+        } catch (error: any) {
+            lastError = error;
+
+            // Check if it's a network/connection error worth retrying
+            const isNetworkError = error.message?.includes('fetch') ||
+                                  error.message?.includes('Premature close') ||
+                                  error.code === 'ECONNRESET' ||
+                                  error.code === 'ETIMEDOUT';
+
+            if (isNetworkError && attempt < retries) {
+                console.log(`Network error on attempt ${attempt + 1}, retrying...`);
+                // Exponential backoff: wait 1s, then 2s
+                await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+                continue;
+            }
+
+            // Don't retry on other errors or if max retries reached
+            break;
         }
-    });
-    if (response && response.choices[0].message) {
-        return response.choices[0].message
-    } else {
-        return { error: true }
     }
+
+    // All retries failed
+    console.error('jsonChat failed after retries:', lastError);
+    return { error: true, message: lastError?.message || 'Unknown error' }
 }
 
 const extractComposer = async (text: string): Promise<{ data?: Composer; error?: string }> => {

@@ -9,15 +9,25 @@ import {
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const prompt = `Provide an insight regarding each musical work provided paying particular attention to how it migh relate to the provided intention.
-The insight should always give a atmospheric or thematic overview, not stricly adherent to the search intention unless relate to a rich search.
+const prompt = `Provide an insight regarding each musical work provided, paying particular attention to how it might relate to the provided intention.
+The insight should give an atmospheric or thematic overview, not strictly adherent to the search intention unless it relates to a rich search.
 
 Instructions:
-- For each work, provide a brief insight highlighting how it relates to the intention if the inintention has thematic or atmospheric ellements.
-- Score relevance from 0-10 (10 = perfectly matches intention, 0 = no relation)
+- For each work, provide a brief insight (1-2 sentences) highlighting how it relates to the intention if the intention has thematic or atmospheric elements
+- Score relevance from 0-10 based on how well the work matches the intention
 - Be concise but meaningful in insights
-- If a work has no clear relation to the intention, give it a low score
-- Avoid potentially offensive or stereotypical comentary.
+- Consider the work's description, genre, period, and instrumentation when assessing relevance
+- Avoid potentially offensive or stereotypical commentary
+
+RELEVANCE SCORING GUIDE:
+- 9-10: Exceptional match - work strongly aligns with multiple aspects of the intention (theme, mood, instrumentation, style)
+- 7-8: Strong match - work clearly relates to the intention in significant ways
+- 5-6: Moderate match - work has some connection to the intention but may lack certain elements
+- 3-4: Weak match - work has tangential or minimal connection to the intention
+- 1-2: Poor match - work barely relates to the intention
+- 0: No match - work has no discernible connection to the intention
+
+IMPORTANT: Be discriminating with high scores (8-10). These should be reserved for works that genuinely excel at matching the intention. Most works should fall in the 4-7 range if they have some relevance. Don't inflate scores just because a work matches one basic criterion (e.g., period or genre alone).
 
 Output JSON only in this exact format:
 {
@@ -59,7 +69,8 @@ export const POST: RequestHandler = async ({ request }) => {
             genre: work.genre?.name || 'Unknown',
             period: work.period || 'Unknown',
             instrumentation: work.instrumentation || 'Unknown',
-            duration: work.duration || 'Unknown'
+            duration: work.duration || 'Unknown',
+            description: work.shortDescription || work.longDescription?.substring(0, 300) || 'No description available'
         }));
 
         const messages: AiMessage[] = [{
