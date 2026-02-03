@@ -44,7 +44,9 @@
 	hidden={$workDetail === null}
 >
 	<button
-		class="flex w-full bg-[#F47C7C]"
+		class="flex w-full text-black bg-period-{$workDetail?.period
+			? $workDetail.period.toLowerCase().trim().replace(' ', '_')
+			: 'romantic'} font-zwocorr"
 		onclick={() => {
 			workDetail.set(null);
 		}}

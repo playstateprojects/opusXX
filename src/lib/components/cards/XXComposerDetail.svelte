@@ -29,7 +29,9 @@
 	hidden={$composerDetail === null}
 >
 	<button
-		class="flex w-full bg-[#F47C7C]"
+		class="flex w-full text-black bg-period-{$composerDetail?.composerPeriod
+			? $composerDetail.composerPeriod.toLowerCase().trim().replace(' ', '_')
+			: 'romantic'} font-zwocorr"
 		onclick={() => {
 			composerDetail.set(null);
 		}}
