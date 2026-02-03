@@ -42,6 +42,8 @@
 				alt=""
 				class="aspect-[1.6] h-full max-h-32 w-1/2 object-cover"
 			/>
+		{:else}
+			<div class="w-4">&nbsp;</div>
 		{/if}
 		<div class="flex w-full flex-col items-start justify-center p-2">
 			<span class="font-bold">{$composerDetail?.name || 'Unknown Composer'}</span>
