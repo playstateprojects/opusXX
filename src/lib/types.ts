@@ -88,6 +88,7 @@ export interface Work {
     subgenreId?: number;
     scoring?: string;
     genre?: Genre; // Genre object from genres table
+    subgenre?: Subgenre; // Genre object from genres table
 }
 
 export interface Composer {

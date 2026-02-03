@@ -97,6 +97,12 @@ const parseSupabaseWork = (work: any): Work => {
       name: work.genres.name,
       slug: work.genres.slug,
       worksId: work.genres.works_id
+    } : undefined,
+    subgenre: work.subgenres ? {
+      id: work.subgenres.id,
+      name: work.subgenres.name,
+      slug: work.subgenres.slug,
+      worksId: work.subgenres.works_id
     } : undefined
   };
 }
@@ -110,7 +116,8 @@ const getWorksByComposerId = async (composerId: number): Promise<Work[]> => {
         *,
         profile_images (*)
       ),
-      genres (*)
+      genres (*),
+      subgenres (*)
     `)
     .eq('composer', composerId);
 
@@ -141,7 +148,8 @@ const getWorkById = async (workId: number): Promise<Work | null> => {
         *,
         profile_images (*)
       ),
-      genres (*)
+      genres (*),
+      subgenres (*)
     `)
     .eq('id', workId);
 

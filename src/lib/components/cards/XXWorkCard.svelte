@@ -80,11 +80,19 @@
 						<span>{workCard.work.duration}</span>
 					</div>
 
-					{#if workCard.work.instrumentation || workCard.work.scoring}
+					<!-- {#if workCard.work.instrumentation || workCard.work.scoring}
 						<div class="mt-3">
 							<h4 class="mb-1 text-xs font-bold">Instrumentation</h4>
 							<p class="text-xs text-gray-300">
 								{formatInstrumentation(workCard.work.instrumentation || workCard.work.scoring)}
+							</p>
+						</div>
+					{/if} -->
+					{#if workCard.work.subgenre}
+						<div class="mt-3">
+							<h4 class="mb-1 text-xs font-bold">Subgenre</h4>
+							<p class="text-xs text-gray-300">
+								{workCard.work.subgenre.name}
 							</p>
 						</div>
 					{/if}
