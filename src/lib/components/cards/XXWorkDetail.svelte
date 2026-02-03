@@ -225,6 +225,16 @@
 							</div>
 						</div>
 					{/if}
+					<XxButton
+						size="sm"
+						excludeIcon
+						link={'https://base.opusxx.com/dashboard/#/nc/plvv803l38mvhyh/mnq7biac92brabu?rowId=' +
+							$workDetail.id}
+					>
+						<span class="flex items-center justify-center"
+							>EDIT <ShareIcon width={14} height={14} /></span
+						>
+					</XxButton>
 				</div>
 			</div>
 

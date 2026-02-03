@@ -81,29 +81,29 @@
 						</div>
 					{/if}
 
-					{#if workCard.work.shortDescription}
+					<!-- {#if workCard.work.shortDescription}
 						<div class="mt-3">
 							<p class="text-sm leading-relaxed">
 								{workCard.work.shortDescription}
 							</p>
 						</div>
-					{/if}
+					{/if} -->
 
 					<div class="mt-4">
-						<h4 class="mb-1 text-xs font-bold">Insight</h4>
-						<p class="text-xs text-gray-300">
+						<h4 class="mb-1 text-lg font-bold">Insight</h4>
+						<p class="text text-gray-300">
 							{workCard.insight}
 						</p>
 					</div>
 
-					{#if workCard.work.firstPerformance}
+					<!-- {#if workCard.work.firstPerformance}
 						<div class="mt-2">
 							<span class="text-xs text-gray-400">Premiered: {workCard.work.firstPerformance}</span>
 						</div>
-					{/if}
+					{/if} -->
 				</div>
 			</div>
-			<section>
+			<!-- <section>
 				<button
 					class="flex w-full flex-col items-center justify-center text-slate-400"
 					onclick={() => {
@@ -114,14 +114,14 @@
 						More <AngleDownOutline class="h-4 w-4" />
 					</div>
 				</button>
-			</section>
+			</section> -->
 			<section class="my-4 flex items-center justify-center gap-x-4">
 				<XxButton size="sm" excludeIcon action={showUnderDevelopmentModal}>
 					<span class="flex items-center justify-center"
 						>SAVE <BookmarkOutline class="h-3 w-3" /></span
 					>
 				</XxButton>
-				<XxButton
+				<!-- <XxButton
 					size="sm"
 					excludeIcon
 					link={'https://base.opusxx.com/dashboard/#/nc/plvv803l38mvhyh/mnq7biac92brabu?rowId=' +
@@ -130,6 +130,15 @@
 					<span class="flex items-center justify-center"
 						>EDIT <ShareIcon width={14} height={14} /></span
 					>
+				</XxButton> -->
+				<XxButton
+					size="sm"
+					excludeIcon
+					onclick={() => {
+						workDetail.set(workCard.work);
+					}}
+				>
+					<span class="flex items-center justify-center">More </span>
 				</XxButton>
 			</section>
 		</div>

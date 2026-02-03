@@ -5,6 +5,7 @@
 		link = '#',
 		label = '',
 		action = () => {},
+		onclick = undefined,
 		color = 'white',
 		excludeIcon = false,
 		size = ButtonSizes.md,
@@ -16,21 +17,25 @@
 
 <div>
 	<button
-		onclick={() => {
-			if (link && link != '#') {
-				if (
-					link.startsWith('http://') ||
-					link.startsWith('https://') ||
-					link.startsWith('mailto')
-				) {
-					// External link - open in new tab
-					window.open(link, '_blank');
-				} else if (link !== '#') {
-					// Internal link - use Svelte's goto
-					goto(link);
+		onclick={(e) => {
+			if (onclick) {
+				onclick(e);
+			} else {
+				if (link && link != '#') {
+					if (
+						link.startsWith('http://') ||
+						link.startsWith('https://') ||
+						link.startsWith('mailto')
+					) {
+						// External link - open in new tab
+						window.open(link, '_blank');
+					} else if (link !== '#') {
+						// Internal link - use Svelte's goto
+						goto(link);
+					}
 				}
+				action();
 			}
-			action();
 		}}
 		class="flex items-center justify-center gap-1 rounded-full border-[1px] border-solid border-black font-light uppercase {size ===
 		ButtonSizes.sm

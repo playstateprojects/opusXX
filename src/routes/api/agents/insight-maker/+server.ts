@@ -18,6 +18,7 @@ Instructions:
 - Be concise but meaningful in insights
 - Consider the work's description, genre, period, and instrumentation when assessing relevance
 - Avoid potentially offensive or stereotypical commentary
+- Surface any noteworthy details such as performaces premeires etc.
 
 RELEVANCE SCORING GUIDE:
 - 9-10: Exceptional match - work strongly aligns with multiple aspects of the intention (theme, mood, instrumentation, style)
