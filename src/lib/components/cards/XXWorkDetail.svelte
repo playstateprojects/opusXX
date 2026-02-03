@@ -33,6 +33,7 @@
 	}
 </script>
 
+<div class={$workDetail === null ? 'pointer-events-none' : ''}>
 <Drawer
 	class="m-4 mr-8 rounded-3xl bg-black p-0"
 	width="w-1/2 w-[calc(100vw/2-3rem)]"
@@ -263,3 +264,4 @@
 		</div>
 	{/if}
 </Drawer>
+</div>
