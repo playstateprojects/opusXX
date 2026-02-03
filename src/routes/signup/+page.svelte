@@ -1,30 +1,31 @@
 <script lang="ts">
-	import { Button, Label, Input, Card } from 'flowbite-svelte';
+	import { Button, Label, Input, Card, Helper } from 'flowbite-svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	let email = '';
 	let password = '';
+	let confirmPassword = '';
 	let loading = false;
+	let passwordMismatch = false;
 	const supabase = $page.data.supabase;
 
-	async function handleSignIn() {
+	$: passwordMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
+	async function handleSignUp() {
 		if (!supabase) return;
+		if (password !== confirmPassword) return;
+
 		try {
 			loading = true;
-			const {
-				data: { user },
-				error
-			} = await supabase.auth.signInWithPassword({
+			const { error } = await supabase.auth.signUp({
 				email,
 				password
 			});
 			if (error) throw error;
-			goto('/demo');
-		} catch (error) {
-			if (error instanceof Error) {
-				alert(error.message);
-			}
+			alert('Check your email for the confirmation link!');
+		} catch (error: any) {
+			alert(error.message ?? 'An error occurred');
 		} finally {
 			loading = false;
 		}
@@ -42,10 +43,10 @@
 <div class="flex min-h-screen items-center justify-center">
 	<Card class="w-full max-w-md space-y-6 p-6">
 		<h3 class="text-center text-xl font-medium text-gray-900 dark:text-white">
-			Sign in to your account
+			Create an account
 		</h3>
 
-		<form on:submit|preventDefault={handleSignIn} class="space-y-4">
+		<form on:submit|preventDefault={handleSignUp} class="space-y-4">
 			<div>
 				<Label for="email" class="mb-2">Email</Label>
 				<Input type="email" id="email" placeholder="name@company.com" bind:value={email} required />
@@ -62,8 +63,23 @@
 				/>
 			</div>
 
-			<Button type="submit" class="w-full" disabled={loading}>
-				{loading ? 'Loading...' : 'Sign in to your account'}
+			<div>
+				<Label for="confirm-password" class="mb-2">Confirm password</Label>
+				<Input
+					type="password"
+					id="confirm-password"
+					placeholder="••••••••"
+					bind:value={confirmPassword}
+					color={passwordMismatch ? 'red' : 'base'}
+					required
+				/>
+				{#if passwordMismatch}
+					<Helper class="mt-2" color="red">Passwords do not match</Helper>
+				{/if}
+			</div>
+
+			<Button type="submit" class="w-full" disabled={loading || passwordMismatch}>
+				{loading ? 'Loading...' : 'Create account'}
 			</Button>
 		</form>
 
@@ -95,12 +111,13 @@
 						></defs
 					>
 				</svg>
-				Sign in with Google
+				Sign up with Google
 			</Button>
 
-			<a href="/signup">
-				<Button color="alternative" class="w-full">Create an account</Button>
-			</a>
+			<p class="text-center text-sm text-gray-500 dark:text-gray-400">
+				Already have an account?
+				<a href="/login" class="text-primary-700 hover:underline dark:text-primary-500">Sign in</a>
+			</p>
 		</div>
 	</Card>
 </div>

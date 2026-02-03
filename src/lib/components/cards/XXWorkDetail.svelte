@@ -17,6 +17,20 @@
 		duration: 200,
 		easing: sineIn
 	};
+
+	function formatInstrumentation(value: string | undefined): string {
+		if (!value) return '';
+		const trimmed = value.trim();
+		if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+			try {
+				const parsed = JSON.parse(trimmed);
+				if (Array.isArray(parsed)) return parsed.join(', ');
+			} catch {
+				// not valid JSON, return as-is
+			}
+		}
+		return value;
+	}
 </script>
 
 <Drawer
@@ -98,7 +112,7 @@
 						<div>
 							<h2 class="mb-2 text-sm font-semibold">Instrumentation</h2>
 							<p class="text-gray-200">
-								{$workDetail.instrumentation || $workDetail.scoring}
+								{formatInstrumentation($workDetail.instrumentation || $workDetail.scoring)}
 							</p>
 						</div>
 					{/if}

@@ -17,6 +17,20 @@
 	let { workCard } = $props<{
 		workCard?: WorkCardType;
 	}>();
+
+	function formatInstrumentation(value: string | undefined): string {
+		if (!value) return '';
+		const trimmed = value.trim();
+		if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+			try {
+				const parsed = JSON.parse(trimmed);
+				if (Array.isArray(parsed)) return parsed.join(', ');
+			} catch {
+				// not valid JSON, return as-is
+			}
+		}
+		return value;
+	}
 </script>
 
 <div class="flip-container relative aspect-[calc(9/16)] h-full w-full max-w-md">
@@ -70,7 +84,7 @@
 						<div class="mt-3">
 							<h4 class="mb-1 text-xs font-bold">Instrumentation</h4>
 							<p class="text-xs text-gray-300">
-								{workCard.work.instrumentation || workCard.work.scoring}
+								{formatInstrumentation(workCard.work.instrumentation || workCard.work.scoring)}
 							</p>
 						</div>
 					{/if}
