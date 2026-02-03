@@ -49,7 +49,12 @@
 
 <Navbar>
 	<NavBrand href="/">
-		<img src="/images/logo.png" class="me-3 w-[140px]" alt="Flowbite Logo" on:click={handleLogoClick} />
+		<img
+			src="/images/logo.png"
+			class="me-3 w-[140px]"
+			alt="Flowbite Logo"
+			on:click={handleLogoClick}
+		/>
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if $user}
@@ -76,7 +81,7 @@
 			}}
 			class="uppercase">About</NavLi
 		>
-		<NavLi on:click={showUnderDevelopmentModal} class="uppercase">FAQ</NavLi>
+		<!-- <NavLi on:click={showUnderDevelopmentModal} class="uppercase">FAQ</NavLi> -->
 		<NavLi href="https://opusxx.com/contact-us/" target="_blank" class="uppercase">Contact</NavLi>
 	</NavUl>
 </Navbar>
