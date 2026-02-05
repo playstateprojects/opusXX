@@ -32,18 +32,11 @@
 		actions.set([]);
 	};
 
-	// Watch for user changes and auto-proceed if logged in
-	$: if ($user && !hasCheckedAuth && pageNumber === 1) {
+	// Track when we've checked auth (no longer auto-proceed)
+	$: if ($user && !hasCheckedAuth) {
 		hasCheckedAuth = true;
-		clearIntro();
 	}
 
-	actions.set([
-		{
-			label: 'Start Curating',
-			action: clearIntro
-		}
-	]);
 	const surpriseMe = async () => {
 		isLoadingSurprise = true;
 		pageNumber = 2;
@@ -142,6 +135,13 @@
 			isLoadingSurprise = false;
 		}
 	};
+
+	actions.set([
+		{
+			label: 'Start Curating',
+			action: clearIntro
+		}
+	]);
 
 	onMount(() => {
 		cardStore.set([]);
