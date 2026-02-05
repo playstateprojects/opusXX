@@ -72,25 +72,18 @@
 			</button>
 			<div class="flex flex-1 flex-col overflow-y-auto text-xs">
 				<div class="flex flex-col p-4">
-					<h3 class="font-extrabold">{workCard.work.name}</h3>
-					<span class="text-xs italic">{workCard.work.publicationYear}</span>
+					<div class=" min-h-16">
+						<h3 class="text-lg font-extrabold leading-snug">{workCard.work.name}</h3>
+						<span class="font-light italic">{workCard.work.publicationYear}</span>
+					</div>
 
-					<div class="mt-2 flex justify-between text-xs uppercase">
+					<div class="mt-2 flex justify-between font-semibold uppercase">
 						<span>{workCard.work.genre?.name || 'Unknown Genre'}</span>
 						<span>{workCard.work.duration}</span>
 					</div>
 
-					<!-- {#if workCard.work.instrumentation || workCard.work.scoring}
-						<div class="mt-3">
-							<h4 class="mb-1 text-xs font-bold">Instrumentation</h4>
-							<p class="text-xs text-gray-300">
-								{formatInstrumentation(workCard.work.instrumentation || workCard.work.scoring)}
-							</p>
-						</div>
-					{/if} -->
 					{#if workCard.work.subgenre}
-						<div class="mt-3">
-							<h4 class="mb-1 text-xs font-bold">Subgenre</h4>
+						<div>
 							<p class="text-xs text-gray-300">
 								{workCard.work.subgenre.name}
 							</p>
@@ -112,7 +105,7 @@
 					{/if} -->
 
 					<div class="mt-4">
-						<h4 class="mb-1 text-lg font-bold">Insight</h4>
+						<h4 class="mb-1 font-semibold">Insight</h4>
 						<p class="text text-gray-300">
 							{workCard.insight}
 						</p>

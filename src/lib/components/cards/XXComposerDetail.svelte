@@ -61,19 +61,26 @@
 
 	{#if $composerDetail}
 		<div class="mx-auto space-y-4 bg-black p-6 text-xs text-white">
-			<div class="flex flex-col items-start justify-between md:flex-row md:items-center">
-				<div class="flex-1">
-					<h1 class="text-lg font-bold">{$composerDetail.name}</h1>
-					<p class="italic text-gray-400">
-						{$composerDetail.birthDate}
-						{#if $composerDetail.deathDate}
-							- {$composerDetail.deathDate}{/if}
-					</p>
-					{#if $composerDetail.nationality}
-						<p class="text-xs text-gray-500">{$composerDetail.nationality}</p>
+			<div class="flex w-full justify-between">
+				<div class="text-xs text-gray-300 md:mt-0">
+					{$composerDetail.composerStyle || ''}
+				</div>
+			</div>
+
+			<!-- At a glance box -->
+			<div class="flex items-end justify-between gap-x-4">
+				<!-- Locations -->
+				<div class="min-w-0 flex-1 space-y-1">
+					{#if $composerDetail.birthLocation}
+						<p class="text-gray-200">Born: {$composerDetail.birthLocation}</p>
+					{/if}
+					{#if $composerDetail.deathLocation}
+						<p class="text-gray-200">Died: {$composerDetail.deathLocation}</p>
 					{/if}
 				</div>
-				<div class="flex gap-x-2">
+
+				<!-- Action buttons -->
+				<div class="flex items-end gap-x-2">
 					<XxButton excludeIcon size="sm" action={showUnderDevelopmentModal}
 						><BookmarkOutline class="h-5 w-5" /></XxButton
 					>
@@ -91,47 +98,25 @@
 				</div>
 			</div>
 
-			<div class="flex w-full justify-between">
-				<div class="text-xs uppercase tracking-wide text-gray-400">
-					{$composerDetail.composerPeriod || 'Unknown Period'}
+			<!-- Biography (full width) -->
+			{#if $composerDetail.longDescription}
+				<div>
+					<h2 class="mb-2 text-sm font-semibold">Biography</h2>
+					<p class="leading-relaxed text-gray-200">
+						{$composerDetail.longDescription}
+					</p>
 				</div>
-				<div class="text-xs text-gray-300 md:mt-0">
-					{$composerDetail.composerStyle || ''}
+			{:else if $composerDetail.shortDescription}
+				<div>
+					<h2 class="mb-2 text-sm font-semibold">Biography</h2>
+					<p class="leading-relaxed text-gray-200">
+						{$composerDetail.shortDescription}
+					</p>
 				</div>
-			</div>
+			{/if}
 
 			<div class="grid gap-4 md:grid-cols-2">
 				<div class="space-y-4">
-					{#if $composerDetail.longDescription}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Biography</h2>
-							<p class="leading-relaxed text-gray-200">
-								{$composerDetail.longDescription}
-							</p>
-						</div>
-					{:else if $composerDetail.shortDescription}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Biography</h2>
-							<p class="leading-relaxed text-gray-200">
-								{$composerDetail.shortDescription}
-							</p>
-						</div>
-					{/if}
-
-					{#if $composerDetail.birthLocation || $composerDetail.deathLocation}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Locations</h2>
-							<div class="space-y-1">
-								{#if $composerDetail.birthLocation}
-									<p class="text-gray-200">Born: {$composerDetail.birthLocation}</p>
-								{/if}
-								{#if $composerDetail.deathLocation}
-									<p class="text-gray-200">Died: {$composerDetail.deathLocation}</p>
-								{/if}
-							</div>
-						</div>
-					{/if}
-
 					{#if $composerDetail.activeLocations}
 						<div>
 							<h2 class="mb-2 text-sm font-semibold">Active Locations</h2>
@@ -157,16 +142,10 @@
 				</div>
 
 				<div class="space-y-4">
-					{#if $composerDetail.gender}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Gender</h2>
-							<p class="text-gray-200">{$composerDetail.gender}</p>
-						</div>
-					{/if}
-
-					{#if $composerDetail.tags && Array.isArray($composerDetail.tags)}
+					{#if $composerDetail.tags && Array.isArray($composerDetail.tags) && $composerDetail.tags.length}
 						<div>
 							<h2 class="mb-2 text-sm font-semibold">Tags</h2>
+
 							<div class="flex flex-wrap gap-1">
 								{#each $composerDetail.tags as tag}
 									<span class="rounded bg-gray-700 px-2 py-1 text-xs">{tag}</span>
