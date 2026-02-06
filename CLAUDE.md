@@ -4,152 +4,78 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-### Core Development
-- `npm run dev` - Start development server with both Vite and Wrangler Pages in parallel
-- `npm run build` - Build production version
+- `npm run dev` - Start development server (runs Vite + Wrangler Pages concurrently via `dotenv-cli`)
+- `npm run build` - Production build
 - `npm run preview` - Preview production build
-
-### Code Quality
 - `npm run lint` - Run Prettier and ESLint checks
 - `npm run format` - Format code with Prettier
-- `npm run check` - Run Svelte type checking
-- `npm run check:watch` - Run Svelte type checking in watch mode
-
-### Data Generation
+- `npm run check` - Svelte type checking (`svelte-kit sync && svelte-check`)
 - `npm run zod:generate` - Generate Zod types from Airtable schema
 
-## Project Architecture
+There is no test framework configured in this project.
 
-This is a SvelteKit application deployed on Cloudflare Pages with the following key integrations:
+## Architecture Overview
+
+SvelteKit 5 application for classical music discovery, deployed on Cloudflare Pages. Users interact with an AI chat interface to discover composers and musical works. Data is extracted from web sources via AI-powered structured extraction, stored in Supabase (PostgreSQL), and made searchable via vector embeddings.
 
 ### Core Stack
-- **Frontend**: SvelteKit 5 with TypeScript
-- **Styling**: TailwindCSS with Flowbite components
-- **Deployment**: Cloudflare Pages with Wrangler
-- **Authentication**: Supabase Auth
-- **Database**: Supabase (PostgreSQL)
+- **Frontend**: SvelteKit 5 + TypeScript + TailwindCSS + Flowbite components
+- **Deployment**: Cloudflare Pages via `@sveltejs/adapter-cloudflare`
+- **Database/Auth**: Supabase (PostgreSQL + Auth)
+- **AI Providers**: DeepSeek (primary, toggled via `useDeepseek` flag in `src/lib/server/openai.ts`) and OpenAI (alternative)
+- **Vector Search**: Cloudflare Vectorize (primary) + Pinecone (alternative)
 
-### Cloudflare Platform Services
-- **AI**: Cloudflare AI Workers binding for LLM interactions
-- **Vector Storage**: Vectorize for semantic search
-- **Object Storage**: R2 bucket for composer data
-- **Pages**: Static site hosting with serverless functions
+### Cloudflare Platform Bindings (defined in `wrangler.toml`, typed in `app.d.ts`)
+- `AI` - Cloudflare AI Workers (includes AutoRAG)
+- `VECTORIZE` - Vector database (index: `opusxx-vectors`)
+- `R2` - Object storage bucket (`composer-data`)
 
-### External APIs
-- **OpenAI/DeepSeek**: Chat completions with structured output using Zod schemas
+## Key Code Patterns
+
+### AI Provider Switching
+`src/lib/server/openai.ts` controls the AI backend. The `useDeepseek` flag (currently `true`) switches between DeepSeek (`deepseek-chat` model) and OpenAI. Both use the OpenAI SDK — DeepSeek is accessed by pointing the OpenAI client at `https://api.deepseek.com`. Embeddings always use OpenAI's `text-embedding-3-small`.
+
+### Client-Server AI Pattern
+Client-side functions in `src/lib/openai.ts` are thin wrappers that call SvelteKit API routes (`/api/chat/`, `/api/extract/`, etc.), which in turn call server-side functions in `src/lib/server/openai.ts`. This keeps API keys server-side.
+
+### Structured Data Extraction
+Server-side extraction functions use Zod schemas with OpenAI's `zodResponseFormat()` for type-safe AI output:
+- `extractComposer()` → `ComposerExtractSchema`
+- `extractComposerList()` → `ComposerList`
+- `extractWorkList()` → `WorkListSchema`
+
+### AI Agent System (`/api/agents/`)
+Specialized endpoints that power the chat interaction loop:
+- **action-decision** — Determines whether to search or continue conversation
+- **query-maker** — Transforms chat context into search queries
+- **insight-maker** — Scores work relevance (0-10) against user intent
+- **question-maker** — Generates follow-up questions
+- **surprise-ninja** — Random/surprise recommendations
+
+### Authentication Flow (`hooks.server.ts`)
+Creates a Supabase client per request with `createSupabaseServerClient()`. Exposes `event.locals.supabase`, `event.locals.getSession()`, and `event.locals.getUser()`. Generates a random nonce for CSP headers and replaces `__NONCE__` placeholders in HTML responses.
 
 ## Key Directories
 
-### `/src/lib/`
-Core library files:
-- `types.ts` - TypeScript interfaces, Zod schemas for validation, and API types (composers, works, genres, etc.)
-- `databaseTypes.ts` - PostgreSQL database schema types
-- `openai.ts` - Client-side AI function wrappers (calls API routes)
-- `supabase.ts` - Supabase client configuration
-- `assitants.ts` - OpenAI Assistants API integration with thread management
-- `scrapingUtils.ts` - Web scraping utilities
+- `src/lib/types.ts` — Core domain types (Composer, Work, Genre) and Zod schemas for AI extraction
+- `src/lib/databaseTypes.ts` — PostgreSQL schema types with composed relation types
+- `src/lib/stores/` — Svelte stores for chat, user, card, modal, error, and loading state
+- `src/lib/utils/` — Utility modules (Airtable, Cloudflare AI, composer parsing, string utils, vectors)
+- `src/lib/components/` — UI components (Chat*, XX* branded components, cards/, SplitPage, ColourLoader)
+- `src/routes/api/` — API routes: `/agents/`, `/chat/`, `/extract/`, `/scrape/`, `/vector/`, `/search/sql/`, `/embeddings/`, `/r2/`, `/base/`
 
-### `/src/lib/server/`
-Server-only code:
-- `openai.ts` - Server-side OpenAI/DeepSeek integration with structured output using Zod schemas
+## Styling
 
-### `/src/lib/stores/`
-Svelte stores for state management:
-- `chatStore.ts` - Chat interface state
-- `userStore.ts` - User authentication state
-- `supabaseStore.ts` - Supabase client store
-- `cardStore.ts` - Card display state
-- `modalStore.ts` - Modal visibility state
-- `errorStore.ts` - Error handling
-- `loadStore.ts` - Loading states
+TailwindCSS with custom theme in `tailwind.config.ts`:
+- Custom fonts: `ff-zwo-web-pro`, `ff-zwo-corr-web-pro` (TypeKit)
+- Primary yellow: `#EAC645`
+- Accent acid green: `#E5FF00`
+- Period-based color palette (Romantic, Classical, Baroque, Contemporary, Modernist) used throughout the UI for visual categorization
 
-### `/src/lib/components/`
-Reusable Svelte components:
-- Chat interface: `Chat.svelte`, `ChatBubble.svelte`, `ChatInput.svelte`, `ChatOption.svelte`, `ChatLoading.svelte`
-- Branding components: `XXButton.svelte`, `XXHeader.svelte`, `XXFooter.svelte`, `XXModal.svelte`
-- Card components: `cards/XXComposerCard.svelte`, `cards/XXWorkCard.svelte`, `cards/XXComposerDetail.svelte`, `cards/XXWorkDetail.svelte`
-- UI utilities: `ColourLoader.svelte`, `AnimatedPageTransition.svelte`
+## Environment Variables
 
-### `/src/routes/api/`
-SvelteKit API routes organized by functionality:
-- `/agents/` - AI agent endpoints (insight-maker, query-maker, question-maker, action-decision)
-- `/chat/` - AI chat endpoints (standard, JSON, Cloudflare AI)
-- `/extract/` - Data extraction endpoints (composer, composer-list, work-list)
-- `/scrape/` - Web scraping utilities
-- `/vector/` - Vector search operations (Vectorize and Pinecone)
-- `/embeddings/` - OpenAI embeddings generation
-- `/r2/` - R2 bucket operations
-- `/base/` - Base data endpoints
-
-## Environment Setup
-
-Required environment variables (see `app.d.ts` for platform types):
-- `VITE_SUPABASE_URL` - Supabase project URL
-- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
-- `OPENAI_API_KEY` - OpenAI API key
-- `DEEPSEEK_API_KEY` - DeepSeek API key
-- `CF_ACCOUNT_ID` - Cloudflare account ID
-- `CF_AI_TOKEN` - Cloudflare AI token
-
-## AI Integration Architecture
-
-### Dual Provider Setup
-The application supports switching between OpenAI and DeepSeek via the `useDeepseek` flag in `src/lib/server/openai.ts`:
-- When `useDeepseek = false`: Uses OpenAI with `gpt-4` model
-- When `useDeepseek = true`: Uses DeepSeek API with `deepseek-chat` model
-
-### Structured Data Extraction
-Server-side functions in `src/lib/server/openai.ts` use Zod schemas with OpenAI's structured output:
-- `extractComposer()` - Extract composer biographical data using `ComposerExtractSchema`
-- `extractComposerList()` - Extract composer links from directory pages using `ComposerList` schema
-- `extractWorkList()` - Extract musical work metadata using `WorkListSchema`
-
-### AI Agent System
-The `/api/agents/` endpoints implement specialized AI agents:
-- **insight-maker**: Analyzes musical works against user intentions, returns relevance scores (0-10)
-- **query-maker**: Transforms chat context into structured search queries
-- **question-maker**: Generates follow-up questions based on conversation context
-- **action-decision**: Determines whether to search or continue conversation
-
-### Chat Modes
-- Standard chat: `/api/chat/` - Regular conversational responses
-- JSON chat: `/api/chat/json/` - Structured JSON responses
-- Cloudflare AI: `/api/chat/cf/` - Uses Cloudflare Workers AI binding
-
-### OpenAI Assistants Integration
-The `assitants.ts` module provides thread-based conversation management:
-- `createThread()` - Initialize conversation threads
-- `addMessage()` - Add messages to threads
-- `runAssistant()` - Execute assistant with custom instructions
-- `waitForRun()` - Poll for completion with timeout
-- `getMessages()` - Retrieve thread messages
-
-## Vector Search Architecture
-
-The application implements dual vector search:
-1. **Cloudflare Vectorize** (primary) - Platform-integrated vector storage via `VECTORIZE` binding
-2. **Pinecone** (alternative) - External vector database via `/api/vector/search/pinecone/`
-
-Embeddings are generated via OpenAI's `text-embedding-3-small` model through `/api/embeddings/`.
-
-## Authentication Flow
-
-Server-side authentication in `hooks.server.ts`:
-- Creates Supabase client for each request with `createSupabaseServerClient()`
-- Exposes `event.locals.supabase`, `event.locals.getSession()`, and `event.locals.getUser()`
-- Nonce generation for CSP headers
-- Session data passed to routes via `app.locals`
-
-## Platform Bindings
-
-Cloudflare Workers bindings defined in `wrangler.toml` and typed in `app.d.ts`:
-- `AI` - Cloudflare AI Workers for LLM inference
-- `VECTORIZE` - Vector database binding (index: `opusxx-vectors`)
-- `R2` - Object storage bucket (`composer-data`)
-
-## Deployment
-
-- Uses `@sveltejs/adapter-cloudflare` for Cloudflare Pages
-- Development requires both Vite and Wrangler running concurrently
-- Environment variables loaded via `dotenv-cli` in dev mode
-- CSP allows TypeKit fonts, Google Fonts, and Cloudflare Image Delivery
+See `app.d.ts` for typed platform bindings. Required:
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` — Supabase connection
+- `OPENAI_API_KEY` — OpenAI (embeddings, alternative chat provider)
+- `DEEPSEEK_API_KEY` — DeepSeek (primary chat provider)
+- `CF_ACCOUNT_ID`, `CF_AI_TOKEN` — Cloudflare platform services
