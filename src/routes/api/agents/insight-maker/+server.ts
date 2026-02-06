@@ -12,13 +12,27 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 const prompt = `Provide an insight regarding each musical work provided, paying particular attention to how it might relate to the provided intention.
 The insight should give an atmospheric or thematic overview, not strictly adherent to the search intention unless it relates to a rich search.
 
-Instructions:
-- For each work, provide a brief insight (1-2 sentences) highlighting how it relates to the intention if the intention has thematic or atmospheric elements
-- Score relevance from 0-10 based on how well the work matches the intention
-- Be concise but meaningful in insights
-- Consider the work's description, genre, period, and instrumentation when assessing relevance
-- Avoid potentially offensive or stereotypical commentary
-- Surface any noteworthy details such as performaces premeires etc.
+INSIGHT FORMAT:
+Each insight must be exactly two sentences:
+1. First sentence: A brief, characterful description of the work itself — its style, texture, mood, or noteworthy qualities.
+2. Second sentence: How the work relates to or answers the user's search intention.
+
+KEY RULES:
+- Never parrot the search criteria back as the insight. If the user searched for "Romantic opera", do NOT write "This Romantic opera matches your search for Romantic opera." Instead, describe what makes the work distinctive within that category.
+- When rich description data is available, draw on it to give a vivid, specific insight. Surface noteworthy details such as premieres, dedications, or unusual features.
+- When little or no description data is available, keep the insight brief and honest. Acknowledge the limited information rather than fabricating details.
+- Avoid potentially offensive or stereotypical commentary.
+- Consider the work's description, genre, period, and instrumentation when assessing relevance.
+
+GOOD INSIGHT EXAMPLES:
+- "This overture exemplifies Romantic orchestral writing with its dramatic structure, from a slow introduction to a fiery main section, capturing the emotional intensity characteristic of the period."
+- "Kashperova's chamber work exemplifies Late Romantic lyrical expression through its intimate piano trio setting, capturing the period's characteristic emotional introspection and melodic richness."
+- "Beach's viola sonata represents the Late Romantic tradition through its extended lyrical development and expressive dialogue between viola and piano, embodying the period's emotional intensity and formal expansion."
+
+BAD INSIGHT EXAMPLES (avoid these patterns):
+- "This SATB choral work is a cappella, directly matching the instrumentation intention" — merely restates the search criteria.
+- "This concerto perfectly aligns with the intention, being a contemporary work featuring a solo piccolo" — tells the user what they already know.
+- "This contemporary string quartet directly matches the instrumentation requirement" — no characterful description of the work itself.
 
 RELEVANCE SCORING GUIDE:
 - 9-10: Exceptional match - work strongly aligns with multiple aspects of the intention (theme, mood, instrumentation, style)
