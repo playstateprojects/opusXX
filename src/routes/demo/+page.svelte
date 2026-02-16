@@ -81,7 +81,7 @@
 	});
 </script>
 
-<div class="flex h-full max-h-full w-full flex-grow-0 flex-col overflow-hidden">
+<div class="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
 	{#if pageNumber == 1}
 		<div class="flex w-full flex-col px-16 pb-0 pt-16" out:slide={{ duration: 500, axis: 'y' }}>
 			<span class="text-center font-zwocorr text-2xl font-light text-gray-500"

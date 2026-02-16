@@ -5,9 +5,11 @@
 
 html,
 body {
-	height: 100vh;
+	height: 100%;
+	min-height: 100%;
 	margin: 0;
 	padding: 0;
+	overflow: hidden;
 }
 
 /* Font loading states */
@@ -21,6 +23,7 @@ body {
 
 /* Font fallbacks */
 body {
+	min-height: 100dvh;
 	font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 

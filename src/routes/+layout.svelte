@@ -52,11 +52,11 @@
 </script>
 
 <div
-	class="bg-gradient flex h-screen w-screen flex-col overflow-hidden bg-gradient-to-b from-white via-white via-15% to-gray-300"
+	class="bg-gradient fixed inset-0 flex min-h-0 min-w-0 flex-col overflow-hidden bg-gradient-to-b from-white via-white via-15% to-gray-300"
 >
 	<XXHeader />
-	<div class="flex-grow overflow-auto">
-		<SplitPage isWideScreen={true}>
+	<div class="relative min-h-0 flex-1 overflow-hidden">
+		<SplitPage isWideScreen={$isWideScreen}>
 			<svelte:fragment slot="main">
 				<slot />
 			</svelte:fragment>
@@ -71,7 +71,7 @@
 						/>
 					</div>
 				{:else if $cardStore.length > 0}
-					<div class="flex h-full w-full flex-col justify-center overflow-hidden p-2">
+					<div class="flex h-full min-h-0 w-full flex-col justify-center overflow-hidden p-2">
 						<div class="flex gap-4 overflow-x-auto">
 							{#each $cardStore as card}
 								<div class="w-80 flex-shrink-0 snap-center">
@@ -81,14 +81,14 @@
 						</div>
 					</div>
 				{:else}
-					<div class="flex h-full w-full flex-grow justify-center px-10">
+					<div class="flex h-full min-h-0 w-full flex-grow justify-center overflow-hidden px-10">
 						<XxSpotlightCards />
 					</div>
 				{/if}
-				<XxWorkDetail />
-				<XxComposerDetail />
 			</svelte:fragment>
 		</SplitPage>
+		<XxWorkDetail />
+		<XxComposerDetail />
 		<div
 			class="bg-acid-500 bg-period-baroque bg-period-early_romantic bg-period-late_romantic"
 		></div>

@@ -20,10 +20,15 @@ Analyze the latest user message in the context of the conversation and currently
 1. Decide whether to initiate a SQL search, vector search, or continue conversation
 2. Extract ALL implicit and explicit filters from the ENTIRE CONVERSATION HISTORY when search is triggered
 
-GLOBAL BIAS (IMPORTANT):
-- When in doubt, assume the user wants a search.
+GLOBAL BIAS (CRITICAL — READ THIS FIRST):
+- ALWAYS prefer searching over asking more questions. You may ask AT MOST ONE follow-up question to clarify a broad filter before searching. After that, SEARCH with whatever filters you have.
+- Two filters is MORE than enough to search. Never wait for three or four filters before searching.
+- If the user provides TWO or more filters (e.g. "Renaissance" + "Instrumental") → SEARCH IMMEDIATELY. Do not ask further questions.
+- If the user provides ONE broad filter (e.g. just "Renaissance"), you MAY ask one clarifying question (e.g. "What kind of Renaissance music?"). But once they answer, SEARCH — do not ask again.
+- The user can always refine results AFTER seeing them. Showing results early is always better than asking a second clarifying question.
 - If the user is talking about pieces they might want to hear / see / use (e.g. "something…", "show me…", "I want…", "too dramatic", "more dreamy"), you MUST return either "sql_search" or "vector_search", NOT "continue".
-- After at least one musical filter (composer, period, genre, instrument, etc.) has appeared earlier in the conversation, only use "continue" when the user is clearly asking for meta-information (history, definitions) or explicitly not asking for more works.
+- THEMES, IMAGERY, AND MOODS ARE COMPLETE SEARCH QUERIES. If the user describes a theme, scene, mood, or evocative image (e.g. "moonlight in Gibraltar", "a stormy night", "autumn melancholy", "a walk through Paris"), return "vector_search" IMMEDIATELY with no follow-up questions. These are rich semantic queries that vector search handles perfectly. Do NOT ask for period, genre, or instrument — the theme itself is the search.
+- Only return "continue" when: (a) the user has provided ONE or ZERO broad categorical filters (like just a period name) and you haven't yet asked a follow-up, or (b) the user is clearly asking meta-questions or chatting about non-search topics.
 
 DISPLAYED WORKS AWARENESS:
 - If works are currently displayed, consider whether the user's message is refining/filtering those results or asking for completely new criteria
@@ -53,10 +58,12 @@ Examples:
 - "20th century symphonies" → sql_search (period: "20th Century", genre: "Orchestral", subgenre: "Symphony")
 
 
-2. "vector_search" (Use for semantic/descriptive queries)
-Return "vector_search" when the user's message is DESCRIPTIVE, SEMANTIC, or MOOD-BASED:
+2. "vector_search" (Use for semantic/descriptive/thematic queries)
+Return "vector_search" IMMEDIATELY (no follow-up questions needed) when the user's message contains:
+- Themes, scenes, or evocative imagery ("moonlight in Gibraltar", "a walk through Paris", "spring morning")
 - Descriptive mood/character ("sad", "joyful", "peaceful", "dramatic", "heroic", "dreamy")
 - Abstract concepts ("something melancholic", "uplifting music")
+- Programme or concert themes ("music for a candlelit dinner", "pieces about the sea")
 - Comparative / refinement language:
   - "something like this but gentler"
   - "more energetic"
@@ -65,9 +72,13 @@ Return "vector_search" when the user's message is DESCRIPTIVE, SEMANTIC, or MOOD
   - "that's too intense", "that's too dramatic"
 - Refinements of previous searches with mood/character descriptors
 
+CRITICAL: Themes and imagery are COMPLETE queries — they do NOT need period, genre, or instrument to be searchable. Search immediately.
+
 Use vector_search when semantic similarity matching is needed. IMPORTANT: Even with vector_search, extract and include any categorical filters from the conversation history.
 
 Examples:
+- "moonlight in Gibraltar" → vector_search with filters: {} (theme is the query — search immediately, do NOT ask for period/genre)
+- "music for a stormy night" → vector_search with filters: {} (search immediately)
 - "Something peaceful and contemplative" → vector_search with filters: {}
 - "Music that feels like autumn rain" → vector_search with filters: {}
 - After discussing Classical period: "something dreamy" → vector_search with filters: { period: "Classical" }
@@ -142,19 +153,35 @@ IMPORTANT Mapping Rules (use EXACT casing shown):
 
 CONVERSATION-BASED FILTER ACCUMULATION EXAMPLES:
 
-Conversation 1:
+Conversation 1 (ONE follow-up max, then SEARCH):
+User: "From a specific time period"
+→ action: "continue" (no specific filter yet, ask which period)
+User: "Renaissance"
+→ action: "continue" (one broad filter — you may ask ONE clarifying question, e.g. "What kind of Renaissance music?")
+User: "Instrumental"
+→ action: "sql_search", filters: { period: "Renaissance" }
+(IMPORTANT: You already asked one follow-up. Now SEARCH with what you have. Do NOT ask "what ensemble?" — the user can refine after seeing results.)
+
+Conversation 2 (Two filters = search immediately, no follow-up needed):
+User: "Renaissance instrumental music"
+→ action: "sql_search", filters: { period: "Renaissance" }
+(Two filters given upfront — search immediately, no questions.)
+
+Conversation 3 (Accumulate filters via refinement AFTER results):
 User: "Classical period"
-Assistant: "What instrumentation..."
+→ action: "continue" (one broad filter, ask one clarifying question)
 User: "Chamber music"
-Assistant: "What size..."
-User: "Wind quintet"
-Assistant: "What difficulty..."
+→ action: "sql_search", filters: { period: "Classical", genre: "Chamber Music" }
+(User sees results, then refines:)
+User: "Wind quintet specifically"
+→ action: "sql_search", filters: { period: "Classical", genre: "Chamber Music", subgenre: "Quintet", instrument: ["wind quintet"] }
 User: "these are great but can you find something dreamy?"
 → action: "vector_search", filters: { period: "Classical", genre: "Chamber Music", instrument: ["wind quintet"] }
 
-Conversation 2:
+Conversation 4:
 User: "Romantic piano music"
-Assistant: "What type..."
+→ action: "sql_search", filters: { period: "Romantic", instrument: "piano" }
+(Two filters — search immediately.)
 User: "something melancholic"
 → action: "vector_search", filters: { period: "Romantic", instrument: "piano" }
 

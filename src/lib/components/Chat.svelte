@@ -498,11 +498,11 @@
 </script>
 
 <div
-	class="mb-8 flex h-full max-h-full w-full flex-col items-center justify-between overflow-y-hidden text-center"
+	class="flex min-h-0 w-full flex-1 flex-col items-center overflow-y-hidden text-center"
 >
 	<div
 		bind:this={scrollContainer}
-		class="flex h-full w-full flex-col items-center justify-center overflow-y-auto"
+		class="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-y-auto"
 	>
 		{#each $messages as message, idx}
 			{#if Array.isArray(message)}
@@ -553,7 +553,7 @@
 	</div>
 
 	{#if showInput && !$actions.length}
-		<div class="mt-4 w-full">
+		<div class="w-full shrink-0 pt-4">
 			<ChatInput
 				prompt={'Something else?'}
 				{onSubmit}
