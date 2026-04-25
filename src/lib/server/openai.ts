@@ -5,13 +5,13 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { ComposerExtractSchema, ComposerList, WorkListSchema, type Composer } from '../types';
 
 const useDeepseek = true;
-let aiModel = "deepseek-chat"
+let aiModel = "ddeepseek-v4-flash"
 let openai: OpenAI;
 
 if (!useDeepseek) {
     openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 } else {
-    aiModel = "deepseek-chat";
+    aiModel = "ddeepseek-v4-flash";
     if (!DEEPSEEK_API_KEY) {
         throw new Error('DEEPSEEK_API_KEY is required when useDeepseek is true');
     }
@@ -49,9 +49,9 @@ const chat = async (messages: AiMessage[], retries = 2) => {
 
             // Check if it's a network/connection error worth retrying
             const isNetworkError = error.message?.includes('fetch') ||
-                                  error.message?.includes('Premature close') ||
-                                  error.code === 'ECONNRESET' ||
-                                  error.code === 'ETIMEDOUT';
+                error.message?.includes('Premature close') ||
+                error.code === 'ECONNRESET' ||
+                error.code === 'ETIMEDOUT';
 
             if (isNetworkError && attempt < retries) {
                 console.log(`Network error on attempt ${attempt + 1}, retrying...`);
@@ -94,9 +94,9 @@ const jsonChat = async (messages: AiMessage[], retries = 2) => {
 
             // Check if it's a network/connection error worth retrying
             const isNetworkError = error.message?.includes('fetch') ||
-                                  error.message?.includes('Premature close') ||
-                                  error.code === 'ECONNRESET' ||
-                                  error.code === 'ETIMEDOUT';
+                error.message?.includes('Premature close') ||
+                error.code === 'ECONNRESET' ||
+                error.code === 'ETIMEDOUT';
 
             if (isNetworkError && attempt < retries) {
                 console.log(`Network error on attempt ${attempt + 1}, retrying...`);
