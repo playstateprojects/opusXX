@@ -5,18 +5,36 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { ComposerExtractSchema, ComposerList, WorkListSchema, type Composer } from '../types';
 
 const useDeepseek = true;
-let aiModel = "ddeepseek-v4-flash"
+// Default ("pro") model used everywhere. FLASH_MODEL is a faster/cheaper tier for
+// high-volume, per-item calls (e.g. per-work insights). Confirm the exact flash
+// model id with DeepSeek if requests start 404-ing on an unknown model.
+export const PRO_MODEL = "deepseek-v4-pro";
+export const FLASH_MODEL = "deepseek-v4-flash";
+let aiModel = PRO_MODEL;
 let openai: OpenAI;
 
 if (!useDeepseek) {
     openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 } else {
-    aiModel = "ddeepseek-v4-flash";
+    aiModel = PRO_MODEL;
     if (!DEEPSEEK_API_KEY) {
         throw new Error('DEEPSEEK_API_KEY is required when useDeepseek is true');
     }
     openai = new OpenAI({ baseURL: 'https://api.deepseek.com', apiKey: DEEPSEEK_API_KEY });
 }
+
+// Errors worth retrying: network blips and request timeouts. The OpenAI SDK throws
+// named error classes (APITimeoutError / APIConnectionError) which a substring check
+// on `message` alone would miss, so check both.
+const isRetryableError = (error: any): boolean =>
+    error?.name === 'APITimeoutError' ||
+    error?.name === 'APIConnectionError' ||
+    error?.name === 'APIConnectionTimeoutError' ||
+    error?.message?.includes('fetch') ||
+    error?.message?.includes('Premature close') ||
+    error?.message?.toLowerCase?.().includes('timeout') ||
+    error?.code === 'ECONNRESET' ||
+    error?.code === 'ETIMEDOUT';
 
 const getEmbedding = async (text: string) => {
     const embedding = await openai.embeddings.create({
@@ -32,11 +50,13 @@ const chat = async (messages: AiMessage[], retries = 2) => {
 
     for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-            const response = await openai.chat.completions.create({
-                model: aiModel,
-                messages: messages,
-                timeout: 30000 // 30 second timeout
-            });
+            const response = await openai.chat.completions.create(
+                {
+                    model: aiModel,
+                    messages: messages
+                },
+                { timeout: 60000 }
+            );
 
             console.log("ch12", response)
             if (response && response.choices[0].message) {
@@ -70,19 +90,28 @@ const chat = async (messages: AiMessage[], retries = 2) => {
     return { error: true, message: lastError?.message || 'Unknown error' }
 }
 
-const jsonChat = async (messages: AiMessage[], retries = 2) => {
+const jsonChat = async (
+    messages: AiMessage[],
+    options: { model?: string; retries?: number; timeoutMs?: number } = {}
+) => {
+    const { model = aiModel, retries = 2, timeoutMs = 60000 } = options;
     let lastError: any;
+
+    // Thinking is always disabled — none of our JSON tasks need chain-of-thought and
+    // it roughly doubles latency. DeepSeek's hybrid models take this `thinking` param;
+    // the OpenAI SDK doesn't type it, so build the body and cast.
+    const body = {
+        model,
+        messages,
+        response_format: { type: 'json_object' as const },
+        thinking: { type: 'disabled' }
+    } as OpenAI.ChatCompletionCreateParamsNonStreaming;
 
     for (let attempt = 0; attempt <= retries; attempt++) {
         try {
-            const response = await openai.chat.completions.create({
-                model: aiModel,
-                messages: messages,
-                response_format: {
-                    'type': 'json_object'
-                },
-                timeout: 30000 // 30 second timeout
-            });
+            // `timeout` is a per-request SDK option (2nd arg), NOT a completion body
+            // param — passing it in the body does nothing.
+            const response = await openai.chat.completions.create(body, { timeout: timeoutMs });
 
             if (response && response.choices[0].message) {
                 return response.choices[0].message
@@ -92,14 +121,8 @@ const jsonChat = async (messages: AiMessage[], retries = 2) => {
         } catch (error: any) {
             lastError = error;
 
-            // Check if it's a network/connection error worth retrying
-            const isNetworkError = error.message?.includes('fetch') ||
-                error.message?.includes('Premature close') ||
-                error.code === 'ECONNRESET' ||
-                error.code === 'ETIMEDOUT';
-
-            if (isNetworkError && attempt < retries) {
-                console.log(`Network error on attempt ${attempt + 1}, retrying...`);
+            if (isRetryableError(error) && attempt < retries) {
+                console.log(`Retryable error on attempt ${attempt + 1}, retrying...`, error?.message);
                 // Exponential backoff: wait 1s, then 2s
                 await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
                 continue;

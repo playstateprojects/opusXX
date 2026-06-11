@@ -72,7 +72,7 @@
 					</div>
 				{:else if $cardStore.length > 0}
 					<div class="flex h-full min-h-0 w-full flex-col justify-center overflow-hidden p-2">
-						<div class="flex gap-4 overflow-x-auto">
+						<div class="flex gap-4 overflow-x-auto overflow-y-hidden">
 							{#each $cardStore as card}
 								<div class="w-80 flex-shrink-0 snap-center">
 									<XxWorkCard workCard={card} />

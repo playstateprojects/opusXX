@@ -18,7 +18,7 @@
 		workCard?: WorkCardType;
 	}>();
 
-	function formatInstrumentation(value: string | undefined): string {
+	function formatScoring(value: string | undefined): string {
 		if (!value) return '';
 		const trimmed = value.trim();
 		if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
@@ -33,7 +33,7 @@
 	}
 </script>
 
-<div class="flip-container relative aspect-[calc(9/16)] h-full w-full max-w-md">
+<div class="flip-container relative aspect-[calc(9/16)] w-full max-w-md">
 	<div
 		class="flip-inner relative h-full w-full"
 		style="transform: rotateY({state.showBack ? 180 : 0}deg);"
@@ -41,7 +41,7 @@
 		<!-- Front -->
 		<div
 			id="card_front"
-			class="flip-front absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
+			class="flip-front absolute inset-0 flex flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
 			<button
 				class="flex w-full text-black bg-period-{workCard.work.period
@@ -161,7 +161,7 @@
 		<!-- Back -->
 		<div
 			id="card_back"
-			class="flip-back absolute inset-0 flex aspect-[calc(9/16)] flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
+			class="flip-back absolute inset-0 flex flex-col overflow-hidden rounded-3xl bg-black text-white shadow-lg"
 		>
 			<button
 				class="flex w-full cursor-pointer bg-period-{workCard.work.period
@@ -179,8 +179,14 @@
 					class="mb-2 aspect-[2.2] w-full object-cover"
 				/>
 			</button>
-			<div class="flex h-full flex-col px-4 pb-0 pt-4">
+			<div class="flex min-h-0 flex-1 flex-col px-4 pb-0 pt-4">
 				<XxComposerCard composer={workCard.work.composer} />
+				{#if workCard.work.scoring}
+					<div class="mt-4 text-xs">
+						<h4 class="mb-1 font-semibold">Scoring</h4>
+						<p class="text-gray-300">{formatScoring(workCard.work.scoring)}</p>
+					</div>
+				{/if}
 			</div>
 
 			<section class="my-4 flex items-center justify-center gap-x-4">

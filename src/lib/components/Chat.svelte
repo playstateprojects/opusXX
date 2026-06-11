@@ -3,8 +3,10 @@
 		AiRole,
 		type AiMessage,
 		type AiOption,
-		type InsightMakerRequest,
-		type InsightMakerResponse,
+		type WorkScorerRequest,
+		type WorkScorerResponse,
+		type WorkInsightRequest,
+		type WorkInsightResponse,
 		type QueryMakerResponse,
 		type QuestionMakerResponse,
 		type ActionDecisionResponse
@@ -18,7 +20,8 @@
 		addCard,
 		cardStore,
 		filterRelevantCards,
-		updateCardInsight,
+		updateCardScore,
+		setCardInsight,
 		clearCards
 	} from '$lib/stores/cardStore.js';
 	import { Spinner } from 'flowbite-svelte';
@@ -28,8 +31,12 @@
 		loading: false,
 		loadingMessage: ''
 	});
-	let { showInput, children } = $props<{
+	import type { Snippet } from 'svelte';
+	let { showInput, children, onSurprise, surpriseLoading } = $props<{
 		showInput?: boolean;
+		onSurprise?: () => void;
+		surpriseLoading?: boolean;
+		children?: Snippet;
 	}>();
 
 	let scrollContainer: HTMLDivElement;
@@ -277,85 +284,71 @@
 			return;
 		}
 
-		// Process works in batches of 5 to avoid payload size issues
-		const BATCH_SIZE = 5;
-		const batches = [];
-		for (let i = 0; i < works.length; i += BATCH_SIZE) {
-			batches.push(works.slice(i, i + BATCH_SIZE));
-		}
+		const workId = (work: (typeof works)[number]) => (work.id || work.name) as string;
 
-		console.log(`Processing ${works.length} works in ${batches.length} batches`);
+		// Score every work in a single call — scoring all of them together lets the
+		// model discriminate relative relevance, and the response is small. This runs
+		// concurrently with insight generation since insights don't depend on scores.
+		const scorePromise = (async () => {
+			try {
+				const scoreRequest: WorkScorerRequest = { works, intention: intent };
+				const response = await fetch('/api/agents/work-scorer', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(scoreRequest)
+				});
 
-		try {
-			// Process batches sequentially to avoid overwhelming the API
-			for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-				const batch = batches[batchIndex];
-				console.log(`Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} works)`);
-
-				const request: InsightMakerRequest = {
-					works: batch,
-					intention: intent
-				};
-
-				// Retry logic with exponential backoff
-				let retries = 3;
-				let delay = 1000;
-				let success = false;
-
-				while (retries > 0 && !success) {
-					try {
-						const controller = new AbortController();
-						const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
-						const response = await fetch('/api/agents/insight-maker', {
-							method: 'POST',
-							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify(request),
-							signal: controller.signal
-						});
-
-						clearTimeout(timeoutId);
-
-						if (!response.ok) {
-							throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-						}
-
-						const data: InsightMakerResponse = await response.json();
-
-						// Update cards with insights using the store function
-						data.works.forEach((workInsight) => {
-							updateCardInsight(workInsight.workId, workInsight.insight, workInsight.relevanceScore);
-						});
-
-						console.log(`Batch ${batchIndex + 1} completed: ${data.works.length} insights generated`);
-						success = true;
-
-					} catch (error) {
-						retries--;
-						if (retries > 0) {
-							console.warn(`Batch ${batchIndex + 1} failed, retrying in ${delay}ms... (${retries} retries left)`, error);
-							await new Promise(resolve => setTimeout(resolve, delay));
-							delay *= 2; // Exponential backoff
-						} else {
-							console.error(`Batch ${batchIndex + 1} failed after all retries:`, error);
-							// Set default insights for failed batch
-							batch.forEach((work) => {
-								updateCardInsight(work.id || work.name, 'Unable to generate insight', 5);
-							});
-						}
-					}
+				if (response.ok) {
+					const data: WorkScorerResponse = await response.json();
+					data.scores.forEach((s) => updateCardScore(s.workId, s.relevanceScore));
+					console.log(`Scored ${data.scores.length} works`);
+				} else {
+					console.error(`work-scorer failed: HTTP ${response.status}`);
 				}
+			} catch (error) {
+				console.error('Error scoring works:', error);
+			}
+		})();
 
-				// Small delay between batches to avoid rate limiting
-				if (batchIndex < batches.length - 1) {
-					await new Promise(resolve => setTimeout(resolve, 500));
+		// Generate one insight per work in parallel, with a small concurrency cap to
+		// avoid hammering the API. A failure only blanks the single offending card.
+		works.forEach((work) => setCardInsight(workId(work), 'Generating insight…'));
+
+		const CONCURRENCY = 6;
+		let cursor = 0;
+
+		const runWorker = async () => {
+			while (cursor < works.length) {
+				const work = works[cursor++];
+				const id = workId(work);
+				try {
+					const request: WorkInsightRequest = { work, intention: intent };
+					const response = await fetch('/api/agents/work-insight', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(request)
+					});
+
+					if (!response.ok) {
+						throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+					}
+
+					const data: WorkInsightResponse = await response.json();
+					setCardInsight(data.workId || id, data.insight);
+				} catch (error) {
+					console.error(`Insight failed for ${id}:`, error);
+					setCardInsight(id, 'Unable to generate insight');
 				}
 			}
+		};
 
-			console.log('All insight batches completed');
-		} catch (error) {
-			console.error('Error updating card insights:', error);
-		}
+		const insightsPromise = Promise.all(
+			Array.from({ length: Math.min(CONCURRENCY, works.length) }, () => runWorker())
+		);
+
+		await Promise.all([scorePromise, insightsPromise]);
+
+		console.log('All scoring and insights completed');
 	};
 	const askNextQuestion = async (currentMessages?: AiMessage[]) => {
 		let filteredMessages = currentMessages || get(messages).filter(
@@ -560,6 +553,8 @@
 				active={!state.loading}
 				onReset={handleStartNewSearch}
 				showReset={$messages.length > 0}
+				{onSurprise}
+				{surpriseLoading}
 			/>
 		</div>
 	{/if}

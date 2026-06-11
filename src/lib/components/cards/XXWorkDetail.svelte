@@ -18,7 +18,51 @@
 		easing: sineIn
 	};
 
-	function formatInstrumentation(value: string | undefined): string {
+	// The Drawer mutates `hidden` itself on outside clicks, so it needs a
+	// two-way bound local state kept in sync with the workDetail store —
+	// a one-way `hidden={...}` prop desyncs and the drawer stops reopening.
+	let hidden = $state(true);
+
+	$effect(() => {
+		hidden = $workDetail === null;
+	});
+
+	$effect(() => {
+		if (hidden && $workDetail !== null) {
+			workDetail.set(null);
+		}
+	});
+
+	function parseLinks(links: string): string[] {
+		try {
+			const parsed = JSON.parse(links);
+			if (Array.isArray(parsed)) return parsed.map(String).filter((link) => link.trim());
+		} catch {
+			// not a JSON array, fall through to splitting
+		}
+		return links.split(/[\n,]+/).filter((link) => link.trim());
+	}
+
+	function normalizeUrl(link: string): string {
+		const trimmed = link.trim();
+		return /^https?:\/\//.test(trimmed) ? trimmed : 'https://' + trimmed;
+	}
+
+	function linkLabel(link: string): string {
+		try {
+			const url = new URL(normalizeUrl(link));
+			const host = url.hostname.replace(/^www\./, '');
+			const lastSegment = decodeURIComponent(url.pathname.split('/').filter(Boolean).pop() ?? '')
+				.replace(/\.(html?|php|aspx?)$/i, '')
+				.replace(/[-_+]/g, ' ')
+				.trim();
+			return lastSegment.length > 2 ? `${lastSegment} (${host})` : host;
+		} catch {
+			return link.trim();
+		}
+	}
+
+	function formatScoring(value: string | undefined): string {
 		if (!value) return '';
 		const trimmed = value.trim();
 		if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
@@ -33,237 +77,209 @@
 	}
 </script>
 
-<div class={$workDetail === null ? 'pointer-events-none' : ''}>
-<Drawer
-	class="m-4 mr-8 rounded-3xl bg-black p-0"
-	width="w-1/2 w-[calc(100vw/2-3rem)]"
-	backdrop={false}
-	position="fixed"
-	placement="right"
-	transitionParams={transitionParamsRight}
-	hidden={$workDetail === null}
->
-	<button
-		class="flex w-full text-black bg-period-{$workDetail?.period
-			? $workDetail.period.toLowerCase().trim().replace(' ', '_')
-			: 'romantic'} font-zwocorr"
-		onclick={() => {
-			workDetail.set(null);
-		}}
+<div class={hidden ? 'pointer-events-none' : ''}>
+	<Drawer
+		class="m-4 mr-8 rounded-3xl bg-black p-0"
+		width="w-1/2 w-[calc(100vw/2-3rem)]"
+		backdrop={false}
+		position="fixed"
+		placement="right"
+		transitionParams={transitionParamsRight}
+		bind:hidden
 	>
-		{#if $workDetail?.composer?.profileImages?.[0]?.cloudflareImageUrl}
-			<img
-				src={$workDetail.composer.profileImages[0].cloudflareImageUrl}
-				alt=""
-				class=" aspect-[1.6] h-full max-h-32 w-1/2 object-cover"
-			/>
-		{/if}
-		<div class="flex w-full flex-col items-start justify-center p-2">
-			<span class="font-bold">{$workDetail?.composer?.name || 'Unknown Composer'}</span>
-			<span class="text-xs">{$workDetail?.period || ''}</span>
-			<span class="text-xs">{$workDetail?.composer?.birthLocation || ''}</span>
-			<span class="text-xs font-extralight italic">
-				{$workDetail?.composer?.birthDate || ''}
-				{#if $workDetail?.composer?.deathDate}~ {$workDetail.composer.deathDate}{/if}
-			</span>
-		</div>
-		<div class="flex flex-col items-center justify-start p-4">
-			<CloseOutline class="solid h-5  w-5 border-[1px] border-black text-sm text-primary-900" />
-		</div>
-	</button>
-	{#if $workDetail}
-		<div class="mx-auto space-y-4 bg-black p-6 text-xs text-white">
-			<div class="flex flex-col items-start justify-between md:flex-row md:items-center">
-				<div class="flex-1">
-					<h1 class="text-lg font-bold">{$workDetail.name}</h1>
-					<p class="italic text-gray-400">{$workDetail.publicationYear}</p>
-					{#if $workDetail.catalogNumber}
-						<p class="text-xs text-gray-500">Catalog: {$workDetail.catalogNumber}</p>
-					{/if}
-				</div>
-				<div class="flex gap-x-2">
-					<XxButton excludeIcon size="sm" action={showUnderDevelopmentModal}
-						><BookmarkOutline class="h-5 w-5" /></XxButton
-					>
-					<XxButton excludeIcon size="sm" action={showUnderDevelopmentModal}><ShareIcon /></XxButton
-					>
-					{#if $workDetail.linkToScore}
-						<XxButton excludeIcon size="sm" link={$workDetail.linkToScore}>
-							Score&nbsp;&nbsp;<ListMusicOutline class="h4 w-4"></ListMusicOutline>
-						</XxButton>
-					{:else if $workDetail.publisher}
-						<XxButton excludeIcon size="sm">
-							{$workDetail.publisher}&nbsp;&nbsp;<ListMusicOutline class="h4 w-4"
-							></ListMusicOutline>
-						</XxButton>
-					{/if}
-				</div>
+		<button
+			class="flex w-full text-black bg-period-{$workDetail?.period
+				? $workDetail.period.toLowerCase().trim().replace(' ', '_')
+				: 'romantic'} font-zwocorr"
+			onclick={() => {
+				workDetail.set(null);
+			}}
+		>
+			{#if $workDetail?.composer?.profileImages?.[0]?.cloudflareImageUrl}
+				<img
+					src={$workDetail.composer.profileImages[0].cloudflareImageUrl}
+					alt=""
+					class=" aspect-[1.6] h-full max-h-32 w-1/2 object-cover"
+				/>
+			{/if}
+			<div class="flex w-full flex-col items-start justify-center p-2">
+				<span class="font-bold">{$workDetail?.composer?.name || 'Unknown Composer'}</span>
+				<span class="text-xs">{$workDetail?.period || ''}</span>
+				<span class="text-xs">{$workDetail?.composer?.birthLocation || ''}</span>
+				<span class="text-xs font-extralight italic">
+					{$workDetail?.composer?.birthDate || ''}
+					{#if $workDetail?.composer?.deathDate}~ {$workDetail.composer.deathDate}{/if}
+				</span>
 			</div>
-
-			<div class="flex w-full justify-between">
-				<div class="text-xs uppercase tracking-wide text-gray-400">
-					{$workDetail.genre?.name || 'Unknown Genre'}
-				</div>
-				<div class="text-xs text-gray-300 md:mt-0">
-					{$workDetail.duration || 'Duration unknown'}
-				</div>
+			<div class="flex flex-col items-center justify-start p-4">
+				<CloseOutline class="solid h-5  w-5 border-[1px] border-black text-sm text-primary-900" />
 			</div>
-
-			<div class="grid gap-4 md:grid-cols-2">
-				<div class="space-y-4">
-					{#if $workDetail.instrumentation || $workDetail.scoring}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Instrumentation</h2>
-							<p class="text-gray-200">
-								{formatInstrumentation($workDetail.instrumentation || $workDetail.scoring)}
-							</p>
-						</div>
-					{/if}
-
-					{#if $workDetail.shortDescription || $workDetail.longDescription}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Overview</h2>
-							{#if $workDetail.longDescription}
-								<p class="leading-relaxed text-gray-200">
-									{$workDetail.longDescription}
-								</p>
-							{:else if $workDetail.shortDescription}
-								<p class="leading-relaxed text-gray-200">
-									{$workDetail.shortDescription}
-								</p>
-							{/if}
-						</div>
-					{/if}
-
-					{#if $workDetail.firstPerformance}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Premiere</h2>
-							<p class="text-gray-200">{$workDetail.firstPerformance}</p>
-						</div>
-					{/if}
-
-					{#if $workDetail.relatedWorks}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Related Works</h2>
-							<p class="text-gray-200">{$workDetail.relatedWorks}</p>
-						</div>
-					{/if}
+		</button>
+		{#if $workDetail}
+			<div class="mx-auto space-y-4 bg-black p-6 text-xs text-white">
+				<div class="flex flex-col items-start justify-between md:flex-row md:items-center">
+					<div class="flex-1">
+						<h1 class="text-lg font-bold">{$workDetail.name}</h1>
+						<p class="italic text-gray-400">{$workDetail.publicationYear}</p>
+						{#if $workDetail.catalogNumber}
+							<p class="text-xs text-gray-500">Catalog: {$workDetail.catalogNumber}</p>
+						{/if}
+					</div>
+					<div class="flex gap-x-2">
+						<XxButton excludeIcon size="sm" action={showUnderDevelopmentModal}
+							><BookmarkOutline class="h-5 w-5" /></XxButton
+						>
+						<XxButton excludeIcon size="sm" action={showUnderDevelopmentModal}
+							><ShareIcon /></XxButton
+						>
+						{#if $workDetail.linkToScore}
+							<XxButton excludeIcon size="sm" link={$workDetail.linkToScore}>
+								Score&nbsp;&nbsp;<ListMusicOutline class="h4 w-4"></ListMusicOutline>
+							</XxButton>
+						{:else if $workDetail.publisher}
+							<XxButton excludeIcon size="sm">
+								{$workDetail.publisher}&nbsp;&nbsp;<ListMusicOutline class="h4 w-4"
+								></ListMusicOutline>
+							</XxButton>
+						{/if}
+					</div>
 				</div>
 
-				<div class="space-y-4">
-					{#if $workDetail.availability}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Availability</h2>
-							<p class="text-gray-200">{$workDetail.availability}</p>
-						</div>
-					{/if}
+				<div class="flex w-full justify-between">
+					<div class="text-xs uppercase tracking-wide text-gray-400">
+						{$workDetail.genre?.name || 'Unknown Genre'}
+					</div>
+					<div class="text-xs text-gray-300 md:mt-0">
+						{$workDetail.duration || 'Duration unknown'}
+					</div>
+				</div>
 
-					{#if $workDetail.tags}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Tags</h2>
-							<p class="text-gray-200">{$workDetail.tags}</p>
-						</div>
-					{/if}
+				<div class="grid gap-4 md:grid-cols-2">
+					<div class="space-y-4">
+						{#if $workDetail.scoring}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Scoring</h2>
+								<p class="text-gray-200">
+									{formatScoring($workDetail.scoring)}
+								</p>
+							</div>
+						{/if}
 
-					{#if $workDetail.notes}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Notes</h2>
-							<p class="leading-relaxed text-gray-200">{$workDetail.notes}</p>
-						</div>
-					{/if}
-
-					{#if $workDetail.source}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Source</h2>
-							<p class="text-gray-200">{$workDetail.source}</p>
-						</div>
-					{/if}
-
-					{#if $workDetail.ismn || $workDetail.iswc || $workDetail.oclc}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Identifiers</h2>
-							<div class="space-y-1 text-xs">
-								{#if $workDetail.ismn}
-									<p class="text-gray-300">ISMN: {$workDetail.ismn}</p>
-								{/if}
-								{#if $workDetail.iswc}
-									<p class="text-gray-300">ISWC: {$workDetail.iswc}</p>
-								{/if}
-								{#if $workDetail.oclc}
-									<p class="text-gray-300">OCLC: {$workDetail.oclc}</p>
+						{#if $workDetail.shortDescription || $workDetail.longDescription}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Overview</h2>
+								{#if $workDetail.longDescription}
+									<p class="leading-relaxed text-gray-200">
+										{$workDetail.longDescription}
+									</p>
+								{:else if $workDetail.shortDescription}
+									<p class="leading-relaxed text-gray-200">
+										{$workDetail.shortDescription}
+									</p>
 								{/if}
 							</div>
-						</div>
-					{/if}
+						{/if}
 
-					{#if $workDetail.links}
-						<div>
-							<h2 class="mb-2 text-sm font-semibold">Links</h2>
-							<div class="space-y-1 text-xs">
-								{#each (() => {
-									// Handle both JSON array strings and plain text links
-									let linksArray = [];
-									try {
-										// Try to parse as JSON array first
-										const parsed = JSON.parse($workDetail.links);
-										if (Array.isArray(parsed)) {
-											linksArray = parsed;
-										} else {
-											// Fall back to splitting if it's not a JSON array
-											linksArray = $workDetail.links.split(/[\n,]+/).filter((link) => link.trim());
-										}
-									} catch {
-										// If JSON parsing fails, split by commas/newlines
-										linksArray = $workDetail.links.split(/[\n,]+/).filter((link) => link.trim());
-									}
-									return linksArray;
-								})() as link, i (`${link}-${i}`)}
-									{#if link.trim()}
+						{#if $workDetail.firstPerformance}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Premiere</h2>
+								<p class="text-gray-200">{$workDetail.firstPerformance}</p>
+							</div>
+						{/if}
+
+						{#if $workDetail.relatedWorks}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Related Works</h2>
+								<p class="text-gray-200">{$workDetail.relatedWorks}</p>
+							</div>
+						{/if}
+					</div>
+
+					<div class="space-y-4">
+						{#if $workDetail.availability}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Availability</h2>
+								<p class="text-gray-200">{$workDetail.availability}</p>
+							</div>
+						{/if}
+
+						{#if $workDetail.tags}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Tags</h2>
+								<p class="text-gray-200">{$workDetail.tags}</p>
+							</div>
+						{/if}
+
+						{#if $workDetail.notes}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Notes</h2>
+								<p class="leading-relaxed text-gray-200">{$workDetail.notes}</p>
+							</div>
+						{/if}
+
+						{#if $workDetail.source}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Source</h2>
+								<p class="text-gray-200">{$workDetail.source}</p>
+							</div>
+						{/if}
+
+						{#if $workDetail.ismn || $workDetail.iswc || $workDetail.oclc}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Identifiers</h2>
+								<div class="space-y-1 text-xs">
+									{#if $workDetail.ismn}
+										<p class="text-gray-300">ISMN: {$workDetail.ismn}</p>
+									{/if}
+									{#if $workDetail.iswc}
+										<p class="text-gray-300">ISWC: {$workDetail.iswc}</p>
+									{/if}
+									{#if $workDetail.oclc}
+										<p class="text-gray-300">OCLC: {$workDetail.oclc}</p>
+									{/if}
+								</div>
+							</div>
+						{/if}
+
+						{#if $workDetail.links}
+							<div>
+								<h2 class="mb-2 text-sm font-semibold">Links</h2>
+								<div class="space-y-1 text-xs">
+									{#each parseLinks($workDetail.links) as link, i (`${link}-${i}`)}
 										<a
-											href={(() => {
-												const trimmedLink = link.trim();
-												// Add https:// protocol if the link doesn't have a protocol
-												if (
-													!trimmedLink.startsWith('http://') &&
-													!trimmedLink.startsWith('https://')
-												) {
-													return 'https://' + trimmedLink;
-												}
-												return trimmedLink;
-											})()}
+											href={normalizeUrl(link)}
 											target="_blank"
 											rel="noopener noreferrer"
-											class="break-all text-blue-400 hover:text-blue-300 hover:underline"
+											class="block break-all text-blue-400 hover:text-blue-300 hover:underline"
 										>
-											{link.trim()}
+											{linkLabel(link)}
 										</a>
-									{/if}
-								{/each}
+									{/each}
+								</div>
 							</div>
-						</div>
-					{/if}
-					<XxButton
-						size="sm"
-						excludeIcon
-						link={'https://base.opusxx.com/dashboard/#/nc/plvv803l38mvhyh/mnq7biac92brabu?rowId=' +
-							$workDetail.id}
-					>
-						<span class="flex items-center justify-center"
-							>EDIT <ShareIcon width={14} height={14} /></span
+						{/if}
+						<XxButton
+							size="sm"
+							excludeIcon
+							link={'https://base.opusxx.com/dashboard/#/nc/plvv803l38mvhyh/mnq7biac92brabu?rowId=' +
+								$workDetail.id}
 						>
-					</XxButton>
+							<span class="flex items-center justify-center"
+								>EDIT <ShareIcon width={14} height={14} /></span
+							>
+						</XxButton>
+					</div>
 				</div>
-			</div>
 
-			{#if !$workDetail.longDescription && !$workDetail.shortDescription && !$workDetail.instrumentation && !$workDetail.notes}
-				<div class="py-8 text-center">
-					<p class="italic text-gray-400">
-						Limited information available for this work. More details may be added in future
-						updates.
-					</p>
-				</div>
-			{/if}
-		</div>
-	{/if}
-</Drawer>
+				{#if !$workDetail.longDescription && !$workDetail.shortDescription && !$workDetail.scoring && !$workDetail.notes}
+					<div class="py-8 text-center">
+						<p class="italic text-gray-400">
+							Limited information available for this work. More details may be added in future
+							updates.
+						</p>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</Drawer>
 </div>

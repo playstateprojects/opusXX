@@ -463,6 +463,33 @@ export interface InsightMakerResponse {
     works: WorkInsight[];
 }
 
+// Work Scorer API types — scores all works in a single call (relative discrimination)
+export interface WorkScorerRequest {
+    works: Work[];
+    intention: string;
+    minRelevanceScore?: number; // Optional filter threshold (0-10)
+}
+
+export interface WorkScore {
+    workId: string;
+    relevanceScore: number;
+}
+
+export interface WorkScorerResponse {
+    scores: WorkScore[];
+}
+
+// Work Insight API types — generates one insight for a single work (parallelisable)
+export interface WorkInsightRequest {
+    work: Work;
+    intention: string;
+}
+
+export interface WorkInsightResponse {
+    workId: string;
+    insight: string;
+}
+
 // Query Maker API types
 export interface QueryMakerInfo {
     schema?: object;

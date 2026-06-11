@@ -1,5 +1,25 @@
 import { RequestEvent } from "@sveltejs/kit";
+import { normalizePeriod } from "$lib/server/taxonomy";
 
+
+// AutoRAG search takes a single query string, so categorical filters are folded
+// into the query text using the canonical period names
+function enrichQuery(query: string, filters?: Record<string, string | string[]>): string {
+    if (!filters) return query;
+
+    const terms: string[] = [];
+    const asArray = (v: string | string[]) => (Array.isArray(v) ? v : [v]);
+
+    if (filters.period) {
+        terms.push(...asArray(filters.period).map(p => `${normalizePeriod(p) ?? p} period`));
+    }
+    if (filters.genre) terms.push(...asArray(filters.genre));
+    if (filters.subgenre) terms.push(...asArray(filters.subgenre));
+    if (filters.instrument) terms.push(...asArray(filters.instrument));
+    if (filters.composer) terms.push(...asArray(filters.composer));
+
+    return terms.length > 0 ? `${query} (${terms.join(', ')})` : query;
+}
 
 export async function POST({ request, platform }: RequestEvent) {
     const body = await request.json();
@@ -31,7 +51,7 @@ export async function POST({ request, platform }: RequestEvent) {
         }
         console.log("body", body)
         const result = await platform.env.AI.autorag("dawn-frog-0b30").search({
-            query: body.query,
+            query: enrichQuery(body.query, body.filters),
         });
 
         return new Response(JSON.stringify({ success: true, result }), {

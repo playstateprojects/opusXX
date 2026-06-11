@@ -7,7 +7,7 @@
 	import { AiOptionIcon, AiRole } from '$lib/types';
 	import { cardStore } from '$lib/stores/cardStore.js';
 	import { onMount } from 'svelte';
-	import { getWorksByComposerId } from '$lib/utils/supabase';
+	import { getWorksByComposerId, parseSupabaseComposer } from '$lib/utils/supabase';
 	import type { SurpriseResponse } from './api/agents/surprise-ninja/+server';
 	import type { WorkCardType, QuestionMakerResponse, QuestionMakerInfo } from '$lib/types';
 	import { user } from '$lib/stores/userStore';
@@ -54,15 +54,7 @@
 			const work = {
 				id: data.work.id,
 				name: data.work.name || '',
-				composer: {
-					id: data.work.composer_details?.id,
-					name: data.work.composer_details?.name || '',
-					birthDate: data.work.composer_details?.birth_date || undefined,
-					deathDate: data.work.composer_details?.death_date || undefined,
-					nationality: data.work.composer_details?.nationality || undefined,
-					composerPeriod: data.work.composer_details?.composer_period || undefined,
-					shortDescription: data.work.composer_details?.short_description || undefined
-				},
+				composer: parseSupabaseComposer(data.work.composer_details ?? {}),
 				period: data.work.period || undefined,
 				instrumentation: data.work.instrumentation || undefined,
 				duration: data.work.duration || undefined,
@@ -72,7 +64,8 @@
 				genre: data.work.genre_details
 					? {
 							id: data.work.genre_details.id,
-							name: data.work.genre_details.name
+							name: data.work.genre_details.name,
+							slug: data.work.genre_details.slug
 						}
 					: undefined
 			};
@@ -166,7 +159,7 @@
 			</p>
 		</div>
 	{/if}
-	<Chat showInput={pageNumber > 1}>
+	<Chat showInput={pageNumber > 1} onSurprise={surpriseMe} surpriseLoading={isLoadingSurprise}>
 		{#if pageNumber == 1}
 			<button
 				class="mt-4 font-light uppercase underline"

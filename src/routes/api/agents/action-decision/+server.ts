@@ -5,14 +5,19 @@ import {
     AiMessage,
     AiRole,
     type ActionDecisionInfo,
-    type ActionDecisionResponse,
-    periods,
-    genres,
-    subGenres
+    type ActionDecisionResponse
 } from '$lib/types.js';
+import {
+    CANONICAL_PERIODS,
+    getTaxonomy,
+    normalizeNameFilter,
+    normalizePeriodFilter,
+    type Taxonomy
+} from '$lib/server/taxonomy';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { countAssistantQuestions, MAX_CLARIFYING_QUESTIONS } from '$lib/utils/stringUtils';
 
-const prompt = `🎼 MUSICAL CHAT CLASSIFIER & FILTER EXTRACTION PROMPT (v2)
+const buildPrompt = (taxonomy: Taxonomy) => `🎼 MUSICAL CHAT CLASSIFIER & FILTER EXTRACTION PROMPT (v2)
 ------------------------------------------------------
 
 Task:
@@ -21,7 +26,11 @@ Analyze the latest user message in the context of the conversation and currently
 2. Extract ALL implicit and explicit filters from the ENTIRE CONVERSATION HISTORY when search is triggered
 
 GLOBAL BIAS (CRITICAL — READ THIS FIRST):
-- ALWAYS prefer searching over asking more questions. You may ask AT MOST ONE follow-up question to clarify a broad filter before searching. After that, SEARCH with whatever filters you have.
+- ALWAYS prefer searching over asking more questions. Returning "continue" makes the assistant ask the user another question, so every "continue" spends one question from a HARD conversation-wide budget. The flow must never feel like an interrogation.
+- QUESTION BUDGET: a "QUESTION BUDGET STATUS" section is appended after the conversation with the exact number of questions already asked. Treat that count as authoritative:
+  - 0-2 questions asked: you may return "continue" to clarify a broad filter, but search as soon as you have anything workable.
+  - 3-5 questions asked: wind the flow down. Return "continue" ONLY if there is genuinely nothing searchable yet; otherwise SEARCH with whatever filters you have.
+  - 6+ questions asked: the budget is EXHAUSTED. You MUST return "sql_search" or "vector_search". NEVER "continue". The user can always refine or ask for more after seeing results.
 - Two filters is MORE than enough to search. Never wait for three or four filters before searching.
 - If the user provides TWO or more filters (e.g. "Renaissance" + "Instrumental") → SEARCH IMMEDIATELY. Do not ask further questions.
 - If the user provides ONE broad filter (e.g. just "Renaissance"), you MAY ask one clarifying question (e.g. "What kind of Renaissance music?"). But once they answer, SEARCH — do not ask again.
@@ -126,16 +135,17 @@ Available filter fields (all can be strings or arrays when multiple values reque
 - composer: Full composer name(s) (e.g., "Clara Schumann", ["Clara Schumann", "Fanny Mendelssohn"])
 
 - period: MUST be EXACTLY one of (case-sensitive):
-  "Medieval", "Renaissance", "Baroque", "Classical", "Early Romantic", "Late Romantic", "Romantic", "20th Century", "Contemporary"
-  Can be array when user says "also include" or "and" (e.g., ["20th Century", "Late Romantic"])
+  ${CANONICAL_PERIODS.map((p) => `"${p}"`).join(', ')}
+  These map to composition years: Medieval (<1400), Renaissance (1400-1599), Baroque (1600-1749), Classical (1750-1819), Romantic (1820-1899), 20th Century (1900-1999), Contemporary (2000+)
+  Can be array when user says "also include" or "and" (e.g., ["20th Century", "Romantic"])
 
 - genre: MUST be EXACTLY one of (case-sensitive, note capitalization):
-  "Chamber Music", "Choral", "Opera", "Orchestral", "Solo", "Vocal"
+  ${taxonomy.genres.map((g) => `"${g.name.trim()}"`).join(', ')}
   ⚠️ NOTE: "Chamber Music" has capital M, not "Chamber music"
   Can be array for multiple genres (e.g., ["Chamber Music", "Solo"])
 
 - subgenre: MUST be EXACTLY one of (case-sensitive):
-  "Canon", "Fugue", "Children's Opera", "Dance", "Mazurka", "Quintet", "Motet", "Opera Seria", "Madrigal", "Symphonic poem", "Anthem", "Etude", "Lieder", "Suite", "Concerto grosso", "Bagatelle", "Concerto", "Prelude", "Serenade", "Trio", "Duo", "Tone poem", "Grand Opera", "Waltz", "Polonaise", "Quartet", "Symphony", "Ballet", "Comic Opera", "Sonata", "Opera Buffa", "Impromptu", "Cantata", "Ensemble", "Chorale", "Scherzo", "Requiem", "Mass", "Masque", "Divertimento", "Minuet"
+  ${taxonomy.subgenres.map((s) => `"${s.name.trim()}"`).join(', ')}
   Can be array for multiple subgenres (e.g., ["Quartet", "Trio"])
 
 - instrument: Any instrument(s) or ensemble mentioned (string, array, or free-text like "piano", "string quartet", ["violin", "cello"], ["wind quintet"])
@@ -148,7 +158,8 @@ IMPORTANT Mapping Rules (use EXACT casing shown):
 - "opera" → genre: "Opera" (may include subgenre if specific type mentioned)
 - "symphony" → genre: "Orchestral", subgenre: "Symphony"
 - "chamber music" → genre: "Chamber Music" (capital M!)
-- Period synonyms: "late 19th century" = "Late Romantic", "1900s" = "20th Century", "modern" = "Contemporary"
+- Period synonyms: "early romantic" / "late romantic" / "19th century" = "Romantic", "1900s" / "modern" / "modernist" = "20th Century", "21st century" / "music written today" = "Contemporary"
+- NEVER append the word "Period" to a period value ("Romantic", not "Romantic Period")
 
 
 CONVERSATION-BASED FILTER ACCUMULATION EXAMPLES:
@@ -199,9 +210,9 @@ User: "something featuring cello"
 Assistant: "What genre..."
 User: "Chamber music"
 Assistant: [shows 20th Century cello chamber music results]
-User: "can you also include options from the late romantic period?"
-→ action: "sql_search", filters: { period: "Late Romantic", instrument: "cello", genre: "Chamber Music" }
-(Note: Search ONLY Late Romantic to add to existing results. Frontend will merge both result sets)
+User: "can you also include options from the romantic period?"
+→ action: "sql_search", filters: { period: "Romantic", instrument: "cello", genre: "Chamber Music" }
+(Note: Search ONLY Romantic to add to existing results. Frontend will merge both result sets)
 
 Conversation 5 (Incremental Search - AFTER seeing results):
 User: "Show me works by Clara Schumann"
@@ -228,17 +239,17 @@ Context Awareness
 - "also include" / "let's include" pattern:
 
   A) After receiving search results (user wants to ADD more results):
-  - User says "also include Late Romantic" or "let's include Fanny Mendelssohn" AFTER seeing results
+  - User says "also include Romantic" or "let's include Fanny Mendelssohn" AFTER seeing results
   - This means: Search ONLY for the NEW filter value, keeping other context filters
   - The frontend will combine the old and new results
   - Example: After showing "20th Century + cello" results:
-    - User: "can you also include options from the late romantic period?"
-    - Return ONLY: { period: "Late Romantic", instrument: "cello", genre: "Chamber Music" }
+    - User: "can you also include options from the romantic period?"
+    - Return ONLY: { period: "Romantic", instrument: "cello", genre: "Chamber Music" }
 
   B) Before any search (user specifying initial criteria):
-  - User mentions multiple values upfront: "Show me 20th Century AND Late Romantic music"
+  - User mentions multiple values upfront: "Show me 20th Century AND Romantic music"
   - This means: Search for BOTH in one query using array
-  - Return: { period: ["20th Century", "Late Romantic"] }
+  - Return: { period: ["20th Century", "Romantic"] }
 
 - Extract filters even from conversational messages if search intent is clear.
 - When a period is mentioned colloquially (e.g., "Baroque", "modern times"), map it to the closest valid period enum.
@@ -272,11 +283,25 @@ IMPORTANT:
 
 `;
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
     const body: ActionDecisionInfo = await request.json();
+
+    // Live genre/subgenre values from Supabase so the model only emits filter
+    // values that actually exist in the database (cached, see taxonomy.ts)
+    const taxonomy = await getTaxonomy(locals.supabase);
+    const prompt = buildPrompt(taxonomy);
+
+    const questionsAsked = countAssistantQuestions(body.chatLog ?? '');
 
     // Build context string including displayed works if available
     let contextString = '\n\nChat conversation:\n' + body.chatLog;
+
+    contextString += `\n\nQUESTION BUDGET STATUS:\nThe assistant has already asked ${questionsAsked} clarifying question(s) in this conversation.`;
+    if (questionsAsked >= MAX_CLARIFYING_QUESTIONS) {
+        contextString += '\nThe question budget is EXHAUSTED. Do NOT return "continue". You MUST return "sql_search" or "vector_search" with the best filters available from the conversation history.';
+    } else if (questionsAsked >= 3) {
+        contextString += '\nThe budget is nearly exhausted. Return "continue" only if there is genuinely nothing searchable yet — otherwise search now with whatever filters you have.';
+    }
 
     if (body.displayedWorks && body.displayedWorks.length > 0) {
         contextString += '\n\nCurrently displayed works:\n';
@@ -337,34 +362,53 @@ export const POST: RequestHandler = async ({ request }) => {
             });
         }
 
-        // Validate filter values against enum types if filters are present
+        // Enforce the question cap deterministically: if the model still wants
+        // to ask another question after the budget is spent, force a vector
+        // search instead — the query-maker builds the semantic query from the
+        // conversation, so empty filters are fine.
+        if (parsedContent.action === 'continue' && questionsAsked >= MAX_CLARIFYING_QUESTIONS) {
+            parsedContent = {
+                action: 'vector_search',
+                reason: `Question budget exhausted (${questionsAsked} questions asked) — searching with available context instead of asking again.`,
+                filters: parsedContent.filters ?? {}
+            };
+        }
+
+        // Normalize filter values against the canonical taxonomy. Each value is
+        // mapped to its canonical form (handles arrays, casing, synonyms like
+        // "Late Romantic" or "Romantic Period"); unrecognized values are dropped.
         if (parsedContent.filters) {
             const { filters } = parsedContent;
 
-            // Validate period against periods enum
             if (filters.period) {
-                const validPeriod = periods.safeParse(filters.period);
-                if (!validPeriod.success) {
+                const normalized = normalizePeriodFilter(filters.period);
+                if (normalized.length === 0) {
                     console.warn(`Invalid period "${filters.period}", will be ignored`);
                     delete filters.period;
+                } else {
+                    filters.period = normalized.length === 1 ? normalized[0] : normalized;
                 }
             }
 
-            // Validate genre against genres enum
             if (filters.genre) {
-                const validGenre = genres.safeParse(filters.genre);
-                if (!validGenre.success) {
+                const matched = normalizeNameFilter(taxonomy.genres, filters.genre);
+                if (matched.length === 0) {
                     console.warn(`Invalid genre "${filters.genre}", will be ignored`);
                     delete filters.genre;
+                } else {
+                    const names = matched.map((g) => g.name);
+                    filters.genre = names.length === 1 ? names[0] : names;
                 }
             }
 
-            // Validate subgenre against subGenres enum
             if (filters.subgenre) {
-                const validSubgenre = subGenres.safeParse(filters.subgenre);
-                if (!validSubgenre.success) {
+                const matched = normalizeNameFilter(taxonomy.subgenres, filters.subgenre);
+                if (matched.length === 0) {
                     console.warn(`Invalid subgenre "${filters.subgenre}", will be ignored`);
                     delete filters.subgenre;
+                } else {
+                    const names = matched.map((s) => s.name);
+                    filters.subgenre = names.length === 1 ? names[0] : names;
                 }
             }
         }

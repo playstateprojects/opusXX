@@ -31,6 +31,30 @@ export function filterRelevantCards() {
         return newCards.length > maxCards ? newCards.slice(0, maxCards) : newCards;
     });
 }
+// Update only the relevance score (used by the work-scorer pass), then re-sort.
+export function updateCardScore(workId: string | number | undefined, relevance: number) {
+    cardStore.update(cards => {
+        const updatedCards = cards.map(card => {
+            if (card.work.id == workId || card.work.name == workId?.toString()) {
+                return { ...card, relevance };
+            }
+            return card;
+        });
+
+        return updatedCards.sort((a, b) => (b.relevance || 0) - (a.relevance || 0));
+    });
+}
+
+// Update only the insight text (used by the per-work work-insight pass).
+export function setCardInsight(workId: string | number | undefined, insight: string) {
+    cardStore.update(cards => cards.map(card => {
+        if (card.work.id == workId || card.work.name == workId?.toString()) {
+            return { ...card, insight };
+        }
+        return card;
+    }));
+}
+
 export function updateCardInsight(workId: string | number | undefined, insight: string, relevance: number) {
     cardStore.update(cards => {
         const updatedCards = cards.map(card => {

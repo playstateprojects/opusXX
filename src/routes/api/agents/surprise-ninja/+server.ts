@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
 		const { data: composer, error: composerError } = await supabase
 			.from('composers')
-			.select('id, name, birth_date, death_date, nationality, composer_period, short_description')
+			.select('*, profile_images (*)')
 			.eq('id', randomWork.composer)
 			.single();
 

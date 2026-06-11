@@ -1,21 +1,40 @@
 <script lang="ts">
 	import type { Composer } from '$lib/types';
 	import { composerDetail } from '$lib/stores/cardStore.js';
+	import { mediumDescription } from '$lib/utils/stringUtils';
 	import { AngleDownOutline } from 'flowbite-svelte-icons';
 
 	let { composer } = $props<{
 		composer: Composer;
 	}>();
+
+	const description = $derived(
+		mediumDescription(composer.longDescription, composer.shortDescription)
+	);
 </script>
 
-<div class="flex h-full flex-col">
-	<div class="flex flex-grow flex-col">
+<div class="flex min-h-0 flex-1 flex-col">
+	<div class="flex min-h-0 flex-grow flex-col overflow-y-auto">
 		<h3 class="font-extrabold">{composer.name}</h3>
 		<span class="text-xs"
 			>{composer.birthDate} {composer.deathDate ? ' - ' : ''}{composer.deathDate}</span
 		>
 		<span class=" text-xs uppercase italic text-gray-400">{composer.nationality}</span>
-		{#if composer.tags}
+		{#if composer.composerPeriod || composer.composerStyle}
+			<span class="text-xs text-gray-300">
+				{[composer.composerPeriod, composer.composerStyle].filter(Boolean).join(' · ')}
+			</span>
+		{/if}
+		{#if composer.birthLocation}
+			<span class="text-xs text-gray-300">Born: {composer.birthLocation}</span>
+		{/if}
+		{#if composer.deathLocation}
+			<span class="text-xs text-gray-300">Died: {composer.deathLocation}</span>
+		{/if}
+		{#if composer.activeLocations}
+			<span class="text-xs text-gray-300">Active: {composer.activeLocations}</span>
+		{/if}
+		{#if composer.tags?.length}
 			<div class="my-2 text-xs italic">{composer.tags.join(' · ')}</div>
 		{/if}
 		{#if composer.representativeWorks}
@@ -34,11 +53,13 @@
 				<p class="text-xs">{composer.themes.join(' · ')}</p>
 			</section>
 		{/if}
-		<div class="mt-4 text-xs">{composer.shortDescription}</div>
+		{#if description}
+			<div class="mt-4 text-xs">{description}</div>
+		{/if}
 	</div>
 
 	<button
-		class="mt-auto flex w-full flex-col items-center justify-center text-slate-400"
+		class="mt-auto flex w-full flex-col items-center justify-center pt-2 text-slate-400"
 		onclick={() => {
 			composerDetail.set(composer);
 		}}

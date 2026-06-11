@@ -2,8 +2,15 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import OpenAI from 'openai';
 import { OPENAI_API_KEY, PINECONE_API_KEY } from '$env/static/private';
 import type { ActionDecisionFilters } from '$lib/types';
+import {
+    getTaxonomy,
+    matchTaxonomyName,
+    normalizePeriod,
+    PERIOD_VARIANTS,
+    type Taxonomy
+} from '$lib/server/taxonomy';
 
-export const POST: RequestHandler = async ({ request, platform }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
     const { query, topK = 5, filters } = await request.json();
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -15,8 +22,11 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     const xq = embeddingRes.data[0].embedding;
 
-    // Build Pinecone filter from ActionDecisionFilters
-    const pineconeFilter = buildPineconeFilter(filters);
+    // Build Pinecone filter from ActionDecisionFilters, normalizing values
+    // against the canonical period list and Supabase genre/subgenre names —
+    // Pinecone metadata matching is exact, so casing/synonyms matter here
+    const taxonomy = await getTaxonomy(locals.supabase);
+    const pineconeFilter = buildPineconeFilter(taxonomy, filters);
     console.log('Pinecone search with filters:', JSON.stringify(pineconeFilter, null, 2));
 
     const res = await fetch(`https://opusxx-a805eee.svc.aped-4627-b74a.pinecone.io/query`, {
@@ -45,7 +55,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
  * - subgenre -> subgenre
  * - instrument -> instrumentation (array field, needs special handling)
  */
-function buildPineconeFilter(filters?: ActionDecisionFilters): Record<string, any> {
+function buildPineconeFilter(taxonomy: Taxonomy, filters?: ActionDecisionFilters): Record<string, any> {
     // Default filter - ensure we have some valid metadata
     const baseFilter: Record<string, any> = {
         genre: { "$exists": true }
@@ -65,25 +75,33 @@ function buildPineconeFilter(filters?: ActionDecisionFilters): Record<string, an
             : { "$in": composers };
     }
 
-    // Map period to period metadata field (exact match or $in for arrays)
+    // Map period to period metadata field. Normalize each value to a canonical
+    // period, then match ALL variant spellings stored in the metadata (e.g.
+    // "Romantic" must also match "Late Romantic", "20th Century" must match
+    // "Modern" and "Early 20th century")
     if (filters.period) {
-        const periods = Array.isArray(filters.period) ? filters.period : [filters.period];
-        pineconeFilter.period = periods.length === 1
-            ? { "$eq": periods[0] }
-            : { "$in": periods };
+        const requested = Array.isArray(filters.period) ? filters.period : [filters.period];
+        const variants = [...new Set(requested.flatMap(p => {
+            const canonical = normalizePeriod(p);
+            return canonical ? PERIOD_VARIANTS[canonical] : [p];
+        }))];
+        pineconeFilter.period = { "$in": variants };
     }
 
-    // Map genre to genre metadata field (exact match or $in for arrays)
+    // Map genre to genre metadata field, canonicalizing casing against the
+    // Supabase genres table (Pinecone matching is exact/case-sensitive)
     if (filters.genre) {
-        const genres = Array.isArray(filters.genre) ? filters.genre : [filters.genre];
+        const requested = Array.isArray(filters.genre) ? filters.genre : [filters.genre];
+        const genres = requested.map(g => matchTaxonomyName(taxonomy.genres, g)?.name.trim() ?? g);
         pineconeFilter.genre = genres.length === 1
             ? { "$eq": genres[0] }
             : { "$in": genres };
     }
 
-    // Map subgenre to subgenre metadata field (exact match or $in for arrays)
+    // Map subgenre to subgenre metadata field, canonicalized like genre
     if (filters.subgenre) {
-        const subgenres = Array.isArray(filters.subgenre) ? filters.subgenre : [filters.subgenre];
+        const requested = Array.isArray(filters.subgenre) ? filters.subgenre : [filters.subgenre];
+        const subgenres = requested.map(s => matchTaxonomyName(taxonomy.subgenres, s)?.name.trim() ?? s);
         pineconeFilter.subgenre = subgenres.length === 1
             ? { "$eq": subgenres[0] }
             : { "$in": subgenres };

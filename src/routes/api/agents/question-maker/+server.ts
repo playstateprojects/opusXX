@@ -8,6 +8,7 @@ import {
     type QuestionMakerResponse
 } from '$lib/types.js';
 import { json, type RequestHandler } from '@sveltejs/kit';
+import { countAssistantQuestions, MAX_CLARIFYING_QUESTIONS } from '$lib/utils/stringUtils';
 
 const prompt = `You are Opus XX's programming advisor.
 Your role when asking questions is to guide the user through artistic decisions, not to interrogate or collect filters.
@@ -21,6 +22,13 @@ Each question must serve one of these purposes:
 - Invite refinement without pressure.
 - Offer an elegant way to shift or reset.
 Do not ask questions that refine details unnecessarily.
+A question is NOT required. If results are displayed and the user's intent is already well served, return an empty question rather than inventing one. Silence after good results is better than a filler question.
+
+QUESTION BUDGET (HARD RULE)
+A "QUESTION BUDGET STATUS" section after the conversation states exactly how many questions you have already asked. Treat that count as authoritative:
+- 0-2 questions asked: a question is fine if it serves a genuine artistic purpose.
+- 3-5 questions asked: strongly prefer Assumption Mode or an empty question; ask only if the user truly cannot proceed without deciding something.
+- 6+ questions asked: the budget is EXHAUSTED. Do NOT ask another question. Return an empty question (optionally with a brief summary of displayed works). The user can always continue the conversation themselves.
 
 STRUCTURAL RULES
 - Ask no more than one question per message.
@@ -31,7 +39,10 @@ STRUCTURAL RULES
 - Prefer offering two artistic directions rather than open-ended interrogation.
 - If enough information exists, offer suggestions instead of asking another question.
 - After two refinement cycles, stop narrowing and offer choice: Continue refining, Explore a new direction, or Start a new search.
-- Optionally provide 2-4 short quick response options (each 1-4 words) that users can click. Quick responses should be specific and actionable. Only include them if relevant or inspiring — they can be an empty array.
+- Quick responses are optional. They are not required and should default to an empty array.
+- Only include quick responses when they genuinely help the user — when they suggest concrete, specific artistic directions worth surfacing (e.g. "Solo piano", "Add a choral work", "Shorter pieces").
+- Do NOT include generic, open-ended, or filler options such as "Surprise me", "Mix both", "Either", "Anything", or "You decide". These add noise rather than guidance. Omit them unless one is genuinely the most useful next step.
+- When you do include them, provide 2-4 short options (each 1-4 words) that point at distinct, actionable directions.
 
 TONE
 - Professional but warm.
@@ -94,17 +105,27 @@ CONTEXT AWARENESS:
 Output JSON only:
 {
   "question": "<direct follow-up question or empty string if providing summary>",
-  "quickResponses": ["<option1>", "<option2>", "<option3>", "<option4>"],
+  "quickResponses": ["<specific actionable option>", ...] or [],
   "summary": "<optional brief summary of displayed works when conversation is extensive>"
 }
 
+quickResponses defaults to an empty array. Only populate it with concrete, specific directions that genuinely help — never with generic filler like "Surprise me" or "Mix both".
 If no meaningful follow-up can be generated, return empty question and no quickResponses.`;
 
 export const POST: RequestHandler = async ({ request }) => {
     const body: QuestionMakerInfo = await request.json();
 
+    const questionsAsked = countAssistantQuestions(body.chatLog ?? '');
+
     // Build context string including displayed works if available
     let contextString = '\n\nChat conversation:\n' + body.chatLog;
+
+    contextString += `\n\nQUESTION BUDGET STATUS:\nYou have already asked ${questionsAsked} question(s) in this conversation.`;
+    if (questionsAsked >= MAX_CLARIFYING_QUESTIONS) {
+        contextString += '\nThe question budget is EXHAUSTED. Do NOT ask another question. Return an empty question (optionally with a brief summary of displayed works).';
+    } else if (questionsAsked >= 3) {
+        contextString += '\nThe budget is nearly exhausted. Prefer an empty question or Assumption Mode — only ask if the user truly cannot proceed without deciding something.';
+    }
 
     if (body.displayedWorks && body.displayedWorks.length > 0) {
         contextString += '\n\nCurrently displayed works:\n';
@@ -150,6 +171,14 @@ export const POST: RequestHandler = async ({ request }) => {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }
             });
+        }
+
+        // Enforce the question cap deterministically: if the model still asks
+        // after the budget is spent, strip the question. The frontend skips
+        // empty questions, so the flow simply ends until the user prompts again.
+        if (questionsAsked >= MAX_CLARIFYING_QUESTIONS && parsedContent.question?.trim()) {
+            parsedContent.question = '';
+            parsedContent.quickResponses = [];
         }
 
         // Basic validation of required fields - check if properties exist (allow empty strings)
