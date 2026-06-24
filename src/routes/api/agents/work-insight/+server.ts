@@ -9,38 +9,13 @@ import {
     type WorkInsightRequest,
     type WorkInsightResponse,
 } from '$lib/types.js';
+import { getPrompt } from '$lib/server/prompts';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const prompt = `You are Opus XX's programming advisor, writing a one-line artistic insight for a work card.
-The card already shows composer, instrumentation, duration, and year — never repeat them.
-The work was already selected to match the user's intention — never explain that it matches.
-
-THE INSIGHT
-One sentence, two at most (under 280 characters).
-Tell the programmer the single most interesting thing they don't already know about this work: a specific musical feature, a surprising context, or a concrete way it functions in a programme.
-Think of it as the remark a sharp colleague would add after the obvious facts are on the table.
-
-NEVER include:
-- Why the work fits the search or intention (genre, period, instrumentation, theme matches — all obvious).
-- Diversity or representation as justification.
-- Generic praise ("masterful", "stunning", "a gem") without a concrete musical observation behind it.
-- Biography, unless it directly explains the work's sound.
-- Vague evaluative adjectives without evidence.
-
-TONE
-A trusted musical colleague: direct, specific, calmly enthusiastic.
-No poetic metaphors, marketing language, exclamation marks, or emojis.
-
-Before writing, ask yourself: would a sceptical conductor learn something from this sentence? If not, find a sharper observation.
-
-Output JSON only in this exact format:
-{ "insight": "<artistic insight for the work card>" }
-
-INTENTION: `;
-
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
     try {
         const body: WorkInsightRequest = await request.json();
+        const prompt = await getPrompt(locals.supabase, 'work-insight');
 
         if (!body.work) {
             return new Response(JSON.stringify({ error: 'Work is required' }), {

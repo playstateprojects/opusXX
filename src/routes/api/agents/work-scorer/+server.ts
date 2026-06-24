@@ -9,33 +9,13 @@ import {
     type WorkScorerRequest,
     type WorkScorerResponse,
 } from '$lib/types.js';
+import { getPrompt } from '$lib/server/prompts';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
-const prompt = `You are Opus XX's programming advisor.
-You are scoring how well each work matches a user's stated intention for a concert programme.
-
-RELEVANCE SCORING GUIDE:
-- 9-10: Exceptional match - work strongly aligns with multiple aspects of the intention (theme, mood, instrumentation, style)
-- 7-8: Strong match - work clearly relates to the intention in significant ways
-- 5-6: Moderate match - work has some connection to the intention but may lack certain elements
-- 3-4: Weak match - work has tangential or minimal connection to the intention
-- 1-2: Poor match - work barely relates to the intention
-- 0: No match - work has no discernible connection to the intention
-
-IMPORTANT: Be discriminating with high scores (8-10). These should be reserved for works that genuinely excel at matching the intention. Most works should fall in the 4-7 range if they have some relevance. Don't inflate scores just because a work matches one basic criterion (e.g., period or genre alone). Score the works relative to each other.
-
-Output JSON only in this exact format:
-{
-  "scores": [
-    { "workId": "<work id or name>", "relevanceScore": <number 0-10> }
-  ]
-}
-
-INTENTION: `;
-
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
     try {
         const body: WorkScorerRequest = await request.json();
+        const prompt = await getPrompt(locals.supabase, 'work-scorer');
 
         if (!body.works || !Array.isArray(body.works) || body.works.length === 0) {
             return new Response(JSON.stringify({ error: 'Works array is required and must not be empty' }), {

@@ -7,28 +7,12 @@ import {
     type QueryMakerInfo,
     type QueryMakerResponse
 } from '$lib/types.js';
+import { getPrompt } from '$lib/server/prompts';
 import { json, type RequestHandler } from '@sveltejs/kit';
-const prompt = `Task: From the conversation log, produce (1) a clean, reusable MUSICAL INTENT (describing the type of musical work the user is searching for) and (2) a concise VECTOR QUERY.
 
-                Rules:
-                - The database ALREADY contains only works by female composers. NEVER include "female", "woman", "underrepresented", or any metadata about identity or the collection.
-                - Use ONLY what the user explicitly states: ensemble/instrumentation, mood or theme, genre/form, era if explicitly stated, length/duration if explicitly stated.
-                - Remain faithful to nuance and include detail from the user.
-                - Do not invent details, synonyms, or composer names. No explanations.
-                - Normalize:
-                - lowercase
-                - remove hashtags and filler words
-                - replace punctuation with single spaces
-                - Keep "vectorQueryTerm" short (3-12 words). If nothing usable, return empty strings.
-
-                Output JSON only:
-                {
-                "intent": "<plain text summary of the user's musical intent>",
-                "vectorQueryTerm": "<concise search string derived from the intent>"
-                }`
-
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
     const body: QueryMakerInfo = await request.json();
+    const prompt = await getPrompt(locals.supabase, 'query-maker');
     const messages: AiMessage[] = [{
         role: AiRole.User,
         content: prompt + body.chatLog

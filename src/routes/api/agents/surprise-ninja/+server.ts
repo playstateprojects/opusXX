@@ -2,6 +2,7 @@
 
 import { chat } from '$lib/server/openai';
 import { AiMessage, AiRole } from '$lib/types.js';
+import { getPrompt, renderPrompt } from '$lib/server/prompts';
 import { json, type RequestHandler } from '@sveltejs/kit';
 import type { WorkWithRelations } from '$lib/databaseTypes.js';
 
@@ -124,17 +125,20 @@ export const GET: RequestHandler = async ({ locals }) => {
 			composer_bio: composer.short_description
 		};
 
+		// Build the work details block injected into the {{WORK}} placeholder of
+		// the prompt template (stored in Supabase, slug "surprise-ninja").
+		const workLines = [
+			`Work: ${workInfo.name}`,
+			`Composer: ${workInfo.composer} (${workInfo.period || 'Unknown period'})`,
+			`Genre: ${workInfo.genre || 'Unknown'}${workInfo.subgenre ? `, ${workInfo.subgenre}` : ''}`,
+			`Instrumentation: ${workInfo.instrumentation || 'Unknown'}`
+		];
+		if (workInfo.short_description) workLines.push(`Description: ${workInfo.short_description}`);
+		if (workInfo.composer_bio) workLines.push(`About the composer: ${workInfo.composer_bio}`);
+
 		// Generate AI summary using DeepSeek via the chat function
-		const prompt = `Provide a single engaging sentence that captures why this musical work and its composer are interesting. Focus on what makes them notable, unique, or culturally significant.
-
-Work: ${workInfo.name}
-Composer: ${workInfo.composer} (${workInfo.period || 'Unknown period'})
-Genre: ${workInfo.genre || 'Unknown'}${workInfo.subgenre ? `, ${workInfo.subgenre}` : ''}
-Instrumentation: ${workInfo.instrumentation || 'Unknown'}
-${workInfo.short_description ? `Description: ${workInfo.short_description}` : ''}
-${workInfo.composer_bio ? `About the composer: ${workInfo.composer_bio}` : ''}
-
-Be concise, engaging, and informative. Avoid generic statements. Highlight specific achievements, innovations, or interesting historical context.`;
+		const template = await getPrompt(supabase, 'surprise-ninja');
+		const prompt = renderPrompt(template, { WORK: workLines.join('\n') });
 
 		const messages: AiMessage[] = [
 			{
